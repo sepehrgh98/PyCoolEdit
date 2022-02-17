@@ -15,6 +15,7 @@ class PDWToolsForm(QWidget, Form):
         super(PDWToolsForm, self).__init__()
         self.setupUi(self)
 
+
         #connections
         self.selectFileBtn.clicked.connect(self.getFilePath)
         self.filePathLineEdit.textChanged.connect(self.setFilePath)
