@@ -1,5 +1,4 @@
-from create_parser import Creator
-from PyQt5.QtCore import QObject, pyqtSlot
+from parser.create_parser import Creator, DataCreator
 
 
 def client(creator: Creator) -> None:
@@ -7,10 +6,20 @@ def client(creator: Creator) -> None:
     creator.call_parser()
 
 
-class GetBatchFile(QObject):
-    @pyqtSlot()
-    def get_batch_file(self, batch: str):
-        print("get: ", batch)
+class GetBatchFile:
+    # def __init__(self):
+    #     self.data = None
+
+    def update(self, subject):
+        if "data" in subject:
+            batch = subject["data"]
+            # if self.data is None:
+            #     self.data = DataCreator(batch)
+            # self.data.received_data = batch
+            # # print(self.data)
+            # client(self.data)
+            client(DataCreator(batch))
+            print("get: ", batch[:40])
 
 
 if __name__ == "__main__":
