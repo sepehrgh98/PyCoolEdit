@@ -7,4 +7,3 @@ if __name__ == '__main__':
     pdwForm = PDWForm()
     pdwForm.show()
     sys.exit(app.exec_())
-
