@@ -1,4 +1,4 @@
-from GUI.PDWForm import PDWForm
+from GUI.pdwform import PDWForm
 from PyQt5.QtWidgets import QApplication
 import sys
 

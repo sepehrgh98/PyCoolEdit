@@ -4,26 +4,24 @@ from PyQt5.QtCore import pyqtSignal
 
 import os
 
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'PDWTools.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwtools.ui'))[0]
 
 
 class PDWToolsForm(QWidget, Form):
-    #signals
+    # signals
     filePathChanged = pyqtSignal(str)
 
     def __init__(self):
         super(PDWToolsForm, self).__init__()
         self.setupUi(self)
 
-
-        #connections
+        # connections
         self.selectFileBtn.clicked.connect(self.getFilePath)
         self.filePathLineEdit.textChanged.connect(self.setFilePath)
 
     def getFilePath(self):
         filePath = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.txt);")[0]
         self.filePathLineEdit.setText(filePath)
-
 
     def setFilePath(self, text):
         self.filePathChanged.emit(text)
