@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from PyQt5.QtCore import pyqtSignal, QObject
-from reader import Product, Data
+from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
+from reader.reader import Product, Data
 
 
 class Creator(ABC):
@@ -20,21 +20,27 @@ class FinalMeta(type(QObject), type(Creator)):
 class DataCreator(Creator, QObject, metaclass=FinalMeta):
     reading_batch_file_is_ready = pyqtSignal(str)
 
-    def __init__(self, file_name, number_of_line_to_read_one_call=10000):
+    def __init__(self, number_of_line_to_read_one_call=10000):
         Creator.__init__(self)
         QObject.__init__(self)
-        self.file_name = file_name
+        self.file_path = ""
         self.number_of_line_to_read_one_call = number_of_line_to_read_one_call
 
+    @pyqtSlot(str)
+    def set_file_path(self, file_path):
+        print(file_path)
+        if file_path != self.file_path:
+            self.file_path = file_path
+
     def make(self) -> Product:
-        return Data(self.file_name, self.number_of_line_to_read_one_call)
+        return Data(self.file_path, self.number_of_line_to_read_one_call)
 
     def call_read(self) -> None:
         product = self.make()
-        print(product.file_name, product.number_of_line_to_read_one_call)
+        # print(product.file_name, product.number_of_line_to_read_one_call)
         result = product.read()
         for res in result:
-            print("res: ", res[:50])
+            # print("res: ", res[:50])
             self.reading_batch_file_is_ready.emit(res)
 
 # class SignalCreator(Creator):

@@ -1,16 +1,20 @@
+import os
+
 from PyQt5 import uic
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
+
+from Channel.channel import Channel
 from GUI.pdwinformationbox import PDWInformationBoxForm
 from GUI.pdwtools import PDWToolsForm
-from PyQt5.QtCore import pyqtSlot
-from Channel.channel import Channel
 from visualizationparams import DataPacket
-import os
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwui.ui'))[0]
 
 
 class PDWForm(QMainWindow, Form):
+    filePathChanged = pyqtSignal(str)
+
     def __init__(self):
         super(PDWForm, self).__init__()
         self.setupUi(self)
@@ -20,6 +24,7 @@ class PDWForm(QMainWindow, Form):
         self.rightFrameLayout.addWidget(self.toolsWidget)
         self.rightFrameLayout.addWidget(self.infBoxWidget)
 
+        self.setup_connections()
         self.channels = []
 
         # self.plot1 = ChannelForm()
@@ -33,6 +38,9 @@ class PDWForm(QMainWindow, Form):
         # x = np.linspace(0, 2 * np.pi, 2000)
         # self.plot1.feed(x, np.sin(x))
         # self.plot2.feed(x, np.cos(x))
+
+    def setup_connections(self):
+        self.toolsWidget.filePathChanged.connect(self.filePathChanged)
 
     @pyqtSlot(dict)
     def setup_channels(self, header):
