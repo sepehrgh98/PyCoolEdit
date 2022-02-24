@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
-from parser.parser import Product, Data
+from visualization.parser.parser import Product, Data
 
 
 # from visualizationparams import DataPacket

@@ -14,7 +14,7 @@ class DataHandler(QObject):
         self.reader = DataCreator()
         self.file_path_changed.connect(self.reader.set_file_path)
         self.parser = DataParser()
-        self.reader.reading_batch_file_is_ready.connect(self.parser.set_data)
+        # self.reader.reading_batch_file_is_ready.connect(self.parser.set_data)
         self.parser.data_is_ready.connect(self.packetize_data)
 
     @pyqtSlot(dict)

@@ -1,4 +1,4 @@
-from plotinteractions.baseinteraction import BaseInteraction
+from visualization.plotinteractions.baseinteraction import BaseInteraction
 import numpy
 
 

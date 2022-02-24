@@ -6,7 +6,7 @@ class ChannelData:
     def __init__(self, _id, _name):
         self._id = _id
         self._name = _name
-        self._data = np.empty()
+        self._data = None
 
     @pyqtSlot(np.ndarray)
     def feed(self, data):

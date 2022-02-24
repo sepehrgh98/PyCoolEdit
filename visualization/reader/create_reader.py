@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
-from reader.reader import Product, Data
+from visualization.reader.reader import Product, Data
 
 
 class Creator(ABC):

@@ -1,5 +1,6 @@
-from Channel.channeldata import ChannelData
-from Channel.channelform import ChannelForm
+from visualization.Channel.channeldata import ChannelData
+from visualization.Channel.channelform import ChannelForm
+
 
 
 class Channel:
@@ -14,3 +15,4 @@ class Channel:
     @property
     def plot(self):
         return self._plot
+

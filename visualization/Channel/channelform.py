@@ -2,11 +2,11 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSlot
 import os
-from visualizationplot import VisualizationPlot
+from visualization.visualizationplot import VisualizationPlot
 import matplotlib
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from visualizationparams import PlotInteraction
+from visualization.visualizationparams import PlotInteraction
 
 matplotlib.use("Qt5Agg")
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'channelui.ui'))[0]
