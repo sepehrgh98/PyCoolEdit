@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
+
 from reader.reader import Product, Data
 
 
@@ -18,7 +20,7 @@ class FinalMeta(type(QObject), type(Creator)):
 
 
 class DataCreator(Creator, QObject, metaclass=FinalMeta):
-    reading_batch_file_is_ready = pyqtSignal(str)
+    reading_batch_file_is_ready = pyqtSignal(dict)
 
     def __init__(self, number_of_line_to_read_one_call=10000):
         Creator.__init__(self)
@@ -27,10 +29,11 @@ class DataCreator(Creator, QObject, metaclass=FinalMeta):
         self.number_of_line_to_read_one_call = number_of_line_to_read_one_call
 
     @pyqtSlot(str)
-    def set_file_path(self, file_path):
-        print(file_path)
+    def set_file_path(self, file_path) -> None:
+        # print(file_path)
         if file_path != self.file_path:
             self.file_path = file_path
+            self.call_read()
 
     def make(self) -> Product:
         return Data(self.file_path, self.number_of_line_to_read_one_call)
@@ -41,7 +44,7 @@ class DataCreator(Creator, QObject, metaclass=FinalMeta):
         result = product.read()
         for res in result:
             # print("res: ", res[:50])
-            self.reading_batch_file_is_ready.emit(res)
+            self.reading_batch_file_is_ready.emit({"data": res, "end": False})
 
 # class SignalCreator(Creator):
 #     def __init__(self, file_name, chunk=1024 * 1024 * 20):
