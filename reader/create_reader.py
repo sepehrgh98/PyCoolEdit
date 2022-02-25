@@ -44,7 +44,7 @@ class DataCreator(Creator, QObject, metaclass=FinalMeta):
         result = product.read()
         for res in result:
             # print("res: ", res[:50])
-            self.reading_batch_file_is_ready.emit({"data": res, "end": False})
+            self.reading_batch_file_is_ready.emit({"data": res[0], "end": res[1]})
 
 # class SignalCreator(Creator):
 #     def __init__(self, file_name, chunk=1024 * 1024 * 20):

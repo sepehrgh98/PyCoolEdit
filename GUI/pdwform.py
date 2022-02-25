@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMainWindow
 from Channel.channel import Channel
 from GUI.pdwinformationbox import PDWInformationBoxForm
 from GUI.pdwtools import PDWToolsForm
-from visualizationparams import DataPacket
+from visualizationparams import DataPacket, PlotInteraction
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwui.ui'))[0]
 
@@ -44,11 +44,17 @@ class PDWForm(QMainWindow, Form):
 
     @pyqtSlot(dict)
     def setup_channels(self, header):
+        print("header:", header)
         for _id, _name in header.items():
-            self.channels.append(Channel(_id, _name))
+            ch = Channel(_id, _name)
+            self.channels.append(ch)
+            self.leftFrameLayout.addWidget(ch.plot)
+            ch.plot.set_interaction(PlotInteraction.Zoom)
+            ch.plot.set_interaction(PlotInteraction.Drag)
 
     @pyqtSlot(DataPacket)
     def feed(self, data_packet):
+        print(data_packet.id, len(data_packet.key), len(data_packet.data))
         for channel in self.channels:
             if channel.id == data_packet.id:
                 channel.data.feed(data_packet.data)

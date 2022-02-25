@@ -22,10 +22,10 @@ class Data(Product):
                     number += 1
                     result += line
                 else:
-                    yield result
+                    yield [result, False]
                     result = ""
                     number = 0
-            yield result
+            yield [result, True]
 
 
 # class Signal(Product):

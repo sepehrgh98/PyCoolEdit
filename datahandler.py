@@ -12,7 +12,7 @@ class DataHandler(QObject):
 
     def __init__(self):
         super(DataHandler, self).__init__()
-        self.reader = DataCreator()
+        self.reader = DataCreator(1000)
         self.file_path_changed.connect(self.reader.set_file_path)
         self.parser = DataParser()
         self.reader.reading_batch_file_is_ready.connect(self.parser.set_data)
@@ -23,20 +23,22 @@ class DataHandler(QObject):
     @pyqtSlot(list)
     def define_columns(self, columns):
         cols = dict()
-        for i in range(len(columns)):
+        for i in range(1, len(columns)):
             cols[i] = columns[i]
-        self.columns_defined.emit(columns)
+        self.columns = cols
+        # print("collls: ",self.columns)
+        self.columns_defined.emit(cols)
 
     @pyqtSlot(dict)
     def packetize_data(self, data):
-        # datas = []
-        for name, val in data:
-            final_data = DataPacket()
-            final_data.data = val
-            final_data.key = name
-            final_data.id = list(data.keys())[list(data.values()).index(name)]
-            print(final_data)
-            self.final_data_is_ready.emit(final_data)
+        for name, val in data.items():
+            if name != "TOA":
+                final_data = DataPacket()
+                final_data.data = val
+                final_data.key = data['TOA']
+                final_data.id = list(self.columns.keys())[list(self.columns.values()).index(name)]
+                # print(final_data)
+                self.final_data_is_ready.emit(final_data)
 
     @pyqtSlot(str)
     def set_file_path(self, file_path):

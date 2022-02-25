@@ -17,7 +17,7 @@ class FinalMeta(type(QObject), type(Parser)):
 class DataParser(Parser, QObject, metaclass=FinalMeta):
     data_is_ready = pyqtSignal(dict)
     columns_defined = pyqtSignal(list)
-    columns = list
+    columns = list()
     parsed_data = {}
 
     def __init__(self):
@@ -39,14 +39,15 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
             cols = line.split()
             for i in range(len(cols)):
                 col_name = self.columns[i]
-                self.parsed_data[col_name] = np.append([float(cols[i])])
+                self.parsed_data[col_name] = np.append(self.parsed_data[col_name], [float(cols[i])])
                 # self.parsed_data[col_name].append(cols[i])
         # return self.parsed_data
 
     def _set_columns(self, received_data) -> None:
         if not self.columns:
-            if self._has_columns():
-                self.columns = received_data.split("\n")[0].split()
+            if self._has_columns(received_data):
+                self.columns = received_data.split("\n")[0].split()[1:]
+                print(self.columns)
                 # cols = received_data.split("\n")[0].split()
                 # for i in range(len(cols)):
                 #     self.columns.setdefault(cols[i], [])
@@ -55,6 +56,7 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
                 print("ERORRRRRRR!")
 
     def _init_data(self) -> None:
+        # print(self.columns)
         for column in self.columns:
             self.parsed_data[column] = np.ndarray(0)
 
