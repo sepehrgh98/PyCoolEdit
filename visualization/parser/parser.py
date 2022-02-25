@@ -3,13 +3,13 @@ from abc import ABC, abstractmethod
 
 class Product(ABC):
     @abstractmethod
-    def parse(self) -> str:
+    def parse(self) -> dict:
         pass
 
 
 class Data(Product):
-    def __init__(self, recieved_data, columns):
-        self.recieved_data = recieved_data
+    def __init__(self, received_data, columns):
+        self.received_data = received_data
         self.columns = columns
         self.parsed_data = {}
 
@@ -23,27 +23,27 @@ class Data(Product):
                 self.parsed_data[col_name].append(cols[i])
         return self.parsed_data
 
-    def _set_columns(self) -> void:
-        if self.columns == []:
+    def _set_columns(self) -> None:
+        if not self.columns:
             if self._has_columns():
                 self.columns = self.recieved_data.split("\n")[0].split()
             else:
                 print("ERORRRRRRR!")
 
-    def _init_data(self) -> void:
+    def _init_data(self) -> None:
         for column in self.columns:
             self.parsed_data[column] = []
 
     def _has_columns(self) -> bool:
         first_line = self.recieved_data.split("\n")[0]
         if first_line[0] != "%":
-            return false
-        return true
+            return False
+        return True
 
 
 class Signal(Product):
-    def __init__(self, recieved_data):
-        self.recieved_data = recieved_data
+    def __init__(self, received_data):
+        self.received_data = received_data
 
     def parse(self) -> str:
         pass

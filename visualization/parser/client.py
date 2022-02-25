@@ -7,10 +7,10 @@ def client(creator: Creator) -> None:
     creator.call_parser()
 
 
-class GetBatchFile(QObject):
-    @pyqtSlot()
-    def get_batch_file(self, batch: str):
-        print("get: ", batch)
+# class GetBatchFile(QObject):
+#     # @pyqtSlot(dict)
+#     def get_batch_file(self, batch: str):
+#         print("get: ", batch)
 
 
 if __name__ == "__main__":

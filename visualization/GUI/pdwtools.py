@@ -1,8 +1,8 @@
-from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5.QtCore import pyqtSignal
-
 import os
+
+from PyQt5 import uic
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QWidget, QFileDialog
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwtools.ui'))[0]
 
