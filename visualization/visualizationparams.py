@@ -1,4 +1,5 @@
 import enum
+import numpy as np
 
 
 class PlotInteraction(enum.Enum):

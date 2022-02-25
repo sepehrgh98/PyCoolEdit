@@ -1,5 +1,5 @@
-from Channel.channeldata import ChannelData
-from Channel.channelform import ChannelForm
+from visualization.Channel.channeldata import ChannelData
+from visualization.Channel.channelform import ChannelForm
 
 
 class Channel:
@@ -36,5 +36,3 @@ class Channel:
         if not isinstance(a, str):
             raise ValueError("name must be integer!")
         self._name = a
-
-

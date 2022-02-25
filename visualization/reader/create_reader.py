@@ -1,8 +1,7 @@
+from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
 from abc import ABC, abstractmethod
 
-from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
-
-from reader.reader import Product, Data
+from visualization.reader.reader import Product, Data
 
 
 class Creator(ABC):
@@ -43,13 +42,5 @@ class DataCreator(Creator, QObject, metaclass=FinalMeta):
         # print(product.file_name, product.number_of_line_to_read_one_call)
         result = product.read()
         for res in result:
-            # print("res: ", res[:50])
             self.reading_batch_file_is_ready.emit({"data": res[0], "end": res[1]})
 
-# class SignalCreator(Creator):
-#     def __init__(self, file_name, chunk=1024 * 1024 * 20):
-#         self.file_name = file_name
-#
-#     def make(self) -> Product:
-#         pass
-#         # return Signal(self.file_name, self.chunk)

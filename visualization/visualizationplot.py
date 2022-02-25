@@ -1,7 +1,7 @@
 import matplotlib
 from matplotlib.figure import Figure
-from plotinteractions.scrollzoominteraction import ZoomOnWheel
-from plotinteractions.mousedraginteraction import DragMove
+from visualization.plotinteractions.scrollzoominteraction import ZoomOnWheel
+from visualization.plotinteractions.mousedraginteraction import PanAndZoom
 
 matplotlib.use("Qt5Agg")
 
@@ -9,6 +9,7 @@ matplotlib.use("Qt5Agg")
 class VisualizationPlot(Figure):
     def __init__(self):
         super(VisualizationPlot, self).__init__()
+
         self.zoomInteraction = None
         self.dragMoveInteraction = None
 
@@ -21,7 +22,7 @@ class VisualizationPlot(Figure):
 
     def set_drag_interaction(self, active):
         if active:
-            self.dragMoveInteraction = DragMove(self)
+            self.dragMoveInteraction = PanAndZoom(self)
         # else:
         #     if self.dragMoveInteraction:
         #         self.dragMoveInteraction.disconnect()

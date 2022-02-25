@@ -2,14 +2,14 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSlot
 import os
-from visualizationplot import VisualizationPlot
+from visualization.visualizationplot import VisualizationPlot
 import matplotlib
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from visualizationparams import PlotInteraction
+from visualization.visualizationparams import PlotInteraction
 
 matplotlib.use("Qt5Agg")
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'channelui.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'channelui.ui'))[0]
 
 
 class ChannelForm(QWidget, Form):
@@ -24,6 +24,9 @@ class ChannelForm(QWidget, Form):
         self.fig = VisualizationPlot()
         self.axis = self.fig.add_subplot(111)
         self.canv = FigureCanvas(self.fig)
+
+        # style
+        self.setup_style()
 
         # add plot to ui
         self.mainPlotLayout.addWidget(self.canv)
@@ -61,3 +64,7 @@ class ChannelForm(QWidget, Form):
         if not isinstance(a, str):
             raise ValueError("name must be integer!")
         self._name = a
+
+    def setup_style(self):
+        pass
+        # self.axis.set_facecolor((100, 100, 100))

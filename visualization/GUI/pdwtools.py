@@ -4,7 +4,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QFileDialog
 
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwtools.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdwtools.ui'))[0]
 
 
 class PDWToolsForm(QWidget, Form):

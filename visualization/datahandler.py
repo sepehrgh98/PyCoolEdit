@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
-from parser.dataparser import DataParser
-from reader.create_reader import DataCreator
-from visualizationparams import DataPacket
+from visualization.parser.dataparser import DataParser
+from visualization.reader.create_reader import DataCreator
+from visualization.visualizationparams import DataPacket
 
 
 class DataHandler(QObject):
@@ -26,7 +26,7 @@ class DataHandler(QObject):
         for i in range(1, len(columns)):
             cols[i] = columns[i]
         self.columns = cols
-        # print("collls: ",self.columns)
+        # print("collls: ", self.columns)
         self.columns_defined.emit(cols)
 
     @pyqtSlot(dict)

@@ -1,15 +1,15 @@
 import os
-
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
 
-from Channel.channel import Channel
-from GUI.pdwinformationbox import PDWInformationBoxForm
-from GUI.pdwtools import PDWToolsForm
-from visualizationparams import DataPacket, PlotInteraction
+from visualization.Channel.channel import Channel
+# from visualization.Channel.channel import Channel
+from visualization.GUI.pdwinformationbox import PDWInformationBoxForm
+from visualization.GUI.pdwtools import PDWToolsForm
+from visualization.visualizationparams import DataPacket, PlotInteraction
 
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwui.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdwui.ui'))[0]
 
 
 class PDWForm(QMainWindow, Form):
@@ -27,24 +27,24 @@ class PDWForm(QMainWindow, Form):
         self.setup_connections()
         self.channels = []
 
-        # self.plot1 = ChannelForm()
-        # self.leftFrameLayout.addWidget(self.plot1)
-        # self.plot1.set_interaction(PlotInteraction.Zoom)
-        # self.plot1.set_interaction(PlotInteraction.Drag)
+        # self.ch1 = Channel(1, "a")
+        # self.leftFrameLayout.addWidget(self.ch1.plot)
+        # self.ch1.plot.set_interaction(PlotInteraction.Zoom)
+        # self.ch1.plot.set_interaction(PlotInteraction.Drag)
         #
-        # self.plot2 = ChannelForm()
-        # self.leftFrameLayout.addWidget(self.plot2)
+        # self.ch2 = Channel(2 , "b")
+        # self.leftFrameLayout.addWidget(self.ch2.plot)
         #
         # x = np.linspace(0, 2 * np.pi, 2000)
-        # self.plot1.feed(x, np.sin(x))
-        # self.plot2.feed(x, np.cos(x))
+        # self.ch1.plot.feed(x, np.sin(x))
+        # self.ch1.data.feed(np.sin(x))
+        # self.ch2.plot.feed(x, np.cos(x))
 
     def setup_connections(self):
         self.toolsWidget.filePathChanged.connect(self.filePathChanged)
 
     @pyqtSlot(dict)
     def setup_channels(self, header):
-        print("header:", header)
         for _id, _name in header.items():
             ch = Channel(_id, _name)
             self.channels.append(ch)
@@ -54,7 +54,6 @@ class PDWForm(QMainWindow, Form):
 
     @pyqtSlot(DataPacket)
     def feed(self, data_packet):
-        print(data_packet.id, len(data_packet.key), len(data_packet.data))
         for channel in self.channels:
             if channel.id == data_packet.id:
                 channel.data.feed(data_packet.data)

@@ -47,7 +47,7 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
         if not self.columns:
             if self._has_columns(received_data):
                 self.columns = received_data.split("\n")[0].split()[1:]
-                print(self.columns)
+                # print(self.columns)
                 # cols = received_data.split("\n")[0].split()
                 # for i in range(len(cols)):
                 #     self.columns.setdefault(cols[i], [])
