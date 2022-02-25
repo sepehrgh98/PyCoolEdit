@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSlot, QDateTime
 import os
 
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwinformationbox.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdwinformationbox.ui'))[0]
 
 
 class PDWInformationBoxForm(QWidget, Form):

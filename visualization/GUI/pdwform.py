@@ -9,7 +9,7 @@ from visualization.GUI.pdwinformationbox import PDWInformationBoxForm
 from visualization.GUI.pdwtools import PDWToolsForm
 from visualization.visualizationparams import DataPacket, PlotInteraction
 
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'GUI', 'pdwui.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdwui.ui'))[0]
 
 
 class PDWForm(QMainWindow, Form):

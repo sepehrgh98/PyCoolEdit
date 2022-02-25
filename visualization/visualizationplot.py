@@ -9,6 +9,7 @@ matplotlib.use("Qt5Agg")
 class VisualizationPlot(Figure):
     def __init__(self):
         super(VisualizationPlot, self).__init__()
+
         self.zoomInteraction = None
         self.dragMoveInteraction = None
 

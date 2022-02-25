@@ -1,14 +1,10 @@
-import sys
-
-from PyQt5.QtWidgets import QApplication
-
+from PyQt5.QtWidgets import QMainWindow
 from GUI.pdwform import PDWForm
-from datahandler import DataHandler
 
 
-class Visualization(QApplication):
+class MainWindow(QMainWindow):
     def __init__(self):
-        super(Visualization, self).__init__([])
+        super(MainWindow, self).__init__()
         self.pdw_form = PDWForm()
         # self.data_handler = DataHandler()
         # self.pdw_form.filePathChanged.connect(self.data_handler.set_file_path)
@@ -16,9 +12,4 @@ class Visualization(QApplication):
         self.pdw_form.show()
 
 
-if __name__ == '__main__':
-    # app = QApplication([])
-    v = Visualization()
-    # v = PDWForm()
-    # pdwForm.show()
-    sys.exit(v.exec_())
+
