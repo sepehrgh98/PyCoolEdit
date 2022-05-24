@@ -29,7 +29,6 @@ class DataCreator(Creator, QObject, metaclass=FinalMeta):
 
     @pyqtSlot(str)
     def set_file_path(self, file_path) -> None:
-        # print(file_path)
         if file_path != self.file_path:
             self.file_path = file_path
             self.call_read()

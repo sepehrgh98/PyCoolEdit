@@ -1,7 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from visualization.mainwindow import MainWindow
-from PyQt5.QtCore import QFile, QIODevice, QVariant
 import os
 
 if __name__ == '__main__':
@@ -9,14 +8,10 @@ if __name__ == '__main__':
     app.setOrganizationName("AUT")
     app.setApplicationName("Visualization")
     app.setApplicationDisplayName("Visualization")
-    path = os.path.join(os.getcwd(), 'visualization', 'Resources', 'style.css')
-    # print(path)
-    styleFile = QFile(path)
-    styleFile.open(QIODevice.ReadOnly)
-    if styleFile.isOpen():
-        # print("is")
-        app.setStyleSheet(str(QVariant(styleFile.readAll())))
-    styleFile.close()
+    path = os.path.join(os.getcwd(), 'visualization', 'Resources', 'style.qss')
+    with open(path, "r") as f:
+        _style = f.read()
+        app.setStyleSheet(_style)
 
     p = MainWindow()
     sys.exit(app.exec_())

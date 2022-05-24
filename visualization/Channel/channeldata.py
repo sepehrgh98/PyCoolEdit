@@ -7,10 +7,12 @@ class ChannelData:
         self._id = _id
         self._name = _name
         self._data = None
+        self.range = ()
 
     @pyqtSlot(np.ndarray)
     def feed(self, data):
         self._data = data
+        self.set_range(data.min(), data.max())
 
     @property
     def id(self):
@@ -31,3 +33,9 @@ class ChannelData:
         if not isinstance(a, str):
             raise ValueError("name must be integer!")
         self._name = a
+
+    def get_data(self):
+        return self._data
+
+    def set_range(self, dmin, dmax):
+        self.range = (dmin, dmax)

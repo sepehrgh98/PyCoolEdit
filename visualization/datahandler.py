@@ -37,7 +37,6 @@ class DataHandler(QObject):
                 final_data.data = val
                 final_data.key = data['TOA']
                 final_data.id = list(self.columns.keys())[list(self.columns.values()).index(name)]
-                # print(final_data)
                 self.final_data_is_ready.emit(final_data)
 
     @pyqtSlot(str)

@@ -10,18 +10,32 @@ Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdwtool
 class PDWToolsForm(QWidget, Form):
     # signals
     filePathChanged = pyqtSignal(str)
+    plotDataRequested = pyqtSignal()
 
     def __init__(self):
         super(PDWToolsForm, self).__init__()
         self.setupUi(self)
 
+        # variables
+        self.file_path = None
+
+        # configs
+        self.selectFileBtn.setToolTip('Select Pdw File')
+        self.showDataBtn.setToolTip('Show Data')
+        self.newRadarBtn.setToolTip('New Radar')
+        self.selectAllBtn.setToolTip('Select All Data')
+        self.clearBtn.setToolTip('Clear All Channels')
+        self.extractBtn.setToolTip('Extract Selected Data')
+
         # connections
-        self.selectFileBtn.clicked.connect(self.getFilePath)
-        self.filePathLineEdit.textChanged.connect(self.setFilePath)
+        self.selectFileBtn.clicked.connect(self.get_file_path)
+        self.showDataBtn.clicked.connect(self.plotDataRequested)
 
-    def getFilePath(self):
-        filePath = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.txt);")[0]
-        self.filePathLineEdit.setText(filePath)
+    def get_file_path(self):
+        new_path = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.txt);")[0]
+        if self.file_path != new_path:
+            self.file_path = new_path
+            self.filePathChanged.emit(self.file_path)
 
-    def setFilePath(self, text):
+    def set_file_path(self, text):
         self.filePathChanged.emit(text)

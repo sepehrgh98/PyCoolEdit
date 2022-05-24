@@ -24,6 +24,7 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
         super(DataParser, self).__init__()
         # self.received_data = None
         # self.columns = list
+        self.initilize_data = True
 
     @pyqtSlot(dict)
     def set_data(self, received_data) -> None:
@@ -34,7 +35,10 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
 
     def parse(self, received_data) -> None:
         self._set_columns(received_data)
-        self._init_data()
+        if self.initilize_data:
+            self._init_data()
+            self.initilize_data = False
+
         for line in received_data.split("\n")[2:]:
             cols = line.split()
             for i in range(len(cols)):
@@ -47,16 +51,11 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
         if not self.columns:
             if self._has_columns(received_data):
                 self.columns = received_data.split("\n")[0].split()[1:]
-                # print(self.columns)
-                # cols = received_data.split("\n")[0].split()
-                # for i in range(len(cols)):
-                #     self.columns.setdefault(cols[i], [])
                 self.columns_defined.emit(self.columns)
             else:
                 print("ERORRRRRRR!")
 
     def _init_data(self) -> None:
-        # print(self.columns)
         for column in self.columns:
             self.parsed_data[column] = np.ndarray(0)
 

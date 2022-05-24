@@ -3,10 +3,17 @@ import numpy as np
 
 
 class PlotInteraction(enum.Enum):
-    Zoom = 1
+    ZoomOnWheel = 1
     Drag = 2
-    VerticalSelect = 3
-    HorizontalSelect = 4
+    Select = 3
+    DoubleClick = 4
+    ZoomOnBox = 5
+
+
+class PlotMethods(enum.Enum):
+    Plot = 1
+    Scatter = 2
+    Bar = 3
 
 
 class DataPacket:
