@@ -30,8 +30,12 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
     def set_data(self, received_data) -> None:
         if received_data['data']:
             self.parse(received_data['data'])
-            if received_data['end']:
-                self.data_is_ready.emit(self.parsed_data)
+            # if received_data['end']:
+            #     self.data_is_ready.emit(self.parsed_data)
+
+    @pyqtSlot()
+    def send_data(self):
+        self.data_is_ready.emit(self.parsed_data)
 
     def parse(self, received_data) -> None:
         self._set_columns(received_data)

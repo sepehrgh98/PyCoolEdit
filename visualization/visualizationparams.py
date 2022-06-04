@@ -33,7 +33,6 @@ class DataPacket:
     @property
     def key(self):
         return self._key
-        # self._key = _key
 
     @key.setter
     def key(self, _key):

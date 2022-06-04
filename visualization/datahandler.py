@@ -9,6 +9,7 @@ class DataHandler(QObject):
     file_path_changed = pyqtSignal(str)
     final_data_is_ready = pyqtSignal(DataPacket)
     columns_defined = pyqtSignal(dict)
+    dataRequest = pyqtSignal()
 
     def __init__(self):
         super(DataHandler, self).__init__()
@@ -18,6 +19,7 @@ class DataHandler(QObject):
         self.reader.reading_batch_file_is_ready.connect(self.parser.set_data)
         self.parser.columns_defined.connect(self.define_columns)
         self.parser.data_is_ready.connect(self.packetize_data)
+        self.dataRequest.connect(self.parser.send_data)
         self.columns = dict()
 
     @pyqtSlot(list)
@@ -26,7 +28,6 @@ class DataHandler(QObject):
         for i in range(1, len(columns)):
             cols[i] = columns[i]
         self.columns = cols
-        # print("collls: ", self.columns)
         self.columns_defined.emit(cols)
 
     @pyqtSlot(dict)

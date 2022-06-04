@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>426</width>
-    <height>190</height>
+    <width>289</width>
+    <height>275</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,36 +50,6 @@
       <property name="spacing">
        <number>5</number>
       </property>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="newRadarBtn">
-        <property name="minimumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <selectedon>../Resources/icons/radar.png</selectedon>
-         </iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="selectFileBtn">
         <property name="minimumSize">
@@ -101,6 +71,36 @@
          <iconset>
           <selectedoff>../Resources/icons/add-file.png</selectedoff>
           <selectedon>../Resources/icons/download-file.png</selectedon>
+         </iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="showDataBtn">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <selectedon>../Resources/icons/play-button.png</selectedon>
          </iconset>
         </property>
         <property name="iconSize">
@@ -141,8 +141,8 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="showDataBtn">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="newRadarBtn">
         <property name="minimumSize">
          <size>
           <width>60</width>
@@ -160,7 +160,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <selectedon>../Resources/icons/play-button.png</selectedon>
+          <selectedon>../Resources/icons/radar.png</selectedon>
          </iconset>
         </property>
         <property name="iconSize">
@@ -171,7 +171,37 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
+      <item row="0" column="3">
+       <widget class="QPushButton" name="clearBtn">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <selectedon>../Resources/icons/delete.png</selectedon>
+         </iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
        <widget class="QPushButton" name="extractBtn">
         <property name="minimumSize">
          <size>
@@ -201,32 +231,15 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="clearBtn">
-        <property name="minimumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="selectBtn">
         <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <selectedon>../Resources/icons/delete.png</selectedon>
-         </iconset>
+         <string>select</string>
         </property>
         <property name="iconSize">
          <size>
-          <width>40</width>
-          <height>40</height>
+          <width>60</width>
+          <height>60</height>
          </size>
         </property>
        </widget>

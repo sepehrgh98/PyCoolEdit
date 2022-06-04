@@ -13,3 +13,5 @@ class MainWindow(QMainWindow):
         self.data_handler.columns_defined.connect(self.pdw_form.setup_channels)
         self.data_handler.final_data_is_ready.connect(self.pdw_form.feed)
         self.pdw_form.show()
+
+        self.pdw_form.dataRequested.connect(self.data_handler.dataRequest)
