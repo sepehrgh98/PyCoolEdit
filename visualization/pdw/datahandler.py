@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
-from visualization.parser.dataparser import DataParser
-from visualization.reader.create_reader import DataCreator
+from visualization.pdw.parser.dataparser import DataParser
+from visualization.pdw.reader.create_reader import DataCreator
 from visualization.visualizationparams import DataPacket
 
 

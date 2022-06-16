@@ -4,7 +4,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget
 
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'datainformationbox.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'datainformationbox.ui'))[0]
 
 
 class DataInformationForm(QWidget, Form):

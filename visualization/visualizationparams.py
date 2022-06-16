@@ -45,3 +45,13 @@ class DataPacket:
     @data.setter
     def data(self, _data):
         self._data = _data
+
+
+class ChannelType(enum.Enum):
+    Omni = 1
+    DF = 2
+    Freq = 3
+    PW = 4
+    AOA = 5
+    CW = 6
+

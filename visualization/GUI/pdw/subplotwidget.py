@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QScrollArea
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from PyQt5.QtCore import Qt, pyqtSignal
-from matplotlib.widgets import SpanSelector
+from matplotlib.widgets import RectangleSelector
 
 
 class SubPlotWidget(QWidget):
-    selectionRangeHasBeenSet = pyqtSignal("double", "double")
+    selectionRangeHasBeenSet = pyqtSignal(tuple, tuple)
 
     def __init__(self, fig):
         QWidget.__init__(self)
@@ -32,30 +32,33 @@ class SubPlotWidget(QWidget):
 
         # list to store the axis last used with a mouseclick
         self.curr_ax = []
-        self.list_of_spans = []
+        self.list_of_select_box = []
 
     def enable_select_action(self):
         if self.fig.axes:
-            self.list_of_spans = [SpanSelector(
+            # self.list_of_select_box = [RectangleSelector(
+            #     ax,
+            #     self.onselect,
+            #     "horizontal",
+            #     useblit=True,
+            #     props=dict(alpha=0.5, facecolor="tab:red"),
+            #     interactive=True,
+            #     drag_from_anywhere=True
+            # ) for ax in self.fig.axes]
+            self.list_of_select_box = [RectangleSelector(
                 ax,
                 self.onselect,
-                "horizontal",
+                drawtype='box',
                 useblit=True,
-                props=dict(alpha=0.5, facecolor="tab:red"),
-                interactive=True,
-                drag_from_anywhere=True
-            ) for ax in self.fig.axes]
+                button=[1]) for ax in self.fig.axes]
             self.canvas.mpl_connect('button_press_event', self.on_mouse_press)
 
     def on_mouse_press(self, event):
         if event.inaxes:
             self.curr_ax[:] = [event.inaxes]
 
-    def onselect(self, xmin, xmax):
-        if xmin == xmax:
-            return
-        self.fig.canvas.draw_idle()
-        self.selectionRangeHasBeenSet.emit(xmin, xmax)
+    def onselect(self, eclick, erelease):
+        self.selectionRangeHasBeenSet.emit((eclick.x, erelease.x), (eclick.y, erelease.y))
 
     def get_canvas(self):
         return self.canvas

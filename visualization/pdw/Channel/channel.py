@@ -1,13 +1,12 @@
 from PyQt5 import uic
 from matplotlib.axes._axes import Axes
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 import os
 import matplotlib
 import numpy as np
-from visualization.visualizationparams import PlotInteraction, PlotMethods
 
 matplotlib.use("Qt5Agg")
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'channelui.ui'))[0]
+Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'channelui.ui'))[0]
 
 
 class Channel:
@@ -45,8 +44,7 @@ class Channel:
         self._max = max(data_list)
         self._min = min(data_list)
         self.feed_time(x)
-        self._axis.scatter(x, data_list, linewidths=1.5, color=color)
-        # self.canvas.draw()
+        self._axis.scatter(x, data_list, linewidths=1.5, color=color, s=0.5)
 
     def feed_time(self, x):
         self.time = x
@@ -80,7 +78,7 @@ class Channel:
         self._axis.spines['right'].set_color(self.plot_detail_color)
         self._axis.spines['left'].set_color(self.plot_detail_color)
         self._axis.grid(axis='both', ls='--', alpha=0.4)
-        self._axis.xaxis.set_visible(False)
+        # self._axis.xaxis.set_visible(False)
         self._axis.set_ylabel(self._name, fontsize=self.title_size, fontname=self.font_name,
                               fontweight=self.font_weight,
                               color=self.font_color)
