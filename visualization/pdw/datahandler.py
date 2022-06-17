@@ -9,7 +9,7 @@ class DataHandler(QObject):
     file_path_changed = pyqtSignal(str)
     final_data_is_ready = pyqtSignal(DataPacket)
     columns_defined = pyqtSignal(dict)
-    dataRequest = pyqtSignal()
+    dataRequest = pyqtSignal(tuple, tuple)  # time Range & value Range
 
     def __init__(self):
         super(DataHandler, self).__init__()

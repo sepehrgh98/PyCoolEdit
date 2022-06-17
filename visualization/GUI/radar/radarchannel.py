@@ -48,7 +48,7 @@ class RadarChannelForm(QWidget, Form):
         self.data_color = '#b0e0e6'
         self.fig_color = '#151a1e'
 
-        # setup fig
+        # style fig
         self.fig.patch.set_color('#151a1e')
         self.fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.993, wspace=0, hspace=0.2)
         self.fig.tight_layout()
@@ -86,7 +86,7 @@ class RadarChannelForm(QWidget, Form):
         self.hist_plot.grid(axis='both', ls='--', alpha=0.4)
 
     def feed(self, time, val):
-        self.main_plot.scatter(time, val, linewidths=1.5)
+        self.main_plot.plot(time, val, 'o', markersize=0.8)
         self.hist_plot.hist(val, bins=self.bin)
 
     @property
