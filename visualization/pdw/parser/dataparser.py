@@ -4,6 +4,12 @@ import numpy as np
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 
+def find_nearest_value_indx(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return idx
+
+
 class Parser(ABC):
     @abstractmethod
     def parse(self) -> dict:
@@ -30,12 +36,17 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
     def set_data(self, received_data) -> None:
         if received_data['data']:
             self.parse(received_data['data'])
-            # if received_data['end']:
-            #     self.data_is_ready.emit(self.parsed_data)
+            if received_data['end']:
+                self.data_is_ready.emit(self.parsed_data)
 
-    @pyqtSlot()
-    def send_data(self):
-        self.data_is_ready.emit(self.parsed_data)
+    @pyqtSlot(tuple, tuple)
+    def send_data(self, time_range, value_range):
+        first_x_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[0])
+        last_x_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[1])
+        requested_data = dict()
+        for key, val in self.parsed_data.items():
+            requested_data[key] = val[first_x_index:last_x_index]
+        self.data_is_ready.emit(requested_data)
 
     def parse(self, received_data) -> None:
         self._set_columns(received_data)

@@ -36,21 +36,16 @@ class SubPlotWidget(QWidget):
 
     def enable_select_action(self):
         if self.fig.axes:
-            # self.list_of_select_box = [RectangleSelector(
-            #     ax,
-            #     self.onselect,
-            #     "horizontal",
-            #     useblit=True,
-            #     props=dict(alpha=0.5, facecolor="tab:red"),
-            #     interactive=True,
-            #     drag_from_anywhere=True
-            # ) for ax in self.fig.axes]
             self.list_of_select_box = [RectangleSelector(
                 ax,
                 self.onselect,
                 drawtype='box',
                 useblit=True,
-                button=[1]) for ax in self.fig.axes]
+                button=[1, 3],  # disable middle button
+                minspanx=5, minspany=5,
+                spancoords='pixels',
+                interactive=False,
+            ) for ax in self.fig.axes]
             self.canvas.mpl_connect('button_press_event', self.on_mouse_press)
 
     def on_mouse_press(self, event):
@@ -58,7 +53,9 @@ class SubPlotWidget(QWidget):
             self.curr_ax[:] = [event.inaxes]
 
     def onselect(self, eclick, erelease):
-        self.selectionRangeHasBeenSet.emit((eclick.x, erelease.x), (eclick.y, erelease.y))
+        pre_coor = self.curr_ax[:][0].transData.inverted().transform((eclick.x, eclick.y))
+        rel_coor = self.curr_ax[:][0].transData.inverted().transform((erelease.x, erelease.y))
+        self.selectionRangeHasBeenSet.emit((pre_coor[0], rel_coor[0]), (pre_coor[1], rel_coor[1]))
 
     def get_canvas(self):
         return self.canvas

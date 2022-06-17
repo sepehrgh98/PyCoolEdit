@@ -27,6 +27,7 @@ class Channel:
         self._max = None
         self._min = None
         self.time_range = ()
+        self.selected_area = None
 
         # style
         self.tick_size = 7
@@ -40,11 +41,15 @@ class Channel:
         self.fig_color = '#151a1e'
 
     @pyqtSlot(np.ndarray, list)
-    def feed(self, x, data_list, color):
+    def feed(self, x, data_list, color, mood="initilize"):
+        if self.selected_area:
+            self.selected_area.set_data([], [])
         self._max = max(data_list)
         self._min = min(data_list)
         self.feed_time(x)
-        self._axis.scatter(x, data_list, linewidths=1.5, color=color, s=0.5)
+        line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+        if mood == "selection":
+            self.selected_area = line
 
     def feed_time(self, x):
         self.time = x

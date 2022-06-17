@@ -3,7 +3,7 @@ from PyQt5.QtCore import QObject, pyqtSlot
 
 
 def client(creator: Creator) -> None:
-    #    get signal from reader and call_parser
+    #    get Signal from reader and call_parser
     creator.call_parser()
 
 

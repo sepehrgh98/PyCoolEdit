@@ -10,7 +10,7 @@ Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', '
 class PDWToolsForm(QWidget, Form):
     # signals
     filePathChanged = pyqtSignal(str)
-    dataRequested = pyqtSignal()
+    # dataRequested = pyqtSignal()
     selectBtnPressed = pyqtSignal()
     radarRequested = pyqtSignal()
 
@@ -31,13 +31,12 @@ class PDWToolsForm(QWidget, Form):
 
         # connections
         self.selectFileBtn.clicked.connect(self.get_file_path)
-        self.showDataBtn.clicked.connect(self.dataRequested)
+        # self.showDataBtn.clicked.connect(self.dataRequested)
         self.selectBtn.clicked.connect(self.selectBtnPressed)
         self.selectBtn.clicked.connect(self.selectBtnPressed)
         self.newRadarBtn.clicked.connect(self.radarRequested)
 
     def get_file_path(self):
-        self.selectFileBtn.setEnabled(False)
         new_path = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.txt);")[0]
         if self.file_path != new_path:
             self.file_path = new_path
@@ -45,6 +44,3 @@ class PDWToolsForm(QWidget, Form):
 
     def set_file_path(self, text):
         self.filePathChanged.emit(text)
-
-    def open_setting_panel(self):
-        self.settingPanel.show()
