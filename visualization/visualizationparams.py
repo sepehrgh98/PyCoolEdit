@@ -15,6 +15,10 @@ class PlotMethods(enum.Enum):
     Scatter = 2
     Bar = 3
 
+class FeedMood(enum.Enum):
+    main_data = 1
+    select = 2
+
 
 class DataPacket:
     def __init__(self):
@@ -47,11 +51,33 @@ class DataPacket:
         self._data = _data
 
 
-class ChannelType(enum.Enum):
-    Omni = 1
-    DF = 2
-    Freq = 3
-    PW = 4
-    AOA = 5
-    CW = 6
+class SignalDataPacket:
+    def __init__(self):
+        self._id = None
+        self._key = None
+        self._data = None
+
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, _id):
+        self._id = _id
+
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, _key):
+        self._key = _key
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self, _data):
+        self._data = _data
 

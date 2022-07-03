@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot
+from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread
 from abc import ABC, abstractmethod
 
 from visualization.pdw.reader.reader import Product, Data
@@ -26,6 +26,12 @@ class DataCreator(Creator, QObject, metaclass=FinalMeta):
         QObject.__init__(self)
         self.file_path = ""
         self.number_of_line_to_read_one_call = number_of_line_to_read_one_call
+
+        # moving to thread
+        self.objThread = QThread()
+        self.moveToThread(self.objThread)
+        self.objThread.finished.connect(self.objThread.deleteLater)
+        self.objThread.start()
 
     @pyqtSlot(str)
     def set_file_path(self, file_path) -> None:

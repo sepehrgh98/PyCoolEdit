@@ -18,7 +18,8 @@ class SignalInformationForm(QWidget, Form):
 
     def applyBtn_clicked(self):
         number_of_channels = int(self.channelNumberComboBox.currentText())
-        data_sign = self.dataSignComboBox.currentText()
-        file_info = {"number_of_channels": number_of_channels, "data_sign": data_sign}
+        data_sign = self.signCheckBox.isChecked()
+        big_endin = self.bigEndinCheckBox.isChecked()
+        file_info = {"channels": number_of_channels, "signed": data_sign, "big_endin": big_endin}
         self.file_info_is_ready.emit(file_info)
         self.close()

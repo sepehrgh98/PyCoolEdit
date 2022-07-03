@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>209</height>
+    <width>370</width>
+    <height>154</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,33 +76,12 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QComboBox" name="dataSignComboBox">
-        <item>
-         <property name="text">
-          <string>signed</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>unsigned</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QRadioButton" name="radioButton">
+       <widget class="QCheckBox" name="signCheckBox">
         <property name="text">
-         <string>Little Endin</string>
+         <string>signed</string>
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QRadioButton" name="radioButton_2">
-        <property name="text">
-         <string>Big Endin</string>
         </property>
        </widget>
       </item>
@@ -110,6 +89,16 @@
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Endin:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QCheckBox" name="bigEndinCheckBox">
+        <property name="text">
+         <string>big endin</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

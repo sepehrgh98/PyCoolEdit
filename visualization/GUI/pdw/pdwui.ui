@@ -15,6 +15,21 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QFrame" name="leftFrame">
       <property name="frameShape">
@@ -23,7 +38,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" name="leftVerticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -52,6 +67,27 @@
            <number>0</number>
           </property>
           <property name="leftMargin">
+           <number>11</number>
+          </property>
+          <property name="topMargin">
+           <number>11</number>
+          </property>
+          <property name="rightMargin">
+           <number>11</number>
+          </property>
+          <property name="bottomMargin">
+           <number>11</number>
+          </property>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="plotWidget" native="true">
+         <layout class="QHBoxLayout" name="plotLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
            <number>0</number>
           </property>
           <property name="topMargin">
@@ -63,19 +99,6 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
        </item>
@@ -102,7 +125,23 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" name="rightFrameLayout"/>
+      <layout class="QVBoxLayout" name="rightFrameLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
      </widget>
     </item>
    </layout>

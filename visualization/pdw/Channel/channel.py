@@ -12,13 +12,14 @@ Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', '
 class Channel:
     dataRequested = pyqtSignal(int, tuple, tuple)  # channel_id , x_range , y_range
 
-    def __init__(self, _id, _name, axis, _canvas):
+    def __init__(self, _id, _name, axis, _canvas, _hist_axis):
 
         # initialize
         self._id = _id
         self._name = _name
         self._axis = axis
         self.canvas = _canvas
+        self._hist_axis = _hist_axis
 
         # variables
         self.properties = dict()
@@ -27,7 +28,7 @@ class Channel:
         self._max = None
         self._min = None
         self.time_range = ()
-        self.selected_area = None
+        self.selected_area = []
 
         # style
         self.tick_size = 7
@@ -42,18 +43,20 @@ class Channel:
 
     @pyqtSlot(np.ndarray, list)
     def feed(self, x, data_list, color, mood="initilize"):
-        if self.selected_area:
-            self.selected_area.set_data([], [])
-        self._max = max(data_list)
-        self._min = min(data_list)
+        if len(data_list):
+            self._max = max(data_list)
+            self._min = min(data_list)
+        
         self.feed_time(x)
         line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+        self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color='#ADD8E6')
         if mood == "selection":
-            self.selected_area = line
+            self.selected_area.append(line)
 
     def feed_time(self, x):
-        self.time = x
-        self.set_time_range((min(x), max(x)))
+        if len(x):
+            self.time = x
+            self.set_time_range((min(x), max(x)))
 
     @property
     def id(self):
@@ -83,10 +86,16 @@ class Channel:
         self._axis.spines['right'].set_color(self.plot_detail_color)
         self._axis.spines['left'].set_color(self.plot_detail_color)
         self._axis.grid(axis='both', ls='--', alpha=0.4)
-        # self._axis.xaxis.set_visible(False)
         self._axis.set_ylabel(self._name, fontsize=self.title_size, fontname=self.font_name,
                               fontweight=self.font_weight,
                               color=self.font_color)
+
+        self._hist_axis.set_facecolor(self.axis_bg_color)
+        self._hist_axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
+        self._hist_axis.spines['bottom'].set_color(self.plot_detail_color)
+        self._hist_axis.spines['top'].set_color(self.plot_detail_color)
+        self._hist_axis.spines['right'].set_color(self.plot_detail_color)
+        self._hist_axis.spines['left'].set_color(self.plot_detail_color)
 
     @pyqtSlot(Axes)
     def add_axis(self, ax):
@@ -111,3 +120,9 @@ class Channel:
 
     def clear(self):
         self.axis.cla()
+    
+    def cancel_selection(self):
+        if self.selected_area:
+            for area in self.selected_area:
+                area.set_data([], [])
+            self.canvas.draw()

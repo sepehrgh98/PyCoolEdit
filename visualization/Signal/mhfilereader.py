@@ -4,6 +4,7 @@ import numpy as np
 from glob import glob
 from time import time
 
+
 ##  mm.read(a); mm.read(n) was slower than mm[a:a+n]...
 
 
@@ -31,8 +32,7 @@ class MHDatReader(mmap.mmap):
     def get(self, a, b, n=10, algorithm="simple"):
         intervals = np.linspace(a, b, n, dtype=int)
         delta = intervals[1] - intervals[0]
-        print("Intervals:", intervals)
-
+        
         format = ">" if self.big_ending else "<"
         if self.singed:
             format += "h"
@@ -46,10 +46,10 @@ class MHDatReader(mmap.mmap):
                 for ch in range(self.channels):
                     arr[ch].append(
                         self[
-                            point * 2 * self.channels
-                            + ch * 2 : point * 2 * self.channels
-                            + ch * 2
-                            + 2
+                        point * 2 * self.channels
+                        + ch * 2: point * 2 * self.channels
+                                  + ch * 2
+                                  + 2
                         ]
                     )
 
@@ -58,6 +58,9 @@ class MHDatReader(mmap.mmap):
             for i in range(n):
                 res[ch].append(struct.unpack(format, arr[ch][i])[0])
         return res
+
+    def get_file_total_size(self):
+        return len(self)
 
 
 if __name__ == "__main__":

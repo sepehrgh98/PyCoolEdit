@@ -11,7 +11,7 @@ class PDWToolsForm(QWidget, Form):
     # signals
     filePathChanged = pyqtSignal(str)
     # dataRequested = pyqtSignal()
-    selectBtnPressed = pyqtSignal()
+    selectBtnPressed = pyqtSignal(bool)
     radarRequested = pyqtSignal()
 
     def __init__(self):
@@ -31,8 +31,6 @@ class PDWToolsForm(QWidget, Form):
 
         # connections
         self.selectFileBtn.clicked.connect(self.get_file_path)
-        # self.showDataBtn.clicked.connect(self.dataRequested)
-        self.selectBtn.clicked.connect(self.selectBtnPressed)
         self.selectBtn.clicked.connect(self.selectBtnPressed)
         self.newRadarBtn.clicked.connect(self.radarRequested)
 

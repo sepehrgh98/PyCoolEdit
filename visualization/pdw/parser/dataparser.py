@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 
 
 def find_nearest_value_indx(array, value):
@@ -31,6 +31,12 @@ class DataParser(Parser, QObject, metaclass=FinalMeta):
         # self.received_data = None
         # self.columns = list
         self.initilize_data = True
+
+         # moving to thread
+        self.objThread = QThread()
+        self.moveToThread(self.objThread)
+        self.objThread.finished.connect(self.objThread.deleteLater)
+        self.objThread.start()
 
     @pyqtSlot(dict)
     def set_data(self, received_data) -> None:

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 
 from visualization.pdw.parser.dataparser import DataParser
 from visualization.pdw.reader.create_reader import DataCreator
@@ -21,6 +21,11 @@ class DataHandler(QObject):
         self.parser.data_is_ready.connect(self.packetize_data)
         self.dataRequest.connect(self.parser.send_data)
         self.columns = dict()
+        # moving to thread
+        self.objThread = QThread()
+        self.moveToThread(self.objThread)
+        self.objThread.finished.connect(self.objThread.deleteLater)
+        self.objThread.start()
 
     @pyqtSlot(list)
     def define_columns(self, columns):

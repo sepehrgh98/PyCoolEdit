@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2,1">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -30,6 +30,11 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="QWidget" name="plotControllerWidget" native="true">
+      <layout class="QHBoxLayout" name="plotControllerWidgetLayout"/>
+     </widget>
+    </item>
     <item>
      <widget class="QWidget" name="plotWidget" native="true">
       <layout class="QVBoxLayout" name="plotLayout"/>
@@ -87,10 +92,25 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="tableWidget" native="true">
+        <widget class="QWidget" name="tableContainerWidget" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QTableWidget" name="tableWidget_2">
+           <widget class="QTableWidget" name="tableWidget">
             <column>
              <property name="text">
               <string>Strat Time(mics)</string>

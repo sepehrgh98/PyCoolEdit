@@ -11,7 +11,6 @@ Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'radar',
 
 
 class RadarForm(QMainWindow, Form):
-
     def __init__(self):
         super(RadarForm, self).__init__()
         self.setupUi(self)
@@ -34,3 +33,6 @@ class RadarForm(QMainWindow, Form):
             if channel.id == data_packet.id:
                 channel.feed(data_packet.key, data_packet.data)
                 break
+
+
+            

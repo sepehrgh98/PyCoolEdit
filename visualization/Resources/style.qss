@@ -573,3 +573,7 @@ CustomTopFrame ,CustomTopFrame QLabel{
     font-size: 22px;
     color : rgb(255,252,173);
 }
+/*******************************************************************************/
+QTableWidget{
+	color : rgb(255,252,173);
+}

@@ -6,16 +6,39 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1155</width>
-    <height>464</height>
+    <width>1375</width>
+    <height>849</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2,1,1">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="plotControlWidget" native="true">
+     <layout class="QHBoxLayout" name="plotControlLayout"/>
+    </widget>
+   </item>
    <item>
     <widget class="QWidget" name="plotWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>400</height>
+      </size>
+     </property>
      <layout class="QVBoxLayout" name="plotLayout"/>
     </widget>
    </item>
@@ -38,22 +61,6 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="channelLineEdit">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
          <item row="6" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -68,29 +75,20 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QLineEdit" name="thdLineEdit">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
          <item row="6" column="1">
           <widget class="QSpinBox" name="binSpinBox">
            <property name="value">
             <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="channelDoubleSpinBox"/>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLineEdit" name="thdLineEdit">
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -99,7 +97,7 @@
       </item>
       <item>
        <widget class="QWidget" name="localTableWidget" native="true">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -113,39 +111,59 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTableWidget" name="tableWidget"/>
+          <widget class="QTableWidget" name="tableWidget">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="localTableControlWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="add_tb_btn">
+           <property name="text">
+            <string>add to Table</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QWidget" name="widget_5" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QPushButton" name="pushButton">
-              <property name="text">
-               <string>add to Table</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="text">
-               <string>Remove Last</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <widget class="QPushButton" name="remove_btn">
+           <property name="text">
+            <string>Remove Last</string>
+           </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
