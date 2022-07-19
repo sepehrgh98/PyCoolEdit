@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\pdw\pdwui.ui'
+# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\pdw\pdwui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -33,11 +33,9 @@ class Ui_MainWindow(object):
         self.dataInformationWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.dataInformationWidget.setObjectName("dataInformationWidget")
         self.dataInformationLayout = QtWidgets.QHBoxLayout(self.dataInformationWidget)
-        self.dataInformationLayout.setContentsMargins(0, 0, 0, 0)
+        self.dataInformationLayout.setContentsMargins(11, 11, 11, 11)
         self.dataInformationLayout.setSpacing(0)
         self.dataInformationLayout.setObjectName("dataInformationLayout")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.dataInformationLayout.addItem(spacerItem)
         self.verticalLayout.addWidget(self.dataInformationWidget)
         self.plotWidget = QtWidgets.QWidget(self.leftFrame)
         self.plotWidget.setObjectName("plotWidget")
@@ -49,8 +47,8 @@ class Ui_MainWindow(object):
         self.verticalLayout.setStretch(1, 1)
         self.horizontalLayout.addWidget(self.leftFrame)
         self.rightFrame = QtWidgets.QFrame(self.centralwidget)
-        self.rightFrame.setMinimumSize(QtCore.QSize(300, 0))
-        self.rightFrame.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.rightFrame.setMinimumSize(QtCore.QSize(0, 0))
+        self.rightFrame.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.rightFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.rightFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.rightFrame.setObjectName("rightFrame")
@@ -59,6 +57,7 @@ class Ui_MainWindow(object):
         self.rightFrameLayout.setSpacing(0)
         self.rightFrameLayout.setObjectName("rightFrameLayout")
         self.horizontalLayout.addWidget(self.rightFrame)
+        self.horizontalLayout.setStretch(0, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1418, 26))

@@ -3,10 +3,12 @@ from tkinter import N
 import numpy as np
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView
+# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from visualization.GUI.customnavigationtoolbar import MyCustomToolbar as NavigationToolbar
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QLabel, QLineEdit
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.widgets import SpanSelector
 
 from visualization.GUI.cursorline import CursorLine
 
@@ -23,17 +25,19 @@ class RadarChannelForm(QWidget, Form):
         self._name = _name
 
         # variables
-        # self.time = np.array([])
-        # self.channel_val =  np.array([])
         self.bin = None
+        self.data = None
         self.time_range = [-1,-1]
         self.val_range = [-1,-1]
         self.main_layer = None
-        # self.hist_layer = None
-        self.hist_n = None
-        self.his_X = None
-        self.hist_V = None
+        self.hist_counts = None
+        self.his_bins = None
+        self.hist_bars = None
         self.row_counter = 0
+        self.selected_bar_list = []
+        self.min_bar_res = 10 
+        self.period_lineEdit = None
+        self.SCR_lineEdit = None
 
         # ui initialize
         self.channelLabel.setText(self._name + " :")
@@ -53,6 +57,7 @@ class RadarChannelForm(QWidget, Form):
         axs = self.fig.subplots(2, 1)
         self.main_plot = axs[0]
         self.hist_plot = axs[1]
+
 
         # style
         self.tick_size = 7
@@ -76,6 +81,18 @@ class RadarChannelForm(QWidget, Form):
 
         # show line
         self.hist_line_cursor = CursorLine(self.hist_plot, "h")
+
+        # span line
+        self.span = SpanSelector(
+            self.main_plot,
+            self.on_span_selected,
+            "horizontal",
+            useblit=True,
+            props=dict(alpha=0.5, facecolor="tab:blue"),
+            interactive=True,
+            drag_from_anywhere=True
+        )
+        self.span.set_active(False)
 
 
         # plot control
@@ -115,22 +132,20 @@ class RadarChannelForm(QWidget, Form):
         self.hist_plot.spines['left'].set_color(self.plot_detail_color)
         self.hist_plot.grid(axis='both', ls='--', alpha=0.4)
 
-
     def feed(self, time, val):
         # set range
         self.time_range[0] = min(time)
         self.time_range[1] = max(time)
         self.val_range[0] = min(val)
         self.val_range[1] = max(val)
-        self.channelDoubleSpinBox.setRange(self.val_range[0], self.val_range[1])
-        self.channelDoubleSpinBox.setValue(self.val_range[0])
 
         # set line cursor
         self.hist_line_cursor.set_pos(self.val_range[0])
 
         # plot
+        self.data = val
         self.main_layer, = self.main_plot.plot(time, val, 'o', markersize=0.8, color=self.data_color)
-        [self.hist_n,self.his_X, self.hist_V] = self.hist_plot.hist(val, bins=self.bin, color=self.data_color)
+        [self.hist_counts,self.his_bins, self.hist_bars] = self.hist_plot.hist(val, bins=self.bin, color=self.data_color)
 
         # rescale
         self.main_plot.set_xlim(self.time_range[0], self.time_range[1])
@@ -140,25 +155,22 @@ class RadarChannelForm(QWidget, Form):
         self.canvas.flush_events()
 
     def feed_local_table(self):
-        thd = self.hist_line_cursor.get_last_data()
-        # self.thdLineEdit.setText(str(thd))
-        if(thd):
-            channel_val = self.channelDoubleSpinBox.value()
+        for bar in self.selected_bar_list:
+            val = round(bar._x0 + bar._width/2, 3)
             self.tableWidget.setRowCount(self.row_counter+1)
-            self.tableWidget.setItem(self.row_counter, 0, QTableWidgetItem(str(thd)))
-            self.tableWidget.setItem(self.row_counter, 1, QTableWidgetItem(str(channel_val)))
+            self.tableWidget.setItem(self.row_counter, 0, QTableWidgetItem(str(val)))
+            self.tableWidget.setItem(self.row_counter, 1, QTableWidgetItem(str(bar._height)))
             self.tableWidget.setItem(self.row_counter, 2, QTableWidgetItem(str(self.val_range[0])))
             self.tableWidget.setItem(self.row_counter, 3, QTableWidgetItem(str(self.val_range[1])))
             self.row_counter += 1
+            self.channelLineEdit.setText(str(val))
         
-
     def set_thd(self, val):
         self.thdLineEdit.setText(str(val))
-
-
-
-
-
+        for bar in self.hist_bars:
+            if bar._height >= val:
+                self.selected_bar_list.append(bar)
+        
     @property
     def id(self):
         return self._id
@@ -171,7 +183,30 @@ class RadarChannelForm(QWidget, Form):
     def set_bin(self, value):
         if self.bin != value:
             self.bin = value
-
+            if self.hist_bars:
+                _ = [b.remove() for b in self.hist_bars]
+                [self.hist_counts,self.his_bins, self.hist_bars] = self.hist_plot.hist(self.data, bins=self.bin, color=self.data_color)
+            self.canvas.draw()
+            self.canvas.flush_events()
 
     def initialize(self):
         self.set_bin(40)
+
+    def set_span(self, active):
+        self.span.set_active(active)
+        if(active):
+            period_label = QLabel(self.controlWidget)
+            period_label.setText("Time Period(us):")
+            self.period_lineEdit = QLineEdit(self.controlWidget)
+            self.controlLayout.addRow(period_label, self.period_lineEdit)
+            SCR_label = QLabel(self.controlWidget)
+            SCR_label.setText("SCR(MHz) :")
+            self.SCR_lineEdit = QLineEdit(self.controlWidget)
+            self.controlLayout.addRow(SCR_label, self.SCR_lineEdit)
+
+
+    def on_span_selected(self, xmin, xmax):
+        if self.period_lineEdit and self.SCR_lineEdit:
+            pr_us = round((xmax - xmin)/1e6, 3)
+            self.period_lineEdit.setText(str(pr_us))
+            self.SCR_lineEdit.setText(str(round(1e6 / pr_us,3)))

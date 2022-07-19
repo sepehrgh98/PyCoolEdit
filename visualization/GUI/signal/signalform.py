@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import numpy as np
 
 from visualization.GUI.signal.signalinformation import SignalInformationForm
@@ -39,6 +39,7 @@ class SignalForm(QMainWindow, Form):
 
         # nav bar
         # self.navbar = NavigationToolbar(self.canvas, self)
+        # self.navbar
         # self.plotControllerWidgetLayout.addWidget(self.navbar)
 
         # style
@@ -80,7 +81,6 @@ class SignalForm(QMainWindow, Form):
     def setup_channels(self, data_info):
         self.axs = self.fig.subplots(data_info["channels"], 1, sharex='all')
         if not isinstance(self.axs, np.ndarray):
-            print("kir", type(self.axs))
             self.axs = [self.axs]
         self.style_channels(self.axs)
         self.channels = self.axs
@@ -107,7 +107,7 @@ class SignalForm(QMainWindow, Form):
     @pyqtSlot(list)
     def feed(self, data_list):
         for item in zip(self.channels, data_list):
-            item[0].plot(item[1].key, item[1].data, markersize=0.8)
+            item[0].plot(item[1].key, item[1].data, linestyle='-', marker='o', markersize=5)
             self.x_limit_range = [min(item[1].key)-2, max(item[1].key)+2]
             self.y_limit_range = [min(item[1].data)-2, max(item[1].data)+2]
 

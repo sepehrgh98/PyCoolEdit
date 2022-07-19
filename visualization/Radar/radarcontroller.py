@@ -12,6 +12,7 @@ class RadarController(QObject):
         self.radars = []
         self.temp_data = {}
         self.temp_data_is_empty = True
+        self.channels_status = False
 
     @pyqtSlot(DataPacket)
     def feed(self, data_packet):
@@ -41,9 +42,13 @@ class RadarController(QObject):
         self.channels_header = header
         for _id, _name in header.items():
             self.temp_data[_id] = [np.array([]), np.array([])] # time & val
+        self.channels_status = True
 
     @pyqtSlot()
     def reset(self):
         self.temp_data = {}
         self.temp_data_is_empty = True
+
+    def channels_defined(self):
+        return self.channels_status
 

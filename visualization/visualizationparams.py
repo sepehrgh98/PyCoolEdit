@@ -2,29 +2,29 @@ import enum
 import numpy as np
 
 
-class PlotInteraction(enum.Enum):
-    ZoomOnWheel = 1
-    Drag = 2
-    Select = 3
-    DoubleClick = 4
-    ZoomOnBox = 5
-
-
-class PlotMethods(enum.Enum):
-    Plot = 1
-    Scatter = 2
-    Bar = 3
 
 class FeedMood(enum.Enum):
     main_data = 1
     select = 2
 
 
+ChannelUnit = {
+    'TOA' : 'sec'
+    ,'Omni' : 'dBm' 
+    ,'DF' : 'dBm'
+    ,'Freq' : 'Hz' 
+    ,'PW' : 'usec' 
+    ,'AOA' : 'deg' 
+    ,'RRI' : 'usec' 
+    ,'RRF' : 'MHz' 
+}
+ 
 class DataPacket:
     def __init__(self):
         self._id = None
         self._data = None
         self._key = None
+
 
     @property
     def id(self):

@@ -1,13 +1,17 @@
+from ast import Try
 from locale import normalize
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QScrollArea, QAction, QMenu, QActionGroup
+from tkinter import N
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QScrollArea, QAction, QMenu, QActionGroup, QApplication
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 # from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from visualization.GUI.custonnavigationtoolbar import MyCustomToolbar as NavigationToolbar
+from visualization.GUI.customnavigationtoolbar import MyCustomToolbar as NavigationToolbar
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
 from PyQt5.QtGui import QIcon, QCursor
+
+
 
 
 class SubPlotWidget(QWidget):
@@ -24,7 +28,7 @@ class SubPlotWidget(QWidget):
         # setup figure
         self.fig = Figure()
         self.fig.patch.set_color('#151a1e')
-        self.fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.993, wspace=0, hspace=0.2)
+        self.fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.993, wspace=0, hspace=0)
         self.fig.tight_layout()
         self.canvas = FigureCanvas(self.fig)
         self.canvas.draw()
@@ -32,50 +36,53 @@ class SubPlotWidget(QWidget):
         # setup hist figure
         self.hist_fig = Figure()
         self.hist_fig.patch.set_color('#151a1e')
-        self.hist_fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.993, wspace=0, hspace=0.2)
+        # self.hist_fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.993, wspace=0, hspace=0.2)
+        self.hist_fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.993, wspace=0, hspace=0)
         self.hist_fig.tight_layout()
         self.hist_canvas = FigureCanvas(self.hist_fig)
         self.hist_canvas.draw()
 
-
+        # navtollbar
         self.mpl_toolbar = NavigationToolbar(self.canvas, None)
+        self.canvas.mpl_connect('release_zoom', self.handle_release_zoom)
 
         # menu items
         self.available_action = []
         self.canvasMenu = QMenu(self)
 
         # creating QAction Instances
-        normalAction = QAction("Normal", self)
-        selectAction = QAction("Select", self)
-        zoomAction = QAction("Zoom", self)
-        dragAction = QAction("Drag", self)
+        self.normalAction = QAction("Normal", self)
+        self.selectAction = QAction("Select", self)
+        self.zoomAction = QAction("Zoom", self)
+        self.dragAction = QAction("Drag", self)
  
         # making actions checkable
-        normalAction.setCheckable(True)
-        selectAction.setCheckable(True)
-        zoomAction.setCheckable(True)
-        dragAction.setCheckable(True)
+        self.normalAction.setCheckable(True)
+        self.selectAction.setCheckable(True)
+        self.zoomAction.setCheckable(True)
+        self.dragAction.setCheckable(True)
+        self.normalAction.setChecked(True)
  
         # adding these actions to the selection menu
-        self.canvasMenu.addAction(normalAction)
-        self.canvasMenu.addAction(selectAction)
-        self.canvasMenu.addAction(zoomAction)
-        self.canvasMenu.addAction(dragAction)
+        self.canvasMenu.addAction(self.normalAction)
+        self.canvasMenu.addAction(self.selectAction)
+        self.canvasMenu.addAction(self.zoomAction)
+        self.canvasMenu.addAction(self.dragAction)
  
         # creating a action group
         action_group = QActionGroup(self)
  
         # adding these action to the action group
-        action_group.addAction(normalAction)
-        action_group.addAction(selectAction)
-        action_group.addAction(zoomAction)
-        action_group.addAction(dragAction)
+        action_group.addAction(self.normalAction)
+        action_group.addAction(self.selectAction)
+        action_group.addAction(self.zoomAction)
+        action_group.addAction(self.dragAction)
 
         # action connections
-        normalAction.triggered.connect(self.enable_normal_action)
-        selectAction.triggered.connect(self.enable_select_action)
-        zoomAction.triggered.connect(self.mpl_toolbar.zoom)
-        dragAction.triggered.connect(self.mpl_toolbar.pan)
+        self.normalAction.triggered.connect(self.enable_normal_action)
+        self.selectAction.triggered.connect(self.enable_select_action)
+        self.zoomAction.triggered.connect(self.enable_zoom_action)
+        self.dragAction.triggered.connect(self.enable_pan_action)
  
         self.canvas.setContextMenuPolicy(Qt.CustomContextMenu)
         self.canvas.customContextMenuRequested.connect(self.exec_canvas_menu)
@@ -100,7 +107,9 @@ class SubPlotWidget(QWidget):
         self.list_of_select_box = []
 
     def enable_select_action(self, active):
+        self.selectAction.setChecked(active)
         if active:
+            self.canvas.setCursor(QCursor(Qt.PointingHandCursor))
             if self.mpl_toolbar.is_zoom():
                 self.mpl_toolbar.zoom(False)
             if self.mpl_toolbar.is_pan():
@@ -109,6 +118,7 @@ class SubPlotWidget(QWidget):
             self.mouse_press_ev = self.canvas.mpl_connect('button_press_event', self.on_mouse_click)
 
         else:
+            self.canvas.setCursor(QCursor(Qt.ArrowCursor))
             [rect.set_active(False) for rect in self.list_of_select_box]
             self.canvas.mpl_disconnect(self.mouse_press_ev)
     
@@ -120,14 +130,21 @@ class SubPlotWidget(QWidget):
             if self.mpl_toolbar.is_pan():
                 self.mpl_toolbar.pan(False)
 
+    def enable_zoom_action(self, active):
+        self.zoomAction.setChecked(active)
+        self.mpl_toolbar.zoom(active)
+    
+    def enable_pan_action(self, active):
+        self.dragAction.setChecked(active)
+        self.mpl_toolbar.pan(active)
+
 
     def on_mouse_click(self, event):
         if event.inaxes:
             if event.button == MouseButton.LEFT:
                 self.curr_ax[:] = [event.inaxes]
-            elif event.button == MouseButton.RIGHT:
+            if event.dblclick:
                 self.unselectRequested.emit()
-
 
     def onselect(self, eclick, erelease):
         if eclick.button == MouseButton.LEFT and erelease.button == MouseButton.LEFT:
@@ -165,3 +182,7 @@ class SubPlotWidget(QWidget):
     def exec_canvas_menu(self, point):
         self.last_point = point
         self.canvasMenu.exec_(self.canvas.mapToGlobal(point))
+
+    def handle_release_zoom(self, evt):
+        print('release_zoom_event')
+        print(evt.xdata,evt.ydata)
