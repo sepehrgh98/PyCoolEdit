@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\signal\signalinformationui.ui'
+# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\signal\signalinformationui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -28,9 +28,6 @@ class Ui_Form(object):
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label)
         self.channelNumberComboBox = QtWidgets.QComboBox(self.widget)
         self.channelNumberComboBox.setObjectName("channelNumberComboBox")
-        self.channelNumberComboBox.addItem("")
-        self.channelNumberComboBox.addItem("")
-        self.channelNumberComboBox.addItem("")
         self.channelNumberComboBox.addItem("")
         self.channelNumberComboBox.addItem("")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.channelNumberComboBox)
@@ -62,9 +59,6 @@ class Ui_Form(object):
         self.label.setText(_translate("Form", "Number of Channels :"))
         self.channelNumberComboBox.setItemText(0, _translate("Form", "1"))
         self.channelNumberComboBox.setItemText(1, _translate("Form", "2"))
-        self.channelNumberComboBox.setItemText(2, _translate("Form", "3"))
-        self.channelNumberComboBox.setItemText(3, _translate("Form", "4"))
-        self.channelNumberComboBox.setItemText(4, _translate("Form", "5"))
         self.label_2.setText(_translate("Form", "Data Sign:"))
         self.signCheckBox.setText(_translate("Form", "signed"))
         self.label_3.setText(_translate("Form", "Endin:"))

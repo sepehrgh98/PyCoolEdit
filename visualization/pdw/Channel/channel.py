@@ -31,9 +31,6 @@ class Worker(QObject):
         self.new_data_is_ready.emit(new_val)
         self.finished.emit()
 
-
-
-
 class Channel:
     dataRequested = pyqtSignal(int, tuple, tuple)  # channel_id , x_range , y_range
 

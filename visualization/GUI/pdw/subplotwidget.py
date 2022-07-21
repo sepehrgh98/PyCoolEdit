@@ -138,7 +138,6 @@ class SubPlotWidget(QWidget):
         self.dragAction.setChecked(active)
         self.mpl_toolbar.pan(active)
 
-
     def on_mouse_click(self, event):
         if event.inaxes:
             if event.button == MouseButton.LEFT:
