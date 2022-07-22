@@ -11,6 +11,7 @@ from visualization.visualizationparams import ChannelUnit, DataPacket, FeedMood
 from visualization.GUI.pdw.subplotwidget import SubPlotWidget
 from visualization.GUI.progressdialog import ProgressDialog
 from visualization.pdw.Channel.multichannel import MultiChannels
+from visualization.visualizationparams import ProgressType
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'pdwui.ui'))[0]
 
@@ -33,6 +34,9 @@ class PDWForm(QMainWindow, Form):
         self.subPlotsWidget = SubPlotWidget()
         self.plotLayout.addWidget(self.subPlotsWidget)
         self.radar_controller = RadarController()
+        self.progress = ProgressDialog(self)
+        self.progress.setWindowTitle("File in Process ...")
+        self.progress.setWindowModality(Qt.WindowModal)
 
         # variables
         self.fig = self.subPlotsWidget.get_figure()
@@ -47,6 +51,7 @@ class PDWForm(QMainWindow, Form):
         self.feedMood = FeedMood.main_data
         self.omni_df_show_together = True
         self.plot_colors = ["#ADD8E6", "#A8F484", "#E5AAFE", "#F5ADA0", "#6D73F4"]
+        self.number_of_fed_channels = 0
 
         # nav
         self.navbar = self.subPlotsWidget.get_nav_tool()
@@ -108,6 +113,8 @@ class PDWForm(QMainWindow, Form):
                 if self.feedMood == FeedMood.main_data:
                     current_channel.feed(data_packet.key, data_packet.data, random.choice(self.plot_colors), mood="initilize")
                     total_size += len(data_packet.key)
+                    self.number_of_fed_channels += 1
+                    self.feed_progressbar({ProgressType.visualizer:self.number_of_fed_channels/len(self.channels)})
                 elif self.feedMood == FeedMood.select:
                     self.radar_controller.feed(data_packet)
                     current_channel.feed(data_packet.key, data_packet.data, "red", mood="selection")
@@ -141,10 +148,7 @@ class PDWForm(QMainWindow, Form):
             channel.cancel_selection()
 
     def start_progress(self):
-        self.progress = ProgressDialog(self)
-        self.progress.setWindowTitle("File in Process ...")
-        self.progress.setWindowModality(Qt.WindowModal)
-        # self.progress.show()
+        self.progress.show()
 
     def all_select_handle(self):
         self.set_selection_area((-1, -1), (-1, -1))
@@ -185,3 +189,19 @@ class PDWForm(QMainWindow, Form):
         self.hist_canvas.draw()
 
         self.dataRequested.emit((-1, -1), (-1, -1))
+
+    @pyqtSlot(dict)
+    def feed_progressbar(self, status):
+        for key, val in status.items():
+            if key == ProgressType.reader:
+                self.progress.readingProgressBar.setValue(int(val*100))
+            elif key == ProgressType.parser:
+                self.progress.parsingProgressBar.setValue(int(val*100))
+            elif key == ProgressType.visualizer:
+                self.progress.visualizingProgressBar.setValue(int(val*100))
+        read_stat = self.progress.readingProgressBar.value()
+        parse_stat = self.progress.parsingProgressBar.value()
+        visualize_stat = self.progress.visualizingProgressBar.value()
+        
+        if read_stat == 100 and parse_stat == 100 and visualize_stat == 100:
+            self.progress.close()

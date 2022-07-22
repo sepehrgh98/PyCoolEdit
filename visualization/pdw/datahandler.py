@@ -10,6 +10,7 @@ class DataHandler(QObject):
     final_data_is_ready = pyqtSignal(DataPacket)
     columns_defined = pyqtSignal(dict)
     dataRequest = pyqtSignal(tuple, tuple)  # time Range & value Range
+    progress_is_ready = pyqtSignal(dict)
 
     def __init__(self):
         super(DataHandler, self).__init__()
@@ -27,6 +28,8 @@ class DataHandler(QObject):
         self.parser.data_packet_is_ready.connect(self.packetize_data)
         # self.capsulator.capsulated_data_is_reaady.connect(self.final_data_is_ready)
         self.dataRequest.connect(self.parser.prepare_requested_data)
+        self.reader.progress_is_ready.connect(self.progress_is_ready)
+        self.parser.progress_is_ready.connect(self.progress_is_ready)
         
 
         # variables
@@ -65,6 +68,3 @@ class DataHandler(QObject):
         self.file_path_changed.emit(file_path)
 
 
-
-
-        

@@ -1,10 +1,9 @@
-from tkinter.messagebox import NO
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread
-from numpy import double
+from visualization.visualizationparams import ProgressType
 
 class SReader(QObject):
     batch_is_ready = pyqtSignal(list, bool, float)
-    progress_is_ready = pyqtSignal(float)
+    progress_is_ready = pyqtSignal(dict)
     def __init__(self, batch_size=10000) :
         super(SReader, self).__init__()
         self.batch_size = batch_size
@@ -28,7 +27,7 @@ class SReader(QObject):
         file_total_size = 0
         with open(self.file_path, "r") as f:
             file_total_size = len(f.readlines())
-
+        number_of_batches = file_total_size / self.batch_size
         with open(self.file_path, "r") as f:
             self.progress = 0
             result = []
@@ -36,12 +35,11 @@ class SReader(QObject):
                 result.append(line)
                 if len(result) == self.batch_size:
                     self.progress = self.progress + (self.batch_size/file_total_size)
-                    self.progress_is_ready.emit(self.progress)
-                    self.batch_is_ready.emit(result, False, file_total_size)
+                    self.progress_is_ready.emit({ProgressType.reader:self.progress})
+                    self.batch_is_ready.emit(result, False, number_of_batches)
                     result.clear()
             self.progress = self.progress + (self.batch_size/file_total_size)
-            self.progress_is_ready.emit(self.progress)
-            self.batch_is_ready.emit(result, True, file_total_size)
+            self.progress_is_ready.emit({ProgressType.reader:1})
+            self.batch_is_ready.emit(result, True, number_of_batches)
 
-                    
                     

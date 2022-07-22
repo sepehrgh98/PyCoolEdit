@@ -7,6 +7,11 @@ class FeedMood(enum.Enum):
     main_data = 1
     select = 2
 
+class ProgressType(enum.Enum):
+    reader = 1
+    parser = 2
+    visualizer = 3
+
 
 ChannelUnit = {
     'TOA' : 'sec'

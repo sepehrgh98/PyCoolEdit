@@ -1,7 +1,9 @@
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 import numpy as np
-from joblib import Parallel, delayed, cpu_count
-from tqdm import tqdm
+from multiprocessing import Pool
+from functools import partial
+from visualization.visualizationparams import ProgressType
+
 
 
 def find_nearest_value_indx(array, value):
@@ -9,10 +11,23 @@ def find_nearest_value_indx(array, value):
     idx = (np.abs(array - value)).argmin()
     return idx
 
+def parse(data_list, cols):
+    parsed_data = {}
+    for column in cols:
+        parsed_data[column] = np.ndarray(0)
+    for line in data_list[2:]:
+        cols_line = line.split()
+        for i in range(len(cols_line)):
+            col_name = cols[i]
+            parsed_data[col_name] = np.append(parsed_data[col_name], [float(cols_line[i])])
+    return parsed_data
+
 
 class SParser(QObject):
     columns_defined = pyqtSignal(list)
     data_packet_is_ready = pyqtSignal(dict)
+    progress_is_ready = pyqtSignal(dict)
+    
     def __init__(self) -> None:
         super(SParser, self).__init__()
         self.columns = []
@@ -28,16 +43,23 @@ class SParser(QObject):
         self.objThread.start()
 
     @pyqtSlot(list, bool, float)
-    def prepare_data(self, data_list, eof, file_total_size):
+    def prepare_data(self, data_list, eof, number_of_batches):
+
         self._set_columns(data_list)
-        self.parse(data_list)
-        # self.progress = self.progress + (len(data_list)/file_total_size)
-        # print(self.progress*100, len(data_list), file_total_size)
         self.raw_data.append(data_list)
         if eof :
+            if self.initilize_data:
+                self._init_data()
+                self.initilize_data = False 
+
+            pool = Pool(processes=5)
+            for i, output in enumerate(pool.imap(partial(parse, cols=self.columns), self.raw_data), 1):
+                for name, val in output.items():
+                    self.parsed_data[name] = np.append(self.parsed_data[name], val)
+                self.progress_is_ready.emit({ProgressType.parser: 1 if i>=1 else i/number_of_batches})
+
             self.calculate_rri()
             self.data_packet_is_ready.emit(self.parsed_data)
-            # self.progress = 0
 
     
     @pyqtSlot(tuple, tuple)
@@ -69,16 +91,6 @@ class SParser(QObject):
         if first_line[0] != "%":
             return False
         return True
-
-    def parse(self, data_list):
-        if self.initilize_data:
-            self._init_data()
-            self.initilize_data = False 
-        for line in data_list[2:]:
-            cols = line.split()
-            for i in range(len(cols)):
-                col_name = self.columns[i]
-                self.parsed_data[col_name] = np.append(self.parsed_data[col_name], [float(cols[i])])
 
     def _init_data(self) -> None:
         for column in self.columns:
