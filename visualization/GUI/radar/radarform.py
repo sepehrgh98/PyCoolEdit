@@ -16,7 +16,8 @@ class RadarForm(QMainWindow, Form):
         self.setupUi(self)
 
         self.tabWidget = QTabWidget()
-        self.tabWidget.setTabPosition(QTabWidget.East)
+        self.tabWidget.setTabPosition(QTabWidget.TabPosition.North)
+        self.tabWidget.setTabShape(QTabWidget.TabShape.Triangular)
         self.channels = []
 
     @pyqtSlot(dict)

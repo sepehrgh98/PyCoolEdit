@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\mainform.ui'
+# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\mainform.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,14 +14,22 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1267, 865)
+        MainWindow.resize(1258, 716)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setContentsMargins(0, 11, 0, 0)
+        self.verticalLayout.setContentsMargins(0, 7, 0, 0)
+        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Triangular)
+        self.tabWidget.setIconSize(QtCore.QSize(20, 20))
+        self.tabWidget.setElideMode(QtCore.Qt.ElideNone)
+        self.tabWidget.setDocumentMode(False)
+        self.tabWidget.setTabsClosable(False)
+        self.tabWidget.setMovable(True)
+        self.tabWidget.setTabBarAutoHide(False)
         self.tabWidget.setObjectName("tabWidget")
         self.PDWTab = QtWidgets.QWidget()
         self.PDWTab.setObjectName("PDWTab")
@@ -49,13 +57,6 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.SignalForm, "")
         self.verticalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1267, 26))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
@@ -65,4 +66,4 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.PDWTab), _translate("MainWindow", "PDW"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.SignalForm), _translate("MainWindow", "Signal"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.SignalForm), _translate("MainWindow", "SIGNAL"))

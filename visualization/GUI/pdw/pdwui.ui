@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -31,14 +31,8 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QFrame" name="leftFrame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+     <widget class="QWidget" name="widget_2" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -55,35 +49,53 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="dataInformationWidget" native="true">
+        <widget class="QFrame" name="leftFrame">
          <property name="minimumSize">
           <size>
            <width>0</width>
            <height>0</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="dataInformationLayout">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="leftFrameLayout">
           <property name="spacing">
            <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>11</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>11</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>11</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>11</number>
+           <number>0</number>
           </property>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="plotWidget" native="true">
-         <layout class="QHBoxLayout" name="plotLayout">
+        <widget class="QFrame" name="rightFrame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -99,64 +111,56 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <widget class="QWidget" name="dataInfoWidget" native="true">
+            <layout class="QHBoxLayout" name="dataInfoLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>15</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="plotWidget" native="true">
+            <layout class="QHBoxLayout" name="plotLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
-    <item>
-     <widget class="QFrame" name="rightFrame">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="rightFrameLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
-    </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1418</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

@@ -28,7 +28,7 @@ class SubPlotWidget(QWidget):
         # setup figure
         self.fig = Figure()
         self.fig.patch.set_color('#151a1e')
-        self.fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.993, wspace=0, hspace=0)
+        self.fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.98, wspace=0, hspace=0)
         self.fig.tight_layout()
         self.canvas = FigureCanvas(self.fig)
         self.canvas.draw()
@@ -36,8 +36,7 @@ class SubPlotWidget(QWidget):
         # setup hist figure
         self.hist_fig = Figure()
         self.hist_fig.patch.set_color('#151a1e')
-        # self.hist_fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.993, wspace=0, hspace=0.2)
-        self.hist_fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.993, wspace=0, hspace=0)
+        self.hist_fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.98, wspace=0, hspace=0)
         self.hist_fig.tight_layout()
         self.hist_canvas = FigureCanvas(self.hist_fig)
         self.hist_canvas.draw()

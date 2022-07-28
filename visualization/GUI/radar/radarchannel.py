@@ -72,8 +72,8 @@ class RadarChannelForm(QWidget, Form):
 
         # style fig
         self.fig.patch.set_color('#151a1e')
-        self.fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.993, wspace=0, hspace=0.2)
-        self.fig.tight_layout()
+        # self.fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.98, wspace=0, hspace=0.2)
+        # self.fig.tight_layout()
         self.fig.suptitle(self._name, fontsize=self.title_size
                           , fontname=self.font_name
                           , fontweight=self.font_weight
@@ -96,8 +96,8 @@ class RadarChannelForm(QWidget, Form):
 
 
         # plot control
-        self.navbar = NavigationToolbar(self.canvas, self.plotWidget)
-        self.plotControlLayout.addWidget(self.navbar)
+        # self.navbar = NavigationToolbar(self.canvas, self.plotWidget)
+        # self.plotControlLayout.addWidget(self.navbar)
 
         self.setup_main_plot()
         self.setup_hist_plot()

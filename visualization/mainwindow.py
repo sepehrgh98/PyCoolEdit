@@ -14,6 +14,8 @@ class MainWindow(QMainWindow, Form):
         super(MainWindow, self).__init__()
         self.setupUi(self)
 
+        self.setWindowTitle('Offline')
+
         # setup module
         self.pdw_form = PDWForm()
         self.data_handler = DataHandler()
@@ -25,6 +27,7 @@ class MainWindow(QMainWindow, Form):
         # setup connections
         # pdw form
         self.pdw_form.filePathChanged.connect(self.data_handler.set_file_path)
+        
         self.pdw_form.dataRequested.connect(self.data_handler.dataRequest)
 
         # data handler

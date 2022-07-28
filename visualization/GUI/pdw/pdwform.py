@@ -2,7 +2,7 @@ import os
 import random
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QLabel
 from visualization.pdw.Channel.channel import Channel
 from visualization.Radar.radarcontroller import RadarController
 from visualization.GUI.pdw.pdwtools import PDWToolsForm
@@ -12,6 +12,8 @@ from visualization.GUI.pdw.subplotwidget import SubPlotWidget
 from visualization.GUI.progressdialog import ProgressDialog
 from visualization.pdw.Channel.multichannel import MultiChannels
 from visualization.visualizationparams import ProgressType
+from visualization.GUI.defaultview.defaultview import DefaultView
+
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'pdwui.ui'))[0]
 
@@ -25,18 +27,21 @@ class PDWForm(QMainWindow, Form):
         self.setupUi(self)
 
         # widgets
-        # self.infBoxWidget = PDWInformationBoxForm()
         self.toolsWidget = PDWToolsForm()
         self.dataInfoWidget = DataInformationForm()
-        self.rightFrameLayout.addWidget(self.toolsWidget)
-        # self.rightFrameLayout.addWidget(self.infBoxWidget)
-        self.dataInformationLayout.addWidget(self.dataInfoWidget)
         self.subPlotsWidget = SubPlotWidget()
-        self.plotLayout.addWidget(self.subPlotsWidget)
         self.radar_controller = RadarController()
         self.progress = ProgressDialog(self)
-        self.progress.setWindowTitle("File in Process ...")
-        self.progress.setWindowModality(Qt.WindowModal)
+        self.default_view = DefaultView(icon_path = 
+                            os.path.join(os.getcwd(), 'visualization', 'Resources', 'icons', 'main.png')
+                            , text='Offline')
+
+        # add widgets
+        self.leftFrameLayout.addWidget(self.toolsWidget)
+        self.dataInfoLayout.addWidget(self.dataInfoWidget)
+        # self.plotLayout.addWidget(self.subPlotsWidget)
+        self.plotLayout.addWidget(self.default_view)
+
 
         # variables
         self.fig = self.subPlotsWidget.get_figure()
@@ -55,13 +60,17 @@ class PDWForm(QMainWindow, Form):
 
         # nav
         self.navbar = self.subPlotsWidget.get_nav_tool()
-        # self.toolsWidget.toolsWidgetLayout.addWidget(self.navbar)
+
+        # progress
+        self.progress.setWindowTitle("File in Process ...")
+        self.progress.setWindowModality(Qt.WindowModal)
 
         # initialization
         self.setup_connections()
 
     def setup_connections(self):
-        self.toolsWidget.filePathChanged.connect(self.filePathChanged)
+        self.toolsWidget.filePathChanged.connect(self.on_filePathChanged)
+        self.default_view.filePathChanged.connect(self.on_filePathChanged)
         self.toolsWidget.filePathChanged.connect(self.dataInfoWidget.set_file_name)
         # self.toolsWidget.dataRequested.connect(self.dataRequested)
         self.toolsWidget.selectBtnPressed.connect(self.subPlotsWidget.enable_select_action)
@@ -205,3 +214,11 @@ class PDWForm(QMainWindow, Form):
         
         if read_stat == 100 and parse_stat == 100 and visualize_stat == 100:
             self.progress.close()
+
+    def on_filePathChanged(self, file_path):
+        if self.default_view:
+            self.plotLayout.removeWidget(self.default_view)
+            self.default_view.deleteLater()
+            self.default_view = None
+            self.plotLayout.addWidget(self.subPlotsWidget)
+        self.filePathChanged.emit(file_path)

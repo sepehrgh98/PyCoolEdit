@@ -1,8 +1,9 @@
 import os
 
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QFileDialog, QButtonGroup
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import QWidget, QFileDialog, QButtonGroup, QLabel
+from PyQt5.QtGui import QPixmap
 from visualization.GUI.pdw.concatbox import ConcatBox
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'pdwtools.ui'))[0]
@@ -22,6 +23,14 @@ class PDWToolsForm(QWidget, Form):
     def __init__(self):
         super(PDWToolsForm, self).__init__()
         self.setupUi(self)
+
+        # # icon
+        # icon_label = QLabel(self.iconWidget)
+        # icon_path = os.path.join(os.getcwd(), 'visualization', 'Resources', 'icons', 'main.png')
+        # icon_label.setScaledContents(True)
+        # icon_label.setPixmap(QPixmap(icon_path).scaled(200,200,Qt.AspectRatioMode.KeepAspectRatio))
+        # icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignRight)
+        # self.iconWidgetLayout.addWidget(icon_label)
 
         # widgets
         self.concat_box = ConcatBox()
@@ -57,7 +66,7 @@ class PDWToolsForm(QWidget, Form):
 
     def get_file_path(self):
         new_path = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.txt);")[0]
-        if self.file_path != new_path:
+        if new_path and self.file_path != new_path:
             self.file_path = new_path
             self.filePathChanged.emit(self.file_path)
 

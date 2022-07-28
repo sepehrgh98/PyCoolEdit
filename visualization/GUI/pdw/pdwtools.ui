@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>116</width>
-    <height>620</height>
+    <height>687</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,9 @@
       <string/>
      </property>
      <layout class="QVBoxLayout" name="toolsWidgetLayout">
+      <property name="topMargin">
+       <number>24</number>
+      </property>
       <item>
        <widget class="QPushButton" name="selectFileBtn">
         <property name="minimumSize">
@@ -66,6 +69,39 @@
           <width>40</width>
           <height>40</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="resetBtn">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normalon>../../Resources/icons/Home.png</normalon>
+         </iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -197,69 +233,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="resetBtn">
-        <property name="minimumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normalon>../../Resources/icons/Home.png</normalon>
-         </iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="clearBtn">
-        <property name="minimumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <selectedon>../../Resources/icons/delete.png</selectedon>
-         </iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="newRadarBtn">
         <property name="minimumSize">
          <size>
@@ -306,6 +279,11 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset>
+          <normalon>../../Resources/icons/concate.png</normalon>
+         </iconset>
+        </property>
         <property name="iconSize">
          <size>
           <width>40</width>
@@ -314,6 +292,36 @@
         </property>
         <property name="checkable">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clearBtn">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <selectedon>../../Resources/icons/delete.png</selectedon>
+         </iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
         </property>
        </widget>
       </item>

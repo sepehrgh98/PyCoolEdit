@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2,1">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -30,11 +30,6 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
-     <widget class="QWidget" name="plotControllerWidget" native="true">
-      <layout class="QHBoxLayout" name="plotControllerWidgetLayout"/>
-     </widget>
-    </item>
     <item>
      <widget class="QWidget" name="plotWidget" native="true">
       <layout class="QVBoxLayout" name="plotLayout"/>
@@ -98,16 +93,16 @@
            <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>11</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>11</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>11</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>11</number>
           </property>
           <item>
            <widget class="QTableWidget" name="tableWidget">
@@ -156,17 +151,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

@@ -11,6 +11,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import matplotlib.gridspec
 from visualization.GUI.signal.signalinformation import SignalInformationForm
+from visualization.GUI.defaultview.defaultview import DefaultView
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'signal', 'signalui.ui'))[0]
 
@@ -22,6 +23,13 @@ class SignalForm(QMainWindow, Form):
         super(SignalForm, self).__init__()
         self.setupUi(self)
 
+        # widgets
+        self.default_view = DefaultView(icon_path = 
+                    os.path.join(os.getcwd(), 'visualization', 'Resources', 'icons', 'signal.png')
+                    , text='Signal'
+                    , filter="Text files (*.DAT);")
+
+        self.plotLayout.addWidget(self.default_view)    
         # variables
         self.file_path = None
         self.signal_information = SignalInformationForm()
@@ -37,7 +45,7 @@ class SignalForm(QMainWindow, Form):
         # setup plot
         self.fig = Figure()
         self.canvas = FigureCanvas(self.fig)
-        self.plotLayout.addWidget(self.canvas)
+        # self.plotLayout.addWidget(self.canvas)
         self.channels = []
         self.y_controls = []
         self.canvas.draw()
@@ -76,13 +84,14 @@ class SignalForm(QMainWindow, Form):
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
         self.canvas.mpl_connect('button_release_event', self.on_mouse_release)
         self.canvas.mpl_connect('scroll_event',self.zoom_on_wheel)
+        self.default_view.filePathChanged.connect(self.handle_file_path_changed)
 
 
     def get_file_path(self):
         new_path = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.DAT);")[0]
         if self.file_path != new_path:
             self.file_path = new_path
-        self.signal_information.show()
+        self.handle_file_path_changed(new_path)
 
     def setup_channels(self, data_info):
         height_ratios_list = [1.4 for _ in range(data_info["channels"])]
@@ -229,4 +238,15 @@ class SignalForm(QMainWindow, Form):
             ax.set_ylim([new_y_start,
                         new_y_end])
         self.canvas.draw() # force re-draw
+
+    def handle_file_path_changed(self, file_path):
+        if self.file_path != file_path:
+            self.file_path = file_path
+        if self.default_view:
+            self.plotLayout.removeWidget(self.default_view)
+            self.default_view.deleteLater()
+            self.default_view = None
+            self.plotLayout.addWidget(self.canvas)
+        self.signal_information.show()
+
 

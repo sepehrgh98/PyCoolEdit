@@ -45,7 +45,7 @@ class Channel:
         self._hist_canvas = _hist_canvas
         self.unit = ChannelUnit[self.name]
 
-        self._axis.callbacks.connect('xlim_changed', self.on_xlims_change)
+        # self._axis.callbacks.connect('xlim_changed', self.on_xlims_change)
         # self._axis.callbacks.connect('ylim_changed', self.on_ylims_change)
  
         # variables
@@ -147,7 +147,6 @@ class Channel:
     def hist_axis(self, a):
         self._hist_axis = a
 
-
     def setup_style(self):
         self._axis.set_facecolor(self.axis_bg_color)
         self._axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
@@ -208,22 +207,23 @@ class Channel:
 
     def on_ylims_change(self, event_ax):
         print(event_ax.get_ylim())
-        if self.val.any() and not self.initial_plot:
+        if len(self.val) and not self.initial_plot:
             new_range = event_ax.get_ylim()
-            # self.thread = QThread()
-            # self.worker = Worker(new_range, self.val)
-            # self.worker.moveToThread(self.thread)
-            # self.thread.started.connect(self.worker.run)
-            # self.worker.finished.connect(self.thread.quit)
-            # self.worker.finished.connect(self.worker.deleteLater)
-            # self.worker.new_data_is_ready.connect(self.update_hist)
-            # self.thread.finished.connect(self.thread.deleteLater)
-            # self.thread.start()
+            self.thread = QThread()
+            self.worker = Worker(new_range, self.val)
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.worker.finished.connect(self.thread.quit)
+            self.worker.finished.connect(self.worker.deleteLater)
+            self.worker.new_data_is_ready.connect(self.update_hist)
+            self.thread.finished.connect(self.thread.deleteLater)
+            self.thread.start()
 
         if self.initial_plot:
             self.initial_plot = False
 
     def update_hist(self, data_list):
+        print("kk")
         self._hist_axis.clear()
         self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color='#ADD8E6')
         self._hist_canvas.draw()
