@@ -1,17 +1,15 @@
 import os
-from select import select
-from turtle import color
-
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-import numpy as np
+from matplotlib.widgets import SpanSelector
 import matplotlib.gridspec
 from visualization.GUI.signal.signalinformation import SignalInformationForm
 from visualization.GUI.defaultview.defaultview import DefaultView
+from matplotlib.backend_bases import MouseButton
+
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'signal', 'signalui.ui'))[0]
 
@@ -41,6 +39,7 @@ class SignalForm(QMainWindow, Form):
         self.x_control = None
         self.drag_mode = False
         self.draged_point = None
+        self.span_list = []
 
         # setup plot
         self.fig = Figure()
@@ -49,11 +48,6 @@ class SignalForm(QMainWindow, Form):
         self.channels = []
         self.y_controls = []
         self.canvas.draw()
-
-        # nav bar
-        # self.navbar = NavigationToolbar(self.canvas, self)
-        # self.navbar
-        # self.plotControllerWidgetLayout.addWidget(self.navbar)
 
         # style
         self.tick_size = 7
@@ -65,6 +59,7 @@ class SignalForm(QMainWindow, Form):
         self.axis_bg_color = '#222b2e'
         self.data_color = '#b0e0e6'
         self.fig_color = '#151a1e'
+
 
         # style fig
         self.fig.patch.set_color(self.fig_color)
@@ -104,9 +99,11 @@ class SignalForm(QMainWindow, Form):
             y_control.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
             y_control.axes.xaxis.set_ticks([])
             y_control.set_facecolor(self.axis_bg_color)
+            # self.cursor_1 = CursorLine(ax, "v")
             self.style_channels(ax)
             self.channels.append(ax)
             self.y_controls.append(y_control)
+            self.setup_span_selector(ax)
         self.x_control = self.fig.add_subplot(gs[data_info["channels"],1])
         self.x_control.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
         self.x_control.axes.yaxis.set_ticks([])
@@ -115,6 +112,20 @@ class SignalForm(QMainWindow, Form):
 
         self.canvas.draw()
         self.canvas.flush_events()
+
+    def setup_span_selector(self, ax):
+        span = SpanSelector(
+            ax,
+            self.on_span_selected,
+            "horizontal",
+            useblit=True,
+            button = [1],
+            props=dict(alpha=0.5, facecolor="tab:red"),
+            interactive=True,
+            drag_from_anywhere=True,
+            handle_props=dict(color="yellow")
+        )
+        self.span_list.append(span)
 
     def style_channels(self, axis):
         axis.set_facecolor(self.axis_bg_color)
@@ -125,6 +136,8 @@ class SignalForm(QMainWindow, Form):
         axis.grid(axis='both', ls='--', alpha=0.4)
         axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.fig_color)
            
+    def on_span_selected(self, xmin, xmax):
+        print(xmin, xmax)
 
     @pyqtSlot(dict)
     def prepare_data_request(self, data_info):
@@ -154,7 +167,21 @@ class SignalForm(QMainWindow, Form):
     def on_mouse_press(self, event):
         if event.inaxes in self.channels:
             if event.dblclick:
-                self.rescale()
+                if event.button == 1:
+                    self.rescale()
+            # else:
+            #     if len(self.span_list):
+            #         if event.button == 3:
+            #             for span in self.span_list:
+            #                 span.set_active(False)
+            #                 span.set_visible(False)
+            #         elif event.button == 1:
+            #             for span in self.span_list:
+            #                 span.set_active(True)
+            #                 span.set_visible(True)
+            #         self.canvas.flush_events()
+            #         self.canvas.draw()
+
         if event.inaxes == self.x_control:
             self.drag_mode = True
             self.draged_point = event.xdata

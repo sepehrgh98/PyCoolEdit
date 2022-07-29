@@ -27,7 +27,7 @@ class MainWindow(QMainWindow, Form):
         # setup connections
         # pdw form
         self.pdw_form.filePathChanged.connect(self.data_handler.set_file_path)
-        
+        self.pdw_form.clearRequested.connect(self.data_handler.clear)
         self.pdw_form.dataRequested.connect(self.data_handler.dataRequest)
 
         # data handler

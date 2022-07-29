@@ -3,6 +3,9 @@ from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtGui import QCursor
+from PyQt5.QtCore import Qt
+
 
 
 class CursorLine(QObject):
@@ -22,6 +25,10 @@ class CursorLine(QObject):
             self.line = ax.axhline(color='g', lw=1.2, ls='-')
         elif self.mood == "v":
             self.line = ax.axvline(color='g', lw=1.2, ls='-')
+
+        self.move_ev = self.fig.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+
+
 
     def set_cross_hair_visible(self, visible):
         need_redraw = self.line.get_visible() != visible
@@ -58,6 +65,7 @@ class CursorLine(QObject):
             # self.data_selected.emit(event.y)
             self.last_data = round(pre_coor[0],2)
         self.data_selected.emit(self.last_data)
+
 
     def get_last_data(self):
         return self.last_data

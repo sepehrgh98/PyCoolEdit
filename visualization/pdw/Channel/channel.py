@@ -179,7 +179,9 @@ class Channel:
         if self._min == self._max:
             self._axis.set_ylim(self._min - 1, self._max + 1)
         else:
-            self._axis.set_ylim(self._min, self._max)
+            y_range = self._max - self._min
+            y_tol = y_range/4
+            self._axis.set_ylim(self._min-y_tol, self._max+y_tol)
 
         self._canvas.draw()
 

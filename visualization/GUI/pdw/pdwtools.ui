@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>116</width>
-    <height>687</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -296,7 +296,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="clearBtn">
+       <widget class="QPushButton" name="unselectBtn">
         <property name="minimumSize">
          <size>
           <width>60</width>
@@ -314,7 +314,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <selectedon>../../Resources/icons/delete.png</selectedon>
+          <normalon>../../Resources/icons/deselect.png</normalon>
          </iconset>
         </property>
         <property name="iconSize">

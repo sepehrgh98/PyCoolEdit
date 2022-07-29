@@ -36,6 +36,7 @@ class RadarForm(QMainWindow, Form):
             if channel.id == data_packet.id:
                 channel.feed(data_packet.key, data_packet.data)
                 break
+        
 
 
             

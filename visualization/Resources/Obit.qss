@@ -258,3 +258,10 @@ QScrollBar::sub-page:vertical
 QSpinBox{
 	color: #c1c1c1;
 }
+
+QMenu{
+	color: #c1c1c1;
+}
+QComboBox{
+	color: #c1c1c1;
+}

@@ -1,10 +1,6 @@
 import os
-from tkinter import N
-import numpy as np
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
-# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from visualization.GUI.customnavigationtoolbar import MyCustomToolbar as NavigationToolbar
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QLabel, QLineEdit
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -90,7 +86,8 @@ class RadarChannelForm(QWidget, Form):
             useblit=True,
             props=dict(alpha=0.5, facecolor="tab:blue"),
             interactive=True,
-            drag_from_anywhere=True
+            drag_from_anywhere=True,
+            handle_props=dict(color="red")
         )
         self.span.set_active(False)
 

@@ -184,3 +184,11 @@ class SubPlotWidget(QWidget):
     def handle_release_zoom(self, evt):
         print('release_zoom_event')
         print(evt.xdata,evt.ydata)
+
+    def clear(self):
+        self.fig.clear()
+        self.hist_fig.clear()
+        self.curr_ax = []
+        self.list_of_select_box = []
+        self.canvas.draw()
+        self.hist_canvas.draw()

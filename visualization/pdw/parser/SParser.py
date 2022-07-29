@@ -56,7 +56,8 @@ class SParser(QObject):
             for i, output in enumerate(pool.imap(partial(parse, cols=self.columns), self.raw_data), 1):
                 for name, val in output.items():
                     self.parsed_data[name] = np.append(self.parsed_data[name], val)
-                self.progress_is_ready.emit({ProgressType.parser: 1 if i>=1 else i/number_of_batches})
+
+                self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
 
             self.calculate_rri()
             self.data_packet_is_ready.emit(self.parsed_data)
@@ -109,4 +110,11 @@ class SParser(QObject):
                 RRF.append(1000000/RRI[-1])
         self.parsed_data['RRI'] = RRI
         self.parsed_data['RRF'] = RRF
+
+    def clear(self):
+        self.columns = []
+        self.initilize_data = True
+        self.parsed_data = {}
+        self.progress = 0
+        self.raw_data = []
 

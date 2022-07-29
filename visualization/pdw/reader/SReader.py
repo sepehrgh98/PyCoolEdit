@@ -42,4 +42,8 @@ class SReader(QObject):
             self.progress_is_ready.emit({ProgressType.reader:1})
             self.batch_is_ready.emit(result, True, number_of_batches)
 
+    def clear(self):
+        self.file_path = None
+        self.progress = 0
+
                     
