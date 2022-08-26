@@ -22,6 +22,19 @@ ChannelUnit = {
     ,'AOA' : 'deg' 
     ,'RRI' : 'usec' 
     ,'RRF' : 'MHz' 
+    ,'CW' : 'None'
+    ,'Freq_Validity' : 'None'
+    ,'Amp': ' '
+}
+
+Channel_id_to_name = {}
+
+TimeCoef = {
+     'psec' : 10e-12
+    ,'nsec' : 10e-9 
+    ,'usec' : 10e-6
+    ,'msec' : 10e-3 
+    ,'sec' : 1 
 }
  
 class DataPacket:
@@ -29,7 +42,6 @@ class DataPacket:
         self._id = None
         self._data = None
         self._key = None
-
 
     @property
     def id(self):

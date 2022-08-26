@@ -4,7 +4,6 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 import os
 import matplotlib
 import numpy as np
-
 from visualization.visualizationparams import ChannelUnit
 
 matplotlib.use("Qt5Agg")
@@ -34,7 +33,7 @@ class Worker(QObject):
 class Channel:
     dataRequested = pyqtSignal(int, tuple, tuple)  # channel_id , x_range , y_range
 
-    def __init__(self, _id, _name, axis, _canvas, _hist_axis, _hist_canvas):
+    def __init__(self, _id, _name, _unit, axis, _canvas, _hist_axis, _hist_canvas):
 
         # initialize
         self._id = _id
@@ -43,7 +42,7 @@ class Channel:
         self._canvas = _canvas
         self._hist_axis = _hist_axis
         self._hist_canvas = _hist_canvas
-        self.unit = ChannelUnit[self.name]
+        self.unit = _unit
 
         # self._axis.callbacks.connect('xlim_changed', self.on_xlims_change)
         # self._axis.callbacks.connect('ylim_changed', self.on_ylims_change)
@@ -56,13 +55,15 @@ class Channel:
         self._max = None
         self._min = None
         self.time_range = ()
-        self.selected_area = []
+        self.whole_area = None
+        # self.selected_area = []
+        self.selected_area = {}   # arange : line obj
         self.initial_plot = True
         self.time_show_range = ()
 
         # style
-        self.tick_size = 7
-        self.title_size = 8
+        self.tick_size = 10
+        self.title_size = 10
         self.font_name = "Times New Roman"
         self.font_weight = "bold"
         self.font_color = '#FFFCAD'
@@ -76,18 +77,26 @@ class Channel:
 
     @pyqtSlot(np.ndarray, list)
     def feed(self, x, data_list, color, mood="initilize"):
+        if mood == "initilize" and self.whole_area:
+            self.whole_area.set_data([], [])
+            self._hist_axis.clear()
+            self.cancel_selection()
+            self.hist_canvas.draw()
+
         if len(data_list):
             self._max = max(data_list)
             self._min = min(data_list)
         
-        self.feed_time(x)
         self.val = data_list
         line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
         if mood == "initilize":
+            self.feed_time(x)
             self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color=color)
         # self.update_hist(data_list)
-        if mood == "selection":
-            self.selected_area.append(line)
+        if mood == "selection" :
+            self.selected_area[x[0], x[-1]] = line
+        else:
+            self.whole_area = line
 
     def feed_time(self, x):
         if len(x):
@@ -187,12 +196,27 @@ class Channel:
 
     def clear(self):
         self.axis.cla()
+
+    def cancel_selection_all(self):
+        for range, line_obj in self.selected_area.items():
+            line_obj.set_data([], [])
+        self.selected_area = {}
+        self.canvas.draw()
+        self.canvas.flush_events()
     
-    def cancel_selection(self):
-        if self.selected_area:
-            for area in self.selected_area:
-                area.set_data([], [])
-            self._canvas.draw()
+    def cancel_selection(self, req_range):
+        mid_point = ((req_range[1] - req_range[0])/2)+req_range[0]
+        current_range = ()
+        for range, line_obj in self.selected_area.items():
+            if mid_point >= range[0] and mid_point <= range[1]:
+                current_range = range
+                line_obj.set_data([], [])
+                break
+        if current_range != ():
+            self.selected_area.pop(current_range)
+        self.canvas.draw()
+        self.canvas.flush_events()
+
 
     def on_xlims_change(self, event_ax):
         if event_ax.get_xlim() != self.time_show_range:
@@ -208,7 +232,6 @@ class Channel:
             self._canvas.draw()
 
     def on_ylims_change(self, event_ax):
-        print(event_ax.get_ylim())
         if len(self.val) and not self.initial_plot:
             new_range = event_ax.get_ylim()
             self.thread = QThread()
@@ -238,3 +261,13 @@ class Channel:
 
     def is_multiple(self):
         return False
+
+    def unit_detection(self, received_name):
+        if "(" in received_name or ")" in received_name:
+            mylist = received_name.split("(")
+            name = mylist[0]
+            unit = mylist[1].split(")")[0]
+        else:
+            name = received_name
+            unit = ChannelUnit[name.translate(name.maketrans('', '', digits))] if ChannelUnit[name.translate(name.maketrans('', '', digits))] else ''
+        return name, unit

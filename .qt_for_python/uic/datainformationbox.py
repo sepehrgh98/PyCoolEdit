@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\pdw\datainformationbox.ui'
+# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\pdw\datainformationbox.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -41,7 +41,6 @@ class Ui_dataInformationBox(object):
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_3.addWidget(self.label_3)
         self.totalDataNumberLabel = QtWidgets.QLabel(self.widget_3)
-        self.totalDataNumberLabel.setText("")
         self.totalDataNumberLabel.setObjectName("totalDataNumberLabel")
         self.horizontalLayout_3.addWidget(self.totalDataNumberLabel)
         self.horizontalLayout.addWidget(self.widget_3)
@@ -80,5 +79,6 @@ class Ui_dataInformationBox(object):
         _translate = QtCore.QCoreApplication.translate
         dataInformationBox.setWindowTitle(_translate("dataInformationBox", "Form"))
         self.label_3.setText(_translate("dataInformationBox", "Total:"))
+        self.totalDataNumberLabel.setText(_translate("dataInformationBox", "0"))
         self.label_5.setText(_translate("dataInformationBox", "Selected:"))
         self.selectedDataNumberLabel.setText(_translate("dataInformationBox", "0"))

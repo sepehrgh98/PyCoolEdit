@@ -5,9 +5,10 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QLabel, QLin
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.widgets import SpanSelector
-
+from visualization.GUI.customnavigationtoolbar import MyCustomToolbar as NavigationToolbar
 from visualization.GUI.cursorline import CursorLine
-
+from PyQt5.QtGui import QCursor
+from PyQt5.QtCore import Qt
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'radar', 'radarchannelui.ui'))[0]
 
 
@@ -68,8 +69,8 @@ class RadarChannelForm(QWidget, Form):
 
         # style fig
         self.fig.patch.set_color('#151a1e')
-        # self.fig.subplots_adjust(left=0.061, bottom=0.007, right=0.9980, top=0.98, wspace=0, hspace=0.2)
-        # self.fig.tight_layout()
+        self.fig.subplots_adjust(left=0.061, bottom=0, right=0.9980, top=0.5, wspace=0, hspace=0.2)
+        self.fig.tight_layout()
         self.fig.suptitle(self._name, fontsize=self.title_size
                           , fontname=self.font_name
                           , fontweight=self.font_weight
@@ -79,22 +80,32 @@ class RadarChannelForm(QWidget, Form):
         self.hist_line_cursor = CursorLine(self.hist_plot, "h")
 
         # span line
-        self.span = SpanSelector(
+        self.horizontal_span = SpanSelector(
             self.main_plot,
-            self.on_span_selected,
+            self.on_horizontal_span_selected,
             "horizontal",
             useblit=True,
-            props=dict(alpha=0.5, facecolor="tab:blue"),
+            props=dict(alpha=0.5, facecolor="tab:red"),
             interactive=True,
             drag_from_anywhere=True,
             handle_props=dict(color="red")
         )
-        self.span.set_active(False)
+        self.horizontal_span.set_active(False)
 
+        self.vertical_span = SpanSelector(
+            self.main_plot,
+            self.on_vertical_span_selected,
+            "vertical",
+            useblit=True,
+            props=dict(alpha=0.5, facecolor="tab:blue"),
+            interactive=True,
+            drag_from_anywhere=True,
+            handle_props=dict(color="blue")
+        )
+        self.vertical_span.set_active(False)
 
-        # plot control
-        # self.navbar = NavigationToolbar(self.canvas, self.plotWidget)
-        # self.plotControlLayout.addWidget(self.navbar)
+        # navtollbar
+        self.mpl_toolbar = NavigationToolbar(self.canvas, None)
 
         self.setup_main_plot()
         self.setup_hist_plot()
@@ -110,6 +121,10 @@ class RadarChannelForm(QWidget, Form):
         self.hist_plot.figure.canvas.mpl_connect('button_release_event', self.hist_line_cursor.on_mouse_released)
         self.hist_line_cursor.data_selected.connect(self.set_thd)
         self.add_tb_btn.clicked.connect(self.feed_local_table)
+        self.zoomBtn.clicked.connect(self.enable_zoom_action)
+        self.verticalSpanBtn.clicked.connect(self.enable_vertical_span)
+        self.horizontalSpanBtn.clicked.connect(self.enable_horizontal_span)
+        self.resetBtn.clicked.connect(self.reset_tools)
 
     def setup_main_plot(self):
         self.main_plot.set_facecolor(self.axis_bg_color)
@@ -189,21 +204,45 @@ class RadarChannelForm(QWidget, Form):
     def initialize(self):
         self.set_bin(40)
 
-    def set_span(self, active):
-        self.span.set_active(active)
-        if(active):
-            period_label = QLabel(self.controlWidget)
-            period_label.setText("Time Period(us):")
-            self.period_lineEdit = QLineEdit(self.controlWidget)
-            self.controlLayout.addRow(period_label, self.period_lineEdit)
-            SCR_label = QLabel(self.controlWidget)
-            SCR_label.setText("SCR(MHz) :")
-            self.SCR_lineEdit = QLineEdit(self.controlWidget)
-            self.controlLayout.addRow(SCR_label, self.SCR_lineEdit)
+    def setup_TimePeriod_SCR(self):
+        period_label = QLabel(self.controlWidget)
+        period_label.setText("Time Period(us):")
+        self.period_lineEdit = QLineEdit(self.controlWidget)
+        self.controlLayout.addRow(period_label, self.period_lineEdit)
+        SCR_label = QLabel(self.controlWidget)
+        SCR_label.setText("SCR(MHz) :")
+        self.SCR_lineEdit = QLineEdit(self.controlWidget)
+        self.controlLayout.addRow(SCR_label, self.SCR_lineEdit)
 
 
-    def on_span_selected(self, xmin, xmax):
+    def on_horizontal_span_selected(self, xmin, xmax):
         if self.period_lineEdit and self.SCR_lineEdit:
             pr_us = round((xmax - xmin)/1e6, 3)
             self.period_lineEdit.setText(str(pr_us))
             self.SCR_lineEdit.setText(str(round(1e6 / pr_us,3)))
+
+    def on_vertical_span_selected(self, xmin, xmax):
+        pass
+
+    
+    def enable_zoom_action(self, active):
+        self.mpl_toolbar.zoom(active)
+
+    def enable_vertical_span(self, active):
+        self.vertical_span.set_active(active)
+        self.horizontal_span.set_active(False)
+        self.canvas.setCursor(QCursor(Qt.SplitVCursor))
+
+
+    def enable_horizontal_span(self, active):
+        self.horizontal_span.set_active(active)
+        self.vertical_span.set_active(False)
+        self.canvas.setCursor(QCursor(Qt.SplitHCursor))
+
+    def reset_tools(self):
+        self.horizontal_span.set_active(False)
+        self.vertical_span.set_active(False)
+        self.horizontal_span.set_visible(False)
+        self.vertical_span.set_visible(False)
+        self.canvas.setCursor(QCursor(Qt.ArrowCursor))
+        self.canvas.draw()

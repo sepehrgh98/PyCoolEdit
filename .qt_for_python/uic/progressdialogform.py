@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\progressdialogform.ui'
+# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\progressdialogform.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,10 +14,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(533, 217)
+        Dialog.resize(522, 132)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Dialog)
+        self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.formLayout = QtWidgets.QFormLayout(self.groupBox)
         self.formLayout.setObjectName("formLayout")
@@ -46,17 +47,6 @@ class Ui_Dialog(object):
         self.visualizingProgressBar.setObjectName("visualizingProgressBar")
         self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.visualizingProgressBar)
         self.verticalLayout.addWidget(self.groupBox)
-        self.widget_4 = QtWidgets.QWidget(Dialog)
-        self.widget_4.setObjectName("widget_4")
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.widget_4)
-        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        spacerItem = QtWidgets.QSpacerItem(377, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem)
-        self.pushButton = QtWidgets.QPushButton(self.widget_4)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_4.addWidget(self.pushButton)
-        self.verticalLayout.addWidget(self.widget_4)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -64,9 +54,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.groupBox.setTitle(_translate("Dialog", "GroupBox"))
         self.label.setText(_translate("Dialog", "Reading:"))
         self.readingProgressBar.setFormat(_translate("Dialog", "%p%"))
         self.label_2.setText(_translate("Dialog", "Parsing:"))
         self.label_3.setText(_translate("Dialog", "Visualizing:"))
-        self.pushButton.setText(_translate("Dialog", "cancel"))

@@ -40,7 +40,7 @@ class RadarController(QObject):
     @pyqtSlot(dict)
     def setup_channel(self, header):
         self.channels_header = header
-        for _id, _name in header.items():
+        for _id, _info in header.items():
             self.temp_data[_id] = [np.array([]), np.array([])] # time & val
         self.channels_status = True
 

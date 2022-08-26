@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\signal\signalinformationui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\signal\signalinformationui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -26,11 +26,6 @@ class Ui_Form(object):
         self.label = QtWidgets.QLabel(self.widget)
         self.label.setObjectName("label")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label)
-        self.channelNumberComboBox = QtWidgets.QComboBox(self.widget)
-        self.channelNumberComboBox.setObjectName("channelNumberComboBox")
-        self.channelNumberComboBox.addItem("")
-        self.channelNumberComboBox.addItem("")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.channelNumberComboBox)
         self.label_2 = QtWidgets.QLabel(self.widget)
         self.label_2.setObjectName("label_2")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_2)
@@ -45,6 +40,11 @@ class Ui_Form(object):
         self.bigEndinCheckBox.setChecked(True)
         self.bigEndinCheckBox.setObjectName("bigEndinCheckBox")
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.FieldRole, self.bigEndinCheckBox)
+        self.channelNumberSpinBox = QtWidgets.QSpinBox(self.widget)
+        self.channelNumberSpinBox.setMinimum(1)
+        self.channelNumberSpinBox.setMaximum(10000)
+        self.channelNumberSpinBox.setObjectName("channelNumberSpinBox")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.channelNumberSpinBox)
         self.verticalLayout.addWidget(self.widget)
         self.applyBtn = QtWidgets.QPushButton(Form)
         self.applyBtn.setObjectName("applyBtn")
@@ -57,8 +57,6 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "Number of Channels :"))
-        self.channelNumberComboBox.setItemText(0, _translate("Form", "1"))
-        self.channelNumberComboBox.setItemText(1, _translate("Form", "2"))
         self.label_2.setText(_translate("Form", "Data Sign:"))
         self.signCheckBox.setText(_translate("Form", "signed"))
         self.label_3.setText(_translate("Form", "Endin:"))

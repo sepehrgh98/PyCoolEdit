@@ -8,7 +8,7 @@ from matplotlib.widgets import SpanSelector
 import matplotlib.gridspec
 from visualization.GUI.signal.signalinformation import SignalInformationForm
 from visualization.GUI.defaultview.defaultview import DefaultView
-from matplotlib.backend_bases import MouseButton
+import matplotlib.collections as collections
 
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'signal', 'signalui.ui'))[0]
@@ -39,7 +39,10 @@ class SignalForm(QMainWindow, Form):
         self.x_control = None
         self.drag_mode = False
         self.draged_point = None
-        self.span_list = []
+        self.vertical_span_list = []
+        self.hor_span = None
+        self.hor_span_2 = None
+        self.current_axis = None
 
         # setup plot
         self.fig = Figure()
@@ -81,7 +84,6 @@ class SignalForm(QMainWindow, Form):
         self.canvas.mpl_connect('scroll_event',self.zoom_on_wheel)
         self.default_view.filePathChanged.connect(self.handle_file_path_changed)
 
-
     def get_file_path(self):
         new_path = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.DAT);")[0]
         if self.file_path != new_path:
@@ -99,33 +101,47 @@ class SignalForm(QMainWindow, Form):
             y_control.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
             y_control.axes.xaxis.set_ticks([])
             y_control.set_facecolor(self.axis_bg_color)
-            # self.cursor_1 = CursorLine(ax, "v")
+            self.setup_vertical_span_selector(y_control, ax)
             self.style_channels(ax)
             self.channels.append(ax)
             self.y_controls.append(y_control)
-            self.setup_span_selector(ax)
+        self.setup_horizontal_span_selector()
         self.x_control = self.fig.add_subplot(gs[data_info["channels"],1])
         self.x_control.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
         self.x_control.axes.yaxis.set_ticks([])
         self.x_control.set_facecolor(self.axis_bg_color)
         self.x_control.get_shared_x_axes().join(self.x_control, *self.channels)
+        # self.setup_vertical_span_selector(self.x_control)
 
         self.canvas.draw()
         self.canvas.flush_events()
 
-    def setup_span_selector(self, ax):
-        span = SpanSelector(
-            ax,
-            self.on_span_selected,
-            "horizontal",
-            useblit=True,
-            button = [1],
-            props=dict(alpha=0.5, facecolor="tab:red"),
-            interactive=True,
-            drag_from_anywhere=True,
-            handle_props=dict(color="yellow")
+    def setup_horizontal_span_selector(self):
+        self.hor_span = SpanSelector(
+        self.channels[0],
+        self.on_horizontal_span_selected,
+        "horizontal",
+        useblit=True,
+        props=dict(alpha=0.5, facecolor="tab:red"),
+        interactive=True,
+        drag_from_anywhere=True,
+        ignore_event_outside=True
         )
-        self.span_list.append(span)
+        self.hor_span_2 = self.channels[-1].axvspan(0, 0.01, facecolor ='red', alpha = 0.5, zorder=10)
+
+    def setup_vertical_span_selector(self,controller, ax):
+        ver_span_on_controller = SpanSelector(
+                controller,
+                self.on_vertical_span_selected,
+                "vertical",
+                useblit=True,
+                props=dict(alpha=0.5, facecolor="tab:blue"),
+                interactive=True,
+                drag_from_anywhere=True,
+                ignore_event_outside=True
+                )
+        ver_span = ax.axhspan(0, 0.01, facecolor ='blue', alpha = 0.5, zorder=10)
+        self.vertical_span_list.append((controller,ver_span_on_controller,ver_span))
 
     def style_channels(self, axis):
         axis.set_facecolor(self.axis_bg_color)
@@ -136,8 +152,26 @@ class SignalForm(QMainWindow, Form):
         axis.grid(axis='both', ls='--', alpha=0.4)
         axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.fig_color)
            
-    def on_span_selected(self, xmin, xmax):
-        print(xmin, xmax)
+    def on_horizontal_span_selected(self, xmin, xmax):
+        _ndarray = self.hor_span_2.get_xy()
+        _ndarray[:, 0] = [xmin, xmin, xmax, xmax, xmin]
+        self.hor_span_2.set_xy(_ndarray)
+        self.canvas.draw()
+        self.canvas.flush_events()
+
+
+    def on_vertical_span_selected(self, ymin, ymax):
+        ver_span = None
+        for item in self.vertical_span_list:
+            if item[0] == self.current_axis:
+                ver_span = item[2]
+        if ver_span:
+            _ndarray = ver_span.get_xy()
+            _ndarray[:, 1] = [ymin, ymax, ymax, ymin, ymin]
+            ver_span.set_xy(_ndarray)
+            self.canvas.draw()
+            self.canvas.flush_events()
+
 
     @pyqtSlot(dict)
     def prepare_data_request(self, data_info):
@@ -165,10 +199,12 @@ class SignalForm(QMainWindow, Form):
         self.canvas.flush_events()
 
     def on_mouse_press(self, event):
+        self.current_axis = event.inaxes
         if event.inaxes in self.channels:
             if event.dblclick:
                 if event.button == 1:
                     self.rescale()
+                    
             # else:
             #     if len(self.span_list):
             #         if event.button == 3:
@@ -200,10 +236,8 @@ class SignalForm(QMainWindow, Form):
             ax.set_xlim([new_x_start, new_x_end])
             self.canvas.draw()
 
-
     def on_mouse_release(self, event):
-        self.drag_mode = False
-            
+        self.drag_mode = False       
 
     def rescale(self):
         for axis in self.channels:

@@ -19,8 +19,11 @@ class PDWToolsForm(QWidget, Form):
     resetZoomRequested = pyqtSignal()
     selectAllRequested = pyqtSignal()
     concatListIsReady = pyqtSignal(list)
-    deselectRequested = pyqtSignal()
+    deselectAllRequested = pyqtSignal()
     clearRequested = pyqtSignal()
+    exportRequested = pyqtSignal()
+    deleteSelectedRequested = pyqtSignal()
+
 
     def __init__(self):
         super(PDWToolsForm, self).__init__()
@@ -48,7 +51,9 @@ class PDWToolsForm(QWidget, Form):
         self.newRadarBtn.clicked.connect(self.radarRequested)
         self.resetBtn.clicked.connect(self.resetZoomRequested)
         self.concatChannelsBtn.clicked.connect(self.show_concat_box)
-        self.unselectBtn.clicked.connect(self.deselectRequested)
+        self.unselectBtn.clicked.connect(self.deselectAllRequested)
+        self.exportBtn.clicked.connect(self.exportRequested)
+        self.deleteBtn.clicked.connect(self.deleteSelectedRequested)
         self.concat_box.concatListIsReady.connect(self.concatListIsReady)
 
         # group Btn

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\visualization\GUI\pdw\pdwui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\pdw\pdwui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -43,8 +43,6 @@ class Ui_MainWindow(object):
         self.rightFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.rightFrame.setObjectName("rightFrame")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.rightFrame)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.dataInfoWidget = QtWidgets.QWidget(self.rightFrame)
         self.dataInfoWidget.setObjectName("dataInfoWidget")
@@ -53,6 +51,13 @@ class Ui_MainWindow(object):
         self.dataInfoLayout.setSpacing(0)
         self.dataInfoLayout.setObjectName("dataInfoLayout")
         self.verticalLayout.addWidget(self.dataInfoWidget)
+        self.reviewWidget = QtWidgets.QWidget(self.rightFrame)
+        self.reviewWidget.setObjectName("reviewWidget")
+        self.reviewLayout = QtWidgets.QHBoxLayout(self.reviewWidget)
+        self.reviewLayout.setContentsMargins(0, 0, 0, 0)
+        self.reviewLayout.setSpacing(0)
+        self.reviewLayout.setObjectName("reviewLayout")
+        self.verticalLayout.addWidget(self.reviewWidget)
         self.plotWidget = QtWidgets.QWidget(self.rightFrame)
         self.plotWidget.setObjectName("plotWidget")
         self.plotLayout = QtWidgets.QHBoxLayout(self.plotWidget)
@@ -61,6 +66,7 @@ class Ui_MainWindow(object):
         self.plotLayout.setObjectName("plotLayout")
         self.verticalLayout.addWidget(self.plotWidget)
         self.verticalLayout.setStretch(1, 1)
+        self.verticalLayout.setStretch(2, 4)
         self.horizontalLayout_2.addWidget(self.rightFrame)
         self.horizontalLayout_2.setStretch(1, 1)
         self.verticalLayout_2.addWidget(self.widget_2)

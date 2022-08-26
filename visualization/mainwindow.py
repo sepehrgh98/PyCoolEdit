@@ -28,7 +28,8 @@ class MainWindow(QMainWindow, Form):
         # pdw form
         self.pdw_form.filePathChanged.connect(self.data_handler.set_file_path)
         self.pdw_form.clearRequested.connect(self.data_handler.clear)
-        self.pdw_form.dataRequested.connect(self.data_handler.dataRequest)
+        self.pdw_form.selectDataRequested.connect(self.data_handler.selectDataRequested)
+        self.pdw_form.deleteSelectedRequested.connect(self.data_handler.deleteSelectedRequested)
 
         # data handler
         self.data_handler.columns_defined.connect(self.pdw_form.setup_channels)

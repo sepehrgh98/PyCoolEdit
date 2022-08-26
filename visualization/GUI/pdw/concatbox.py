@@ -16,9 +16,9 @@ class ConcatBox(QWidget, Form):
         self.channels = []
 
     def setup_channel(self, header):
-        for id, name in header.items():
+        for id, _info in header.items():
             ch_label = QLabel(self.concatGroupBox)
-            ch_label.setText(name)
+            ch_label.setText(_info[0])
             self.channel_checkBox = QCheckBox(self.concatGroupBox)
             self.channel_checkBox.setAccessibleName(str(id))
             self.channels.append(self.channel_checkBox)
