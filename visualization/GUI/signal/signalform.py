@@ -1,7 +1,7 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QGroupBox, QFormLayout, QLabel, QLineEdit
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.widgets import SpanSelector
@@ -43,6 +43,7 @@ class SignalForm(QMainWindow, Form):
         self.hor_span = None
         self.hor_span_2 = None
         self.current_axis = None
+        self.span_result_widgets = [] # list of (id, min_lineEdit, max_lineEdit, diff_lineEdit)
 
         # setup plot
         self.fig = Figure()
@@ -105,6 +106,7 @@ class SignalForm(QMainWindow, Form):
             self.style_channels(ax)
             self.channels.append(ax)
             self.y_controls.append(y_control)
+            self.setup_span_widgets(i)
         self.setup_horizontal_span_selector()
         self.x_control = self.fig.add_subplot(gs[data_info["channels"],1])
         self.x_control.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
@@ -115,6 +117,23 @@ class SignalForm(QMainWindow, Form):
 
         self.canvas.draw()
         self.canvas.flush_events()
+
+    def setup_span_widgets(self, ch_ind):
+        group_box = QGroupBox(self.verticalSpanResultWidget)
+        group_box.setTitle("channel " + str(ch_ind+1))
+        layout = QFormLayout()
+        min_lineEdit = QLineEdit()
+        max_lineEdit = QLineEdit()
+        diff_lineEdit = QLineEdit()
+        min_lineEdit.setReadOnly(True)
+        max_lineEdit.setReadOnly(True)
+        diff_lineEdit.setReadOnly(True)
+        self.span_result_widgets.append((ch_ind+1,min_lineEdit, max_lineEdit, diff_lineEdit))
+        layout.addRow(QLabel("min : "), min_lineEdit)
+        layout.addRow(QLabel("max : "), max_lineEdit)
+        layout.addRow(QLabel("diff : "), diff_lineEdit)
+        group_box.setLayout(layout)
+        self.verticalSpanResultLayout.addWidget(group_box)
 
     def setup_horizontal_span_selector(self):
         self.hor_span = SpanSelector(
@@ -153,6 +172,12 @@ class SignalForm(QMainWindow, Form):
         axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.fig_color)
            
     def on_horizontal_span_selected(self, xmin, xmax):
+        # feed widgets
+        self.HSMinLineEdit.setText(str(round(xmin, 2)))
+        self.HSMaxLineEdit.setText(str(round(xmax, 2)))
+        self.HSDiffLineEdit.setText(str(round(xmax - xmin, 2)))
+
+        # second span
         _ndarray = self.hor_span_2.get_xy()
         _ndarray[:, 0] = [xmin, xmin, xmax, xmax, xmin]
         self.hor_span_2.set_xy(_ndarray)
@@ -162,9 +187,22 @@ class SignalForm(QMainWindow, Form):
 
     def on_vertical_span_selected(self, ymin, ymax):
         ver_span = None
+        index = 0
         for item in self.vertical_span_list:
             if item[0] == self.current_axis:
+                index = self.vertical_span_list.index(item) + 1
                 ver_span = item[2]
+                break
+            
+         # feed widgets
+        for wid in self.span_result_widgets:
+            if index == wid[0]:
+                wid[1].setText(str(round(ymin, 2)))
+                wid[2].setText(str(round(ymax, 2)))
+                wid[3].setText(str(round(ymax - ymin, 2)))
+                break
+
+        # second span
         if ver_span:
             _ndarray = ver_span.get_xy()
             _ndarray[:, 1] = [ymin, ymax, ymax, ymin, ymin]
@@ -204,20 +242,16 @@ class SignalForm(QMainWindow, Form):
             if event.dblclick:
                 if event.button == 1:
                     self.rescale()
-                    
-            # else:
-            #     if len(self.span_list):
-            #         if event.button == 3:
-            #             for span in self.span_list:
-            #                 span.set_active(False)
-            #                 span.set_visible(False)
-            #         elif event.button == 1:
-            #             for span in self.span_list:
-            #                 span.set_active(True)
-            #                 span.set_visible(True)
-            #         self.canvas.flush_events()
-            #         self.canvas.draw()
-
+                elif event.button == 3:
+                    self.hor_span.set_active(False)
+                    self.hor_span.set_visible(False)
+                    self.hor_span_2.remove()
+                    for item in self.vertical_span_list:
+                        item[1].set_active(False)
+                        item[1].set_visible(False)
+                        item[2].remove()
+                    self.canvas.flush_events()
+                    self.canvas.draw()
         if event.inaxes == self.x_control:
             self.drag_mode = True
             self.draged_point = event.xdata

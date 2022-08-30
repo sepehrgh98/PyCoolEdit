@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\pdw\datainformationbox.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\pdw\datainformationbox.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,20 +14,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_dataInformationBox(object):
     def setupUi(self, dataInformationBox):
         dataInformationBox.setObjectName("dataInformationBox")
-        dataInformationBox.resize(800, 29)
-        dataInformationBox.setMinimumSize(QtCore.QSize(800, 0))
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(dataInformationBox)
-        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_5.setSpacing(0)
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.groupBox = QtWidgets.QGroupBox(dataInformationBox)
-        self.groupBox.setTitle("")
-        self.groupBox.setObjectName("groupBox")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.groupBox)
+        dataInformationBox.resize(365, 338)
+        dataInformationBox.setMinimumSize(QtCore.QSize(0, 0))
+        self.horizontalLayout = QtWidgets.QHBoxLayout(dataInformationBox)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.widget_3 = QtWidgets.QWidget(self.groupBox)
+        self.widget_4 = QtWidgets.QWidget(dataInformationBox)
+        self.widget_4.setObjectName("widget_4")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.widget_4)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.widget_3 = QtWidgets.QWidget(self.widget_4)
         self.widget_3.setObjectName("widget_3")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget_3)
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -43,8 +40,8 @@ class Ui_dataInformationBox(object):
         self.totalDataNumberLabel = QtWidgets.QLabel(self.widget_3)
         self.totalDataNumberLabel.setObjectName("totalDataNumberLabel")
         self.horizontalLayout_3.addWidget(self.totalDataNumberLabel)
-        self.horizontalLayout.addWidget(self.widget_3)
-        self.widget_2 = QtWidgets.QWidget(self.groupBox)
+        self.verticalLayout.addWidget(self.widget_3)
+        self.widget_2 = QtWidgets.QWidget(self.widget_4)
         self.widget_2.setObjectName("widget_2")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.widget_2)
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -58,8 +55,8 @@ class Ui_dataInformationBox(object):
         self.selectedDataNumberLabel = QtWidgets.QLabel(self.widget_2)
         self.selectedDataNumberLabel.setObjectName("selectedDataNumberLabel")
         self.horizontalLayout_4.addWidget(self.selectedDataNumberLabel)
-        self.horizontalLayout.addWidget(self.widget_2)
-        self.widget = QtWidgets.QWidget(self.groupBox)
+        self.verticalLayout.addWidget(self.widget_2)
+        self.widget = QtWidgets.QWidget(self.widget_4)
         self.widget.setObjectName("widget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -69,8 +66,8 @@ class Ui_dataInformationBox(object):
         self.fileNameLabel.setText("")
         self.fileNameLabel.setObjectName("fileNameLabel")
         self.horizontalLayout_2.addWidget(self.fileNameLabel)
-        self.horizontalLayout.addWidget(self.widget)
-        self.horizontalLayout_5.addWidget(self.groupBox)
+        self.verticalLayout.addWidget(self.widget)
+        self.horizontalLayout.addWidget(self.widget_4)
 
         self.retranslateUi(dataInformationBox)
         QtCore.QMetaObject.connectSlotsByName(dataInformationBox)

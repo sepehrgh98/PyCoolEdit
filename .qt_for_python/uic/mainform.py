@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\mainform.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\mainform.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -34,6 +34,8 @@ class Ui_MainWindow(object):
         self.PDWTab = QtWidgets.QWidget()
         self.PDWTab.setObjectName("PDWTab")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.PDWTab)
+        self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
+        self.verticalLayout_2.setSpacing(7)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.pdwWidget = QtWidgets.QWidget(self.PDWTab)
         self.pdwWidget.setObjectName("pdwWidget")
@@ -46,6 +48,7 @@ class Ui_MainWindow(object):
         self.SignalForm = QtWidgets.QWidget()
         self.SignalForm.setObjectName("SignalForm")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.SignalForm)
+        self.verticalLayout_3.setContentsMargins(11, 11, 11, -1)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.signalWidget = QtWidgets.QWidget(self.SignalForm)
         self.signalWidget.setObjectName("signalWidget")
@@ -55,6 +58,20 @@ class Ui_MainWindow(object):
         self.signalLayout.setObjectName("signalLayout")
         self.verticalLayout_3.addWidget(self.signalWidget)
         self.tabWidget.addTab(self.SignalForm, "")
+        self.settingsForm = QtWidgets.QWidget()
+        self.settingsForm.setObjectName("settingsForm")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.settingsForm)
+        self.verticalLayout_4.setContentsMargins(11, 11, 11, 11)
+        self.verticalLayout_4.setSpacing(7)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.settingsWidget = QtWidgets.QWidget(self.settingsForm)
+        self.settingsWidget.setObjectName("settingsWidget")
+        self.MainSettingsLayout = QtWidgets.QHBoxLayout(self.settingsWidget)
+        self.MainSettingsLayout.setContentsMargins(0, 0, 0, 0)
+        self.MainSettingsLayout.setSpacing(0)
+        self.MainSettingsLayout.setObjectName("MainSettingsLayout")
+        self.verticalLayout_4.addWidget(self.settingsWidget)
+        self.tabWidget.addTab(self.settingsForm, "")
         self.verticalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -67,3 +84,4 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.PDWTab), _translate("MainWindow", "PDW"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SignalForm), _translate("MainWindow", "SIGNAL"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingsForm), _translate("MainWindow", "SETTINGS"))

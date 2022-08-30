@@ -23,6 +23,11 @@ class PDWToolsForm(QWidget, Form):
     clearRequested = pyqtSignal()
     exportRequested = pyqtSignal()
     deleteSelectedRequested = pyqtSignal()
+    showNormalizeRequested = pyqtSignal()
+    forwardZoomRequested = pyqtSignal()
+    backeardZoomRequested = pyqtSignal()
+    lineMarkerRequested = pyqtSignal(bool)
+    pointMarkerRequested = pyqtSignal(bool)
 
 
     def __init__(self):
@@ -54,6 +59,11 @@ class PDWToolsForm(QWidget, Form):
         self.unselectBtn.clicked.connect(self.deselectAllRequested)
         self.exportBtn.clicked.connect(self.exportRequested)
         self.deleteBtn.clicked.connect(self.deleteSelectedRequested)
+        self.noralizeBtn.clicked.connect(self.showNormalizeRequested)
+        self.forwardZoomBtn.clicked.connect(self.forwardZoomRequested)
+        self.backwardZoomBtn.clicked.connect(self.backeardZoomRequested)
+        self.lineMarkerBtn.clicked.connect(self.lineMarkerRequested)
+        self.pointCursorBtn.clicked.connect(self.pointMarkerRequested)
         self.concat_box.concatListIsReady.connect(self.concatListIsReady)
 
         # group Btn

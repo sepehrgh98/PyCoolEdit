@@ -35,10 +35,20 @@ QLabel
 	background-color: #232430;
 	color: #c1c1c1;
 	border-color: #000000;
+}
+/*-----QGroupBox-----*/
+QGroupBox:title
+{
+	color: #c1c1c1;
+}
+QGroupBox{ 
+	border: 2px solid #c1c1c1; 
+	border-radius: 3px; 
+} 
+QRadioButton{
+	color: #c1c1c1;
 
 }
-
-
 /*-----QPushButton-----*/
 QPushButton
 {
@@ -48,6 +58,7 @@ QPushButton
 	border-style: solid;
 	border-color: #000000;
 	padding: 6px;
+	border-radius: 15px;
 
 }
 

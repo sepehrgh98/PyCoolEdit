@@ -6,7 +6,6 @@ from visualization.visualizationparams import ProgressType
 from visualization.visualizationparams import ChannelUnit
 from string import digits
 from visualization.visualizationparams import TimeCoef
-import time
 
 
 def find_nearest_value_indx(array, value):
@@ -71,18 +70,41 @@ class SParser(QObject):
             self.data_packet_is_ready.emit(self.parsed_data)
 
     
-    @pyqtSlot(tuple)
-    def prepare_requested_select_data(self, time_range):
+    @pyqtSlot(str, tuple, tuple)
+    def prepare_requested_select_data(self,ch_name, time_range, value_range):
+
         if time_range == (-1,) :
             first_x_index = 0
             last_x_index = len(self.parsed_data['TOA']) - 1
         else:
             first_x_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[0])
             last_x_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[1])
+
+        if value_range == (-1,):
+            min_val = min(self.parsed_data[ch_name])
+            max_val = max(self.parsed_data[ch_name])
+            value_range = (min_val, max_val)
+
             
         requested_data = dict()
+        req_time = (self.parsed_data['TOA'])[first_x_index:last_x_index]
+        req_val = (self.parsed_data[ch_name])[first_x_index:last_x_index]
+        y_x_filtered = []
+        outout_index = []
+        for key, val in zip(req_time, req_val):
+            if val >= value_range[0] and val <= value_range[1]:
+                y_x_filtered.append(val)
+                outout_index.append(list(self.parsed_data['TOA']).index(key))
+
+
+        requested_data[ch_name] = y_x_filtered
+
         for key, val in self.parsed_data.items():
-            requested_data[key] = val[first_x_index:last_x_index]
+            if key != ch_name:
+                new_val = [val[ind] for ind in outout_index]
+                requested_data[key] = new_val
+
+
         self.data_packet_is_ready.emit(requested_data)
 
 

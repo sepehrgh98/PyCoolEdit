@@ -5,6 +5,7 @@ from visualization.GUI.pdw.pdwform import PDWForm
 from visualization.GUI.signal.signalform import SignalForm
 from visualization.Signal.signalcontroller import SignalController
 from visualization.pdw.datahandler import DataHandler
+from visualization.GUI.settings.mainsettings import MainSettings
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'mainform.ui'))[0]
 
@@ -21,8 +22,10 @@ class MainWindow(QMainWindow, Form):
         self.data_handler = DataHandler()
         self.signal_form = SignalForm()
         self.signal_controller = SignalController()
+        self.mainsettings = MainSettings()
         self.pdwLayout.addWidget(self.pdw_form)
         self.signalLayout.addWidget(self.signal_form)
+        self.MainSettingsLayout.addWidget(self.mainsettings)
 
         # setup connections
         # pdw form
@@ -41,7 +44,10 @@ class MainWindow(QMainWindow, Form):
 
         # signal controller
         self.signal_controller.data_packet_is_ready.connect(self.signal_form.feed)
+
+        # settings
+        self.mainsettings.showPolicyChanged.connect(self.pdw_form.showPolicyChanged)
         
 
         # show project
-        self.show()
+        self.showMaximized()

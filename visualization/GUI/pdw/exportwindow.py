@@ -34,7 +34,7 @@ class PDWExprtWindow(QWidget, Form):
     def do_export(self):
         exporter = None
         new_path = self.pathLineEdit.text()
-        if self.type == 'text':
+        if self.type == 'txt':
             exporter = PDWTextExport(new_path)
         elif self.type == 'html':
             exporter = PDWHtmlExport(new_path)

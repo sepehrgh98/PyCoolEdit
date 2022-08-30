@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\radar\radarformui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\dist\main\visualization\GUI\radar\radarformui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #

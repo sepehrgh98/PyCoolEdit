@@ -49,7 +49,7 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "Export to :"))
-        self.exportTypeComboBox.setItemText(0, _translate("Form", "text"))
+        self.exportTypeComboBox.setItemText(0, _translate("Form", "txt"))
         self.exportTypeComboBox.setItemText(1, _translate("Form", "csv"))
         self.browsBtn.setText(_translate("Form", "Brows"))
         self.exportBtn.setText(_translate("Form", "Export"))

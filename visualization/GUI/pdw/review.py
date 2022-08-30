@@ -82,7 +82,8 @@ class PDWReviewForm(QWidget, Form):
                                 , linefmt=self.axis_color
                                 , bottom = min_val
                                 , markerfmt=self.axis_circle_color
-                                , basefmt=self.axis_color)
+                                ,basefmt=" "
+                                )
             self.canvas.draw()
             self.canvas.flush_events()
 
@@ -92,6 +93,8 @@ class PDWReviewForm(QWidget, Form):
 
     @pyqtSlot(DataPacket)
     def feed_marked(self, data_packet):
+        if len(data_packet.key) < 2 :
+            return
         if data_packet.id == self.showed_channel:
             min_val = min(data_packet.data)
             markerline, stemline, baseline =self.main_plot.stem(data_packet.key
@@ -100,15 +103,13 @@ class PDWReviewForm(QWidget, Form):
                                 , linefmt=self.axis_marked_color
                                 , bottom = min_val
                                 , markerfmt=self.axis_marked_circle_color
-                                , basefmt=self.axis_marked_color)
+                                , basefmt=" ")
             self.marked_areas[(data_packet.key[0],data_packet.key[-1])] = (markerline, stemline, baseline)
             self.canvas.draw()
             self.canvas.flush_events()
 
     @pyqtSlot(tuple) # ranges
     def unmark(self, req_range):
-        # print((list(self.marked_areas.values())[0])[2].get_xdata())
-        # print(req_range, self.marked_areas.keys())
         mid_point = ((req_range[1] - req_range[0])/2)+req_range[0]
         current_range = ()
         for range, stem_obj in self.marked_areas.items():

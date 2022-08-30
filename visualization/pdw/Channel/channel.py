@@ -77,10 +77,12 @@ class Channel:
 
     @pyqtSlot(np.ndarray, list)
     def feed(self, x, data_list, color, mood="initilize"):
+        if len(x)<2:
+            return
         if mood == "initilize" and self.whole_area:
             self.whole_area.set_data([], [])
             self._hist_axis.clear()
-            self.cancel_selection()
+            self.cancel_selection_all()
             self.hist_canvas.draw()
 
         if len(data_list):
@@ -92,11 +94,14 @@ class Channel:
         if mood == "initilize":
             self.feed_time(x)
             self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color=color)
+            self.rescale()
+
         # self.update_hist(data_list)
         if mood == "selection" :
             self.selected_area[x[0], x[-1]] = line
         else:
             self.whole_area = line
+
 
     def feed_time(self, x):
         if len(x):
@@ -214,8 +219,6 @@ class Channel:
                 break
         if current_range != ():
             self.selected_area.pop(current_range)
-        self.canvas.draw()
-        self.canvas.flush_events()
 
 
     def on_xlims_change(self, event_ax):
@@ -248,7 +251,6 @@ class Channel:
             self.initial_plot = False
 
     def update_hist(self, data_list):
-        print("kk")
         self._hist_axis.clear()
         self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color='#ADD8E6')
         self._hist_canvas.draw()

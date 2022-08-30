@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\sepeh\Desktop\Visualization\dist\main\visualization\GUI\defaultview\defaultview.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\dist\main\visualization\GUI\defaultview\defaultview.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -77,7 +77,7 @@ class Ui_Form(object):
         self.horizontalLayout_3.addItem(spacerItem7)
         self.commandLinkButton = QtWidgets.QCommandLinkButton(self.widget_4)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("c:\\Users\\sepeh\\Desktop\\Visualization\\dist\\main\\visualization\\GUI\\defaultview\\../../Resources/icons/plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("f:\\Visualization\\dist\\main\\visualization\\GUI\\defaultview\\../../Resources/icons/plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.commandLinkButton.setIcon(icon)
         self.commandLinkButton.setObjectName("commandLinkButton")
         self.horizontalLayout_3.addWidget(self.commandLinkButton)

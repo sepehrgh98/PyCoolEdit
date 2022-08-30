@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\Visualization\dist\main\visualization\GUI\pdw\reviewui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\pdw\normalizewindowui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,11 +14,20 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1047, 343)
+        Form.resize(1145, 716)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
-        self.verticalLayout.setContentsMargins(11, 11, 11, 0)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.plotWidget = QtWidgets.QWidget(Form)
+        self.plotWidget.setObjectName("plotWidget")
+        self.plotLayout = QtWidgets.QHBoxLayout(self.plotWidget)
+        self.plotLayout.setObjectName("plotLayout")
+        self.verticalLayout.addWidget(self.plotWidget)
+        self.controllerWidget = QtWidgets.QWidget(Form)
+        self.controllerWidget.setObjectName("controllerWidget")
+        self.verticalLayout.addWidget(self.controllerWidget)
+        self.verticalLayout.setStretch(0, 1)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)

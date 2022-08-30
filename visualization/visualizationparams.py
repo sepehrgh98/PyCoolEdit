@@ -12,6 +12,10 @@ class ProgressType(enum.Enum):
     parser = 2
     visualizer = 3
 
+class ShowPolicy(enum.Enum):
+    scroll = 1
+    non_scroll = 2
+
 
 ChannelUnit = {
     'TOA' : 'sec'
@@ -42,6 +46,9 @@ class DataPacket:
         self._id = None
         self._data = None
         self._key = None
+
+    def __repr__(self) -> str:
+        return str(self._id) + " : " + str(len(self._key)) + ", " + str(len(self._data))
 
     @property
     def id(self):

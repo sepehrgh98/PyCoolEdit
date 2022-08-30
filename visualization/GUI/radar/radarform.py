@@ -24,8 +24,8 @@ class RadarForm(QMainWindow, Form):
     def setup_channel(self, header):
         for _id, _info in header.items():
             radar_ch_form = RadarChannelForm(_id, _info[0])
-            if _info[0] == "Omni" or _info[0] == "DF":
-                radar_ch_form.setup_TimePeriod_SCR()
+            # if _info[0] == "Omni" or _info[0] == "DF":
+            radar_ch_form.setup_TimePeriod_SCR()
             self.tabWidget.addTab(radar_ch_form, _info[0])
             self.channels.append(radar_ch_form)
         self.tabBarLayout.addWidget(self.tabWidget)

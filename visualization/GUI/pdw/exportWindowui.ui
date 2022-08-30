@@ -43,7 +43,7 @@
        <widget class="QComboBox" name="exportTypeComboBox">
         <item>
          <property name="text">
-          <string>text</string>
+          <string>txt</string>
          </property>
         </item>
         <item>

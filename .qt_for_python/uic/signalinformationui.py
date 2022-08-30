@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\signal\signalinformationui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\dist\main\visualization\GUI\signal\signalinformationui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
