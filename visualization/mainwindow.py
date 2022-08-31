@@ -33,11 +33,14 @@ class MainWindow(QMainWindow, Form):
         self.pdw_form.clearRequested.connect(self.data_handler.clear)
         self.pdw_form.selectDataRequested.connect(self.data_handler.selectDataRequested)
         self.pdw_form.deleteSelectedRequested.connect(self.data_handler.deleteSelectedRequested)
+        self.pdw_form.lineCursorDataRequested.connect(self.data_handler.lineCursorDataRequested)
+        self.pdw_form.pointMarkerDataRequested.connect(self.data_handler.pointMarkerDataRequested)
 
         # data handler
         self.data_handler.columns_defined.connect(self.pdw_form.setup_channels)
         self.data_handler.final_data_is_ready.connect(self.pdw_form.feed)
         self.data_handler.progress_is_ready.connect(self.pdw_form.feed_progressbar)
+        self.data_handler.markerLineResultIsReady.connect(self.pdw_form.markerLineResultIsReady)
 
         # signal form
         self.signal_form.request_data.connect(self.signal_controller.get_data)
@@ -47,6 +50,7 @@ class MainWindow(QMainWindow, Form):
 
         # settings
         self.mainsettings.showPolicyChanged.connect(self.pdw_form.showPolicyChanged)
+        self.mainsettings.showOmniDfChanged.connect(self.pdw_form.on_showOmniDfChanged)
         
 
         # show project

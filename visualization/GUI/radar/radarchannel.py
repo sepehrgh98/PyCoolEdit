@@ -2,16 +2,18 @@ import os
 import re
 from tokenize import Double
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSlot, QPersistentModelIndex
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QLabel, QLineEdit
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QLabel, QLineEdit, QTableView
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.widgets import SpanSelector
-from visualization.GUI.customnavigationtoolbar import MyCustomToolbar as NavigationToolbar
 from visualization.GUI.cursorline import CursorLine
 from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import Qt
 import numpy as np
+from visualization.GUI.pdw.historicalzoom import HistoricalZoom
+
+from visualization.pdw.capsulation.capsulator import find_nearest_value_indx
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'radar', 'radarchannelui.ui'))[0]
 
@@ -28,8 +30,10 @@ class RadarChannelForm(QWidget, Form):
         # variables
         self.bin = None
         self.input_data = ()
-        self.spanned_horizontal_data = ()
-        self.spanned_vertical_data = ()
+        # self.spanned_horizontal_data = ()
+        # self.spanned_vertical_data = ()
+        self.time_req_range = ()
+        self.val_req_range = ()
         self.h_span_data = ()
         self.time_range = [-1,-1]
         self.val_range = [-1,-1]
@@ -47,15 +51,12 @@ class RadarChannelForm(QWidget, Form):
         self.channelLabel.setText(self._name + " :")
 
         # local table
-        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setColumnCount(6)
         table_header = [self._name, "Count", "Min", "Max", "Average", "STD"]
         self.tableWidget.setHorizontalHeaderLabels(table_header)
         # self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        #shared table
-        
 
         # setup figure
         self.fig = Figure()
@@ -84,9 +85,7 @@ class RadarChannelForm(QWidget, Form):
                           , fontname=self.font_name
                           , fontweight=self.font_weight
                           , color=self.font_color)
-
-        # show line
-        self.hist_line_cursor = CursorLine(self.hist_plot, "h")
+        
 
         # span line
         self.horizontal_span = SpanSelector(
@@ -118,9 +117,10 @@ class RadarChannelForm(QWidget, Form):
         self.vertical_span.set_active(False)
         self.vertical_span.set_visible(False)
 
+        # zoom
+        self.historical_zoom = HistoricalZoom(self.fig)
+        self.historical_zoom.setup_rect()
 
-        # navtollbar
-        self.mpl_toolbar = NavigationToolbar(self.canvas, None)
 
         self.setup_main_plot()
         self.setup_hist_plot()
@@ -132,15 +132,22 @@ class RadarChannelForm(QWidget, Form):
 
     def setup_connections(self):
         self.binSpinBox.valueChanged.connect(self.set_bin)
-        self.hist_plot.figure.canvas.mpl_connect('button_press_event', self.hist_line_cursor.on_mouse_pressed)
-        self.hist_plot.figure.canvas.mpl_connect('button_release_event', self.hist_line_cursor.on_mouse_released)
-        self.hist_line_cursor.data_selected.connect(self.set_thd)
         self.add_tb_btn.clicked.connect(self.feed_local_table)
         self.zoomBtn.clicked.connect(self.enable_zoom_action)
         self.verticalSpanBtn.clicked.connect(self.enable_vertical_span)
         self.horizontalSpanBtn.clicked.connect(self.enable_horizontal_span)
         self.resetBtn.clicked.connect(self.reset_tools)
         self.remove_btn.clicked.connect(self.table_remove_last)
+        self.cursorLineBtn.clicked.connect(self.setup_cursor_line)
+        self.zoomBtn.clicked.connect(self.enable_zoom_action)
+        self.backwardZoomBtn.clicked.connect(self.historical_zoom.previous_range)
+        self.forwardZoomBtn.clicked.connect(self.historical_zoom.next_range)
+        self.resetZoomBtn.clicked.connect(self.rescale)
+
+    def rescale(self):
+        self.main_plot.set_xlim(self.time_range)
+        self.main_plot.set_ylim(self.val_range)
+        self.canvas.draw()        
 
     def setup_main_plot(self):
         self.main_plot.set_facecolor(self.axis_bg_color)
@@ -166,9 +173,11 @@ class RadarChannelForm(QWidget, Form):
         self.time_range[1] = max(time)
         self.val_range[0] = min(val)
         self.val_range[1] = max(val)
+        self.time_req_range = self.time_range
+        self.val_req_range = self.val_range
 
         # set line cursor
-        self.hist_line_cursor.set_pos(self.val_range[0])
+        # self.hist_line_cursor.set_pos(self.val_range[0])
 
         # plot
         self.input_data = (time, val)
@@ -185,16 +194,15 @@ class RadarChannelForm(QWidget, Form):
         self.canvas.flush_events()
 
     def feed_local_table(self):
-
         for bar in self.selected_bar_list:
             val = round(bar._x0 + bar._width/2, 3)
             self.tableWidget.setRowCount(self.row_counter+1)
             self.tableWidget.setItem(self.row_counter, 0, QTableWidgetItem(str(val)))
             self.tableWidget.setItem(self.row_counter, 1, QTableWidgetItem(str(bar._height)))
-            self.tableWidget.setItem(self.row_counter, 2, QTableWidgetItem(str(self.val_range[0])))
-            self.tableWidget.setItem(self.row_counter, 3, QTableWidgetItem(str(self.val_range[1])))
-            self.tableWidget.setItem(self.row_counter, 4, QTableWidgetItem(str(self.val_range[1])))
-            self.tableWidget.setItem(self.row_counter, 5, QTableWidgetItem(str(self.val_range[1])))
+            self.tableWidget.setItem(self.row_counter, 2, QTableWidgetItem(str(max(self.spanned_data[1]))))
+            self.tableWidget.setItem(self.row_counter, 3, QTableWidgetItem(str(min(self.spanned_data[1]))))
+            self.tableWidget.setItem(self.row_counter, 4, QTableWidgetItem(str(round(np.average(self.spanned_data[1]),2))))
+            self.tableWidget.setItem(self.row_counter, 5, QTableWidgetItem(str(round(np.std(self.spanned_data[1]),2))))
             self.row_counter += 1
             self.channelLineEdit.setText(str(val))
         
@@ -219,7 +227,6 @@ class RadarChannelForm(QWidget, Form):
             if self.hist_bars:
                 _ = [b.remove() for b in self.hist_bars]
                 self.update_histogeram(self.req_data, self.bin, self.data_color,  self.bin, self.data_color)
-                # [self.hist_counts,self.his_bins, self.hist_bars] = self.hist_plot.hist(self.data, bins=self.bin, color=self.data_color)
             self.canvas.draw()
             self.canvas.flush_events()
 
@@ -236,26 +243,9 @@ class RadarChannelForm(QWidget, Form):
         self.SCR_lineEdit = QLineEdit(self.controlWidget)
         self.controlLayout.addRow(SCR_label, self.SCR_lineEdit)
 
-    def on_horizontal_span_selected(self, xmin, xmax):    
-        if len(self.spanned_vertical_data) :
-            full_time = self.spanned_vertical_data[0]
-            full_data = self.spanned_vertical_data[1]
-        else:
-            full_time = self.input_data[0]
-            full_data = self.input_data[1]
-
-        selected_time = []
-        selected_data = []
-        for t in full_time:
-            if t >= xmin and t <= xmax:
-                ind = np.where(full_time == t)
-                val = full_data[ind]
-                selected_time.append(t)
-                selected_data.append(val)
-
-        self.spanned_horizontal_data = (selected_time , selected_data)
-        self.update_histogeram(selected_data, self.bin, self.data_color)
-
+    def on_horizontal_span_selected(self, xmin, xmax):
+        self.time_req_range = (xmin, xmax)
+        self.prepare_histogeram_data()
         self.HSMinLineEdit.setText(str(round(xmin, 2)))
         self.HSMaxLineEdit.setText(str(round(xmax,2)))
         self.HSDeltaTLineEdit.setText(str(round(xmax-xmin,2)))
@@ -265,30 +255,15 @@ class RadarChannelForm(QWidget, Form):
             self.SCR_lineEdit.setText(str(round(1e6 / pr_us,3)))
 
     def on_vertical_span_selected(self, ymin, ymax):
-        if len(self.spanned_horizontal_data) :
-            full_time = self.spanned_horizontal_data[0]
-            full_data = self.spanned_horizontal_data[1]
-        else:
-            full_time = self.input_data[0]
-            full_data = self.input_data[1]
-
-        selected_time = []
-        selected_data = []
-        for d in full_data:
-            if d >= ymin and d <= ymax:
-                ind = np.where(full_data == d)
-                time = full_time[ind]
-                selected_time.append(time)
-                selected_data.append(d)
-
-        self.spanned_vertical_data = (selected_time , selected_data)
-        self.update_histogeram(selected_data, self.bin, self.data_color)
+        self.val_req_range = (ymin, ymax)
+        self.prepare_histogeram_data()
         self.VSMinLineEdit.setText(str(round(ymin, 2)))
         self.VSMaxLineEdit.setText(str(round(ymax, 2)))
         self.VSDeltaTLineEdit.setText(str(round(ymax-ymin, 2)))
 
-    def enable_zoom_action(self):
-        self.mpl_toolbar.zoom(True)
+    def enable_zoom_action(self, active):
+        self.canvas.setCursor(QCursor(Qt.CrossCursor))
+        self.historical_zoom.activate(active)
         self.vertical_span.set_active(False)
         self.horizontal_span.set_active(False)
 
@@ -307,6 +282,7 @@ class RadarChannelForm(QWidget, Form):
         self.vertical_span.set_active(False)
         self.horizontal_span.set_visible(False)
         self.vertical_span.set_visible(False)
+        self.historical_zoom.reset()
         self.canvas.setCursor(QCursor(Qt.ArrowCursor))
         self.canvas.draw()
 
@@ -320,4 +296,47 @@ class RadarChannelForm(QWidget, Form):
         self.canvas.draw()
         self.canvas.flush_events()
 
+    def prepare_histogeram_data(self):
+        full_time = self.input_data[0]
+        full_data = self.input_data[1]
 
+        start_time_index = find_nearest_value_indx(full_time, self.time_req_range[0])
+        end_time_index = find_nearest_value_indx(full_time, self.time_req_range[1])
+
+        time_limited = full_time[start_time_index:end_time_index]
+
+        final_data = []
+        for t in time_limited:
+            index = list(full_time).index(t)
+            val = full_data[index]
+            if val >= self.val_req_range[0] and val <= self.val_req_range[1]:
+                final_data.append(val)
+
+        self.update_histogeram(final_data, self.bin, self.data_color)
+        time_limited = np.array(time_limited)
+        final_data = np.array(final_data)
+        self.spanned_data = (time_limited, final_data)
+
+    def setup_cursor_line(self, active):
+        if active:
+            self.hist_line_cursor = CursorLine(self.hist_plot, "h")
+            self.hist_line_cursor.set_pos(self.val_range[0])
+            self.hist_plot.figure.canvas.mpl_connect('button_press_event', self.hist_line_cursor.on_mouse_pressed)
+            self.hist_plot.figure.canvas.mpl_connect('button_release_event', self.hist_line_cursor.on_mouse_released)
+            self.hist_line_cursor.data_selected.connect(self.set_thd)
+        else:
+            self.hist_line_cursor.remove()
+
+    def setup_shared_table(self, model, header):
+        # self.sharedTableWidget.setColumnCount(len(header.keys())+8)
+        table_header = []
+        for id , channel in header.items():
+            table_header.append(channel[0]+'('+channel[1]+')')
+        table_header.extend(['SCT(s)','SCP(Hz)','SCR(deg)','Emmiter','PLT','count', 'F.Time','L.Time'])
+
+        # model.set(table_header)
+        self.sharedTable = QTableView(self)
+        self.sharedTable.setModel(model)
+        self.sharedTableLayout.addWidget(self.sharedTable)
+        
+  

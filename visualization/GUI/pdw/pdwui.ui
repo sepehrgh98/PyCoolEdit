@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1418</width>
-    <height>751</height>
+    <width>1436</width>
+    <height>841</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
     </property>
     <item>
      <widget class="QWidget" name="widget_2" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -49,28 +49,10 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QFrame" name="leftFrame">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
+        <widget class="QWidget" name="leftWidget" native="true">
          <layout class="QVBoxLayout" name="leftFrameLayout">
           <property name="spacing">
-           <number>0</number>
+           <number>7</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -88,14 +70,44 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="rightFrame">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,4">
+        <widget class="QWidget" name="rightWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,2,20">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="infoWidget" native="true">
+            <layout class="QHBoxLayout" name="infoWidgetLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
           <item>
            <widget class="QWidget" name="reviewWidget" native="true">
             <layout class="QHBoxLayout" name="reviewLayout">

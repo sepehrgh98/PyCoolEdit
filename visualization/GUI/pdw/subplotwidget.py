@@ -1,5 +1,6 @@
 from tkinter.messagebox import NO
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QScrollArea, QAction, QMenu, QActionGroup, QApplication
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QScrollArea, QAction, QMenu, QActionGroup
+from PyQt5.QtCore import QTimer
 from matplotlib.backend_bases import MouseButton
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from visualization.GUI.customnavigationtoolbar import MyCustomToolbar as NavigationToolbar
@@ -9,7 +10,7 @@ from matplotlib.figure import Figure
 from PyQt5.QtGui import QIcon, QCursor
 from visualization.GUI.pdw.historicalzoom import HistoricalZoom
 from matplotlib.widgets import MultiCursor
-
+import matplotlib.pyplot as plt
 
 from visualization.visualizationparams import ShowPolicy
 
@@ -23,6 +24,8 @@ class SubPlotWidget(QWidget):
     forwardZoomRequested = pyqtSignal()
     backeardZoomRequested = pyqtSignal()
     resetZoomRequested = pyqtSignal()
+    lineCursorDataRequested = pyqtSignal(float)
+    pointMarkerDataReady = pyqtSignal(tuple)
 
 
     def __init__(self):
@@ -94,7 +97,7 @@ class SubPlotWidget(QWidget):
 
  
         self.canvas.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.canvas.customContextMenuRequested.connect(self.exec_canvas_menu)
+        # self.canvas.customContextMenuRequested.connect(self.exec_canvas_menu)
 
         self.scroll = QScrollArea(self)
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -115,6 +118,11 @@ class SubPlotWidget(QWidget):
         self.curr_ax = []
         self.list_of_select_box = []
 
+        # timer
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.send_point_marker_data)
+        self.timer.setSingleShot(True)
+        
 
         self.setup_connections()
 
@@ -170,6 +178,10 @@ class SubPlotWidget(QWidget):
         if event.inaxes:
             if event.button == MouseButton.LEFT:
                 self.curr_ax[:] = [event.inaxes]
+                if self.point_marker.active and event.inaxes in self.fig.axes:
+                    self.marked_point = (event.xdata, event.ydata)
+                    self.curr_ax[:] = [event.inaxes]
+                    self.prepare_marked_point()
             if event.dblclick:
                 self.unselectAllRequested.emit()
 
@@ -268,20 +280,48 @@ class SubPlotWidget(QWidget):
     def setup_point_marker(self):
         self.point_marker = MultiCursor(self.canvas, tuple(self.fig.axes), color = 'r', lw=1,horizOn=True, vertOn=True, linestyle='--', useblit=True)
         self.point_marker.set_active(False)
+        
 
     @pyqtSlot(bool)
     def activate_point_marker(self, active):
         if active:
             self.point_marker.set_active(True)
             self.line_cursor.set_active(False)
+            self.mouse_press_ev = self.canvas.mpl_connect('button_press_event', self.on_mouse_click)
+            self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+
         else:
             self.point_marker.set_active(False)
+            self.canvas.mpl_disconnect(self.mouse_press_ev)
+
         self.canvas.flush_events()
         self.canvas.draw()
 
     def on_mouse_move(self, event):
         if self.line_cursor.active and event.inaxes in self.fig.axes:
-            print(event.xdata)
+            self.lineCursorDataRequested.emit(event.xdata)
+
+        if self.point_marker.active and event.inaxes in self.fig.axes:
+            self.marked_point = (event.xdata, event.ydata)
+            self.curr_ax[:] = [event.inaxes]
+            self.timer.start(500)
+
+
+    def prepare_marked_point(self):
+        text = str(round(self.marked_point[0],2)) + "\n"+ str(round(self.marked_point[1],2))
+        annot = (self.curr_ax[:])[-1].annotate("", xy=(self.marked_point[0], self.marked_point[1]), xytext=(20,20),textcoords="offset points",
+                    bbox=dict(boxstyle="round", fc="w"),
+                    arrowprops=dict(arrowstyle="->"))
+
+        annot.set_text(text)
+        annot.get_bbox_patch().set_alpha(0.4)
+        self.canvas.draw()
+
+    def send_point_marker_data(self):
+        self.pointMarkerDataReady.emit(self.marked_point)
+
+
+
 
 
 

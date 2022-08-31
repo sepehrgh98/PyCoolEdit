@@ -15,6 +15,9 @@ class DataHandler(QObject):
     deleteSelectedRequested = pyqtSignal(list) # list of tuples 
     progress_is_ready = pyqtSignal(dict)
     clearRequested = pyqtSignal()
+    lineCursorDataRequested = pyqtSignal(float)
+    markerLineResultIsReady = pyqtSignal(dict)
+    pointMarkerDataRequested = pyqtSignal(str, tuple)
 
     def __init__(self):
         super(DataHandler, self).__init__()
@@ -37,6 +40,9 @@ class DataHandler(QObject):
         self.clearRequested.connect(self.reader.clear)
         self.clearRequested.connect(self.parser.clear)
         self.capsulator.capsulated_data_is_reaady.connect(self.final_data_is_ready)
+        self.lineCursorDataRequested.connect(self.parser.single_row_req)
+        self.parser.markerLineResultIsReady.connect(self.markerLineResultIsReady)
+        self.pointMarkerDataRequested.connect(self.parser.single_data_req)
 
 
         self.timer = QElapsedTimer()

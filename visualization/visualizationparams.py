@@ -16,6 +16,9 @@ class ShowPolicy(enum.Enum):
     scroll = 1
     non_scroll = 2
 
+class PlotType(enum.Enum):
+    stem = 1
+    point = 2
 
 ChannelUnit = {
     'TOA' : 'sec'

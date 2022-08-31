@@ -30,6 +30,7 @@ class Ui_Form(object):
         self.groupBox.setGeometry(QtCore.QRect(30, 30, 119, 87))
         self.groupBox.setObjectName("groupBox")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.groupBox)
+        self.verticalLayout.setContentsMargins(-1, 22, -1, -1)
         self.verticalLayout.setObjectName("verticalLayout")
         self.scrollRadioButton = QtWidgets.QRadioButton(self.groupBox)
         self.scrollRadioButton.setChecked(True)

@@ -2,12 +2,12 @@ import os
 import random
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtWidgets import QMainWindow, QLabel, QSpacerItem, QSizePolicy
 from visualization.pdw.Channel.channel import Channel
 from visualization.Radar.radarcontroller import RadarController
 from visualization.GUI.pdw.pdwtools import PDWToolsForm
 from visualization.GUI.pdw.datainformationform import DataInformationForm
-from visualization.visualizationparams import ChannelUnit, DataPacket, FeedMood, ShowPolicy
+from visualization.visualizationparams import ChannelUnit, DataPacket, FeedMood, ShowPolicy, PlotType
 from visualization.GUI.pdw.subplotwidget import SubPlotWidget
 from visualization.GUI.progressdialog import ProgressDialog
 from visualization.pdw.Channel.multichannel import MultiChannels
@@ -16,6 +16,8 @@ from visualization.GUI.defaultview.defaultview import DefaultView
 from visualization.GUI.pdw.review import PDWReviewForm
 from visualization.GUI.pdw.exportwindow import PDWExprtWindow
 from visualization.GUI.pdw.normalizewindow import NormalizeWindow
+from visualization.GUI.pdw.markerinfo import MarkerInfo
+ 
 import numpy as np
 
 
@@ -29,6 +31,9 @@ class PDWForm(QMainWindow, Form):
     clearRequested = pyqtSignal()
     deleteSelectedRequested = pyqtSignal(list) # list of tuples
     showPolicyChanged = pyqtSignal(ShowPolicy)
+    lineCursorDataRequested = pyqtSignal(float)
+    markerLineResultIsReady = pyqtSignal(dict)
+    pointMarkerDataRequested = pyqtSignal(str, tuple)
 
     def __init__(self):
         super(PDWForm, self).__init__()
@@ -46,11 +51,17 @@ class PDWForm(QMainWindow, Form):
                             , text='Offline')
         self.export_window = PDWExprtWindow()
         self.normalize_window = NormalizeWindow()
+        self.marker_info = MarkerInfo()
 
         # add widgets
         self.leftFrameLayout.addWidget(self.toolsWidget)
-        self.leftFrameLayout.addWidget(self.dataInfoWidget)
+        # self.leftFrameLayout.addWidget(self.dataInfoWidget)
+        self.infoWidgetLayout.addWidget(self.dataInfoWidget)
+        self.leftFrameLayout.addWidget(self.marker_info)
         self.plotLayout.addWidget(self.default_view)
+
+
+
 
 
         # variables
@@ -104,6 +115,8 @@ class PDWForm(QMainWindow, Form):
         self.subPlotsWidget.unselectAllRequested.connect(self.do_unselect_all)
         self.subPlotsWidget.unselectAllRequested.connect(self.radar_controller.reset)
         self.subPlotsWidget.unselectSpecialArea.connect(self.do_unselect_special_area)
+        self.subPlotsWidget.lineCursorDataRequested.connect(self.lineCursorDataRequested)
+        self.subPlotsWidget.pointMarkerDataReady.connect(self.marker_info.feed_point_marker)
         # default view widget connections
         self.default_view.filePathChanged.connect(self.on_filePathChanged)
         # self connections
@@ -112,7 +125,22 @@ class PDWForm(QMainWindow, Form):
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_point_marker)
         self.channelsSettedUp.connect(self.subPlotsWidget.set_fig_size)
         self.showPolicyChanged.connect(self.subPlotsWidget.set_show_policy)
+        self.markerLineResultIsReady.connect(self.marker_info.feed)
 
+
+    def on_showOmniDfChanged(self, omni_df_type):
+        omni = None
+        df = None
+        for channel in self.channels:
+            if channel.name == "Omni":
+                omni =channel
+            if channel.name == "DF":
+                df = channel
+
+        omni.set_plot_type(omni_df_type)
+        df.set_plot_type(omni_df_type)
+        omni.replot(random.choice(self.plot_colors))
+        df.replot(random.choice(self.plot_colors))
 
 
     @pyqtSlot(dict)
@@ -121,6 +149,7 @@ class PDWForm(QMainWindow, Form):
         if not self.radar_controller.channels_defined():
             self.radar_controller.setup_channel(header)
             self.toolsWidget.setup_channel(header)
+            self.marker_info.setup_channels(header)
         axs = self.fig.subplots(len(header.items()), 1, sharex='all')
         hist_axs = self.hist_fig.subplots(len(header.items()), 1)
         ch_counter = 0

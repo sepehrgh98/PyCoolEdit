@@ -62,6 +62,9 @@
           <string>Show Policy</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="topMargin">
+           <number>22</number>
+          </property>
           <item>
            <widget class="QRadioButton" name="scrollRadioButton">
             <property name="text">

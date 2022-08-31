@@ -33,6 +33,7 @@ class SParser(QObject):
     columns_defined = pyqtSignal(dict)
     data_packet_is_ready = pyqtSignal(dict)
     progress_is_ready = pyqtSignal(dict)
+    markerLineResultIsReady = pyqtSignal(dict)
     
     def __init__(self) -> None:
         super(SParser, self).__init__()
@@ -187,3 +188,20 @@ class SParser(QObject):
             for i, output in enumerate(pool.imap(partial(cut_data, f_inx=start_index, l_inx=stop_index), channel_val), 1):
                 self.parsed_data[key_list[i-1]] = output
         self.data_packet_is_ready.emit(self.parsed_data)
+
+    @pyqtSlot(float)
+    def single_row_req(self, time):
+        time_list = list(self.parsed_data['TOA'])
+        index = find_nearest_value_indx(time_list, time)
+        output_data = {}
+        for key, val in self.parsed_data.items():
+            if key != 'TOA':
+                output_data[key] = val[index]
+        self.markerLineResultIsReady.emit(output_data)
+
+    @pyqtSlot(str, tuple)
+    def single_data_req(self,ch_name, data_point):
+        time_list = list(self.parsed_data['TOA'])
+        index = find_nearest_value_indx(time_list, data_point[0])
+        val = (self.parsed_data[ch_name])[index]
+        print(data_point[1], val)

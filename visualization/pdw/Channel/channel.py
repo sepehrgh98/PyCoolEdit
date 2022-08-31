@@ -4,7 +4,9 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 import os
 import matplotlib
 import numpy as np
-from visualization.visualizationparams import ChannelUnit
+from visualization.visualizationparams import ChannelUnit, PlotType
+import matplotlib.pyplot as plt
+
 
 matplotlib.use("Qt5Agg")
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'channelui.ui'))[0]
@@ -44,12 +46,9 @@ class Channel:
         self._hist_canvas = _hist_canvas
         self.unit = _unit
 
-        # self._axis.callbacks.connect('xlim_changed', self.on_xlims_change)
-        # self._axis.callbacks.connect('ylim_changed', self.on_ylims_change)
  
         # variables
         self.properties = dict()
-        self.plot_method = None
         self.time = []
         self.val = []
         self._max = None
@@ -60,6 +59,7 @@ class Channel:
         self.selected_area = {}   # arange : line obj
         self.initial_plot = True
         self.time_show_range = ()
+        self.plot_type = PlotType.point
 
         # style
         self.tick_size = 10
@@ -80,7 +80,14 @@ class Channel:
         if len(x)<2:
             return
         if mood == "initilize" and self.whole_area:
-            self.whole_area.set_data([], [])
+            if self.plot_type == PlotType.stem:
+                self.whole_area.set_data([], [])
+            elif self.plot_type == PlotType.point:
+                # self.selected_area[x[0], x[-1]] = (markerline, stemline, baseline)
+                self.whole_area[0].remove() # markerline
+                self.whole_area[1].remove() # stemline
+                self.whole_area[2].remove() # baseline
+
             self._hist_axis.clear()
             self.cancel_selection_all()
             self.hist_canvas.draw()
@@ -90,7 +97,20 @@ class Channel:
             self._min = min(data_list)
         
         self.val = data_list
-        line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+        if self.plot_type == PlotType.point:
+            line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+        elif self.plot_type == PlotType.stem:
+            # line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+            markerline, stemline, baseline =self._axis.stem(x
+                                , data_list
+                                , use_line_collection = True
+                                , linefmt=color
+                                , bottom = self._min
+                                , markerfmt='#182e6b'
+                                , basefmt=" ")
+            plt.setp(stemline, 'linewidth', 2)
+
+
         if mood == "initilize":
             self.feed_time(x)
             self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color=color)
@@ -98,15 +118,26 @@ class Channel:
 
         # self.update_hist(data_list)
         if mood == "selection" :
-            self.selected_area[x[0], x[-1]] = line
+            if self.plot_type == PlotType.point:
+                self.selected_area[x[0], x[-1]] = line
+            elif self.plot_type == PlotType.stem:
+                self.selected_area[x[0], x[-1]] = (markerline, stemline, baseline)
         else:
-            self.whole_area = line
+            if self.plot_type == PlotType.point:
+                self.whole_area = line
+            elif self.plot_type == PlotType.stem:
+                self.whole_area = (markerline, stemline, baseline)
+            
 
 
     def feed_time(self, x):
         if len(x):
             self.time = x
             self.set_time_range((min(x), max(x)))
+
+    def set_plot_type(self, PlotType):
+        if self.plot_type != PlotType:
+            self.plot_type = PlotType
 
     @property
     def id(self):
@@ -273,3 +304,7 @@ class Channel:
             name = received_name
             unit = ChannelUnit[name.translate(name.maketrans('', '', digits))] if ChannelUnit[name.translate(name.maketrans('', '', digits))] else ''
         return name, unit
+
+    def replot(self, color):
+        self.feed(self.time, self.val, color, mood="initilize")
+            
