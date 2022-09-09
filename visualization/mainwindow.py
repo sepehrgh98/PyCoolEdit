@@ -32,7 +32,7 @@ class MainWindow(QMainWindow, Form):
         self.pdw_form.filePathChanged.connect(self.data_handler.set_file_path)
         self.pdw_form.clearRequested.connect(self.data_handler.clear)
         self.pdw_form.selectDataRequested.connect(self.data_handler.selectDataRequested)
-        self.pdw_form.deleteSelectedRequested.connect(self.data_handler.deleteSelectedRequested)
+        # self.pdw_form.deleteSelectedRequested.connect(self.data_handler.deleteSelectedRequested)
         self.pdw_form.lineCursorDataRequested.connect(self.data_handler.lineCursorDataRequested)
         self.pdw_form.pointMarkerDataRequested.connect(self.data_handler.pointMarkerDataRequested)
 
@@ -41,8 +41,11 @@ class MainWindow(QMainWindow, Form):
         self.data_handler.final_data_is_ready.connect(self.pdw_form.feed)
         self.data_handler.progress_is_ready.connect(self.pdw_form.feed_progressbar)
         self.data_handler.markerLineResultIsReady.connect(self.pdw_form.markerLineResultIsReady)
+        self.data_handler.pointMarkerResultIsReady.connect(self.pdw_form.pointMarkerResultIsReady)
+        self.data_handler.totalSizeIsReady.connect(self.pdw_form.totalSizeIsReady)
 
         # signal form
+        self.signal_form.fileInfoReceived.connect(self.signal_controller.on_info_received)
         self.signal_form.request_data.connect(self.signal_controller.get_data)
 
         # signal controller

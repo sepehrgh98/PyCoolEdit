@@ -1,4 +1,3 @@
-from operator import concat
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QLabel, QCheckBox
@@ -30,6 +29,7 @@ class ConcatBox(QWidget, Form):
             if ch.isChecked():
                 concat_list.append(ch.accessibleName())
         self.concatListIsReady.emit(concat_list)
+        self.close()
 
 
 

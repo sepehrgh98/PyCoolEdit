@@ -102,6 +102,7 @@ class RadarChannelForm(QWidget, Form):
         self.horizontal_span.set_active(False)
         self.horizontal_span.set_visible(False)
 
+
         self.vertical_span = SpanSelector(
             self.main_plot,
             self.on_vertical_span_selected,

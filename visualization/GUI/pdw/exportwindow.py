@@ -1,12 +1,11 @@
-from fileinput import close
 import os
-
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QFileDialog
 from visualization.pdw.export.PDWTextExport import PDWTextExport
 from visualization.pdw.export.PDWHtmlExport import PDWHtmlExport
 from visualization.pdw.export.PDWCsvExport import PDWCsvExport
 from visualization.visualizationparams import Channel_id_to_name
+import numpy as np
 
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'exportWindowui.ui'))[0]
@@ -29,7 +28,10 @@ class PDWExprtWindow(QWidget, Form):
     def feed(self, packet):
         if 'TOA' not in  self.selected_data.keys():
             self.selected_data['TOA'] = packet.key
-        self.selected_data[Channel_id_to_name[packet.id]] = packet.data
+        if Channel_id_to_name[packet.id] not in self.selected_data:
+            self.selected_data[Channel_id_to_name[packet.id]] = packet.data
+        else:
+            self.selected_data[Channel_id_to_name[packet.id]] = np.concatenate([self.selected_data[Channel_id_to_name[packet.id]], packet.data],axis=0)
     
     def do_export(self):
         exporter = None

@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QScrollArea, QAction, QMenu, QActionGroup
 from PyQt5.QtCore import QTimer
 from matplotlib.backend_bases import MouseButton
@@ -10,7 +9,7 @@ from matplotlib.figure import Figure
 from PyQt5.QtGui import QIcon, QCursor
 from visualization.GUI.pdw.historicalzoom import HistoricalZoom
 from matplotlib.widgets import MultiCursor
-import matplotlib.pyplot as plt
+from visualization.visualizationparams import ChannelUnit
 
 from visualization.visualizationparams import ShowPolicy
 
@@ -34,31 +33,25 @@ class SubPlotWidget(QWidget):
 
         # variables
         self.mouse_press_ev = None
-        self.channel_plot_size = 200
+        self.channel_plot_size = 100
         self.selection_area = []
         # self.selection_area_y = (-1, -1)
         self.show_policy = ShowPolicy.scroll
+        self.annote_container = []
 
         # setup figure
         self.fig = Figure()
         self.fig.patch.set_color('#151a1e')
-        self.fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.98, wspace=0, hspace=0.1)
+        self.fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.98, wspace=0.01, hspace=0.1)
         self.fig.tight_layout()
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
         self.canvas.draw()
 
-        # setup hist figure
-        self.hist_fig = Figure()
-        self.hist_fig.patch.set_color('#151a1e')
-        self.hist_fig.subplots_adjust(left=0.061, bottom=0.06, right=0.9980, top=0.98, wspace=0, hspace=0.1)
-        self.hist_fig.tight_layout()
-        self.hist_canvas = FigureCanvas(self.hist_fig)
-        self.hist_canvas.draw()
+
 
         # navtollbar
         self.mpl_toolbar = NavigationToolbar(self.canvas, None)
-        # self.canvas.mpl_connect('release_zoom', self.handle_release_zoom)
         self.historical_zoom = HistoricalZoom(self.fig)
 
 
@@ -69,21 +62,14 @@ class SubPlotWidget(QWidget):
         # creating QAction Instances
         self.lineMarkerAction = QAction("Line Marker", self)
         self.pointMarkerAction = QAction("Point Marker", self)
-        # self.zoomAction = QAction("Zoom", self)
-        # self.dragAction = QAction("Drag", self)
  
         # making actions checkable
         self.lineMarkerAction.setCheckable(True)
         self.pointMarkerAction.setCheckable(True)
-        # self.zoomAction.setCheckable(True)
-        # self.dragAction.setCheckable(True)
-        # self.normalAction.setChecked(True)
  
         # adding these actions to the selection menu
         self.canvasMenu.addAction(self.lineMarkerAction)
         self.canvasMenu.addAction(self.pointMarkerAction)
-        # self.canvasMenu.addAction(self.zoomAction)
-        # self.canvasMenu.addAction(self.dragAction)
  
         # creating a action group
         action_group = QActionGroup(self)
@@ -91,9 +77,6 @@ class SubPlotWidget(QWidget):
         # adding these action to the action group
         action_group.addAction(self.lineMarkerAction)
         action_group.addAction(self.pointMarkerAction)
-        # action_group.addAction(self.zoomAction)
-        # action_group.addAction(self.dragAction)
-
 
  
         self.canvas.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -107,9 +90,9 @@ class SubPlotWidget(QWidget):
         layout = QHBoxLayout(self.plot_container)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
-        self.hist_canvas.setMaximumWidth(150)
+        # self.hist_canvas.setMaximumWidth(150)
         layout.addWidget(self.canvas)
-        layout.addWidget(self.hist_canvas)       
+        # layout.addWidget(self.hist_canvas)       
         self.scroll.setWidget(self.plot_container)
 
         self.layout().addWidget(self.scroll)
@@ -130,14 +113,11 @@ class SubPlotWidget(QWidget):
         self.forwardZoomRequested.connect(self.historical_zoom.next_range)
         self.backeardZoomRequested.connect(self.historical_zoom.previous_range)
         self.resetZoomRequested.connect(self.historical_zoom.reset)
+        self.resetZoomRequested.connect(self.reset_annotates)
         # action connections
         self.lineMarkerAction.triggered.connect(self.setup_line_marker)
-        # self.selectAction.triggered.connect(self.enable_select_action)
-        # self.zoomAction.triggered.connect(self.enable_zoom_action)
-        # self.dragAction.triggered.connect(self.enable_pan_action)
 
     def enable_select_action(self, active):
-        # self.selectAction.setChecked(active)
         if active:
             self.canvas.setCursor(QCursor(Qt.PointingHandCursor))
             if self.historical_zoom.is_active:
@@ -167,11 +147,11 @@ class SubPlotWidget(QWidget):
             if self.mpl_toolbar.is_pan():
                 self.mpl_toolbar.pan(False)
         self.canvas.setCursor(QCursor(Qt.CrossCursor))
-        self.zoomAction.setChecked(active)
+        # self.zoomAction.setChecked(active)
         self.historical_zoom.activate(active)
     
     def enable_pan_action(self, active):
-        self.dragAction.setChecked(active)
+        # self.dragAction.setChecked(active)
         self.mpl_toolbar.pan(active)
 
     def on_mouse_click(self, event):
@@ -181,7 +161,10 @@ class SubPlotWidget(QWidget):
                 if self.point_marker.active and event.inaxes in self.fig.axes:
                     self.marked_point = (event.xdata, event.ydata)
                     self.curr_ax[:] = [event.inaxes]
-                    self.prepare_marked_point()
+                    x_unit = ChannelUnit['TOA']
+                    u = (((self.curr_ax[:])[-1].get_ylabel()).split('('))[-1]
+                    y_unit = u[:-1]
+                    self.prepare_marked_point(x_unit, y_unit)
             if event.dblclick:
                 self.unselectAllRequested.emit()
 
@@ -208,8 +191,6 @@ class SubPlotWidget(QWidget):
     def get_nav_tool(self):
         return self.mpl_toolbar
 
-    def get_hist_figure(self):
-        return self.hist_fig
 
     @pyqtSlot()
     def setup_rect(self):
@@ -243,11 +224,11 @@ class SubPlotWidget(QWidget):
 
     def clear(self):
         self.fig.clear()
-        self.hist_fig.clear()
+        # self.hist_fig.clear()
         self.curr_ax = []
         self.list_of_select_box = []
         self.canvas.draw()
-        self.hist_canvas.draw()
+        # self.hist_canvas.draw()
 
     def has_selected_area(self):
         return len(self.selection_area)
@@ -307,18 +288,26 @@ class SubPlotWidget(QWidget):
             self.timer.start(500)
 
 
-    def prepare_marked_point(self):
-        text = str(round(self.marked_point[0],2)) + "\n"+ str(round(self.marked_point[1],2))
+    def prepare_marked_point(self, x_unit, y_unit):
+        text = str(round(self.marked_point[0],2)) + " " + x_unit +"\n"+ str(round(self.marked_point[1],2)) + " " + y_unit
         annot = (self.curr_ax[:])[-1].annotate("", xy=(self.marked_point[0], self.marked_point[1]), xytext=(20,20),textcoords="offset points",
                     bbox=dict(boxstyle="round", fc="w"),
                     arrowprops=dict(arrowstyle="->"))
 
         annot.set_text(text)
         annot.get_bbox_patch().set_alpha(0.4)
+        self.annote_container.append(annot)
         self.canvas.draw()
 
     def send_point_marker_data(self):
         self.pointMarkerDataReady.emit(self.marked_point)
+
+    def reset_annotates(self):
+        ann_list = self.annote_container
+        for ann in ann_list:
+            ann.remove()
+        self.annote_container.clear()
+        self.canvas.draw()
 
 
 

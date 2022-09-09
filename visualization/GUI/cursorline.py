@@ -1,5 +1,3 @@
-from tkinter import N
-from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, QObject

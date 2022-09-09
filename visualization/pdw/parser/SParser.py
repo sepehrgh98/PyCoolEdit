@@ -6,6 +6,7 @@ from visualization.visualizationparams import ProgressType
 from visualization.visualizationparams import ChannelUnit
 from string import digits
 from visualization.visualizationparams import TimeCoef
+import re
 
 
 def find_nearest_value_indx(array, value):
@@ -20,8 +21,11 @@ def parse(data_list, cols):
     for line in data_list[2:]:
         cols_line = line.split()
         for i in range(len(cols_line)):
-            col_name = cols[i]
-            parsed_data[col_name] = np.append(parsed_data[col_name], [float(cols_line[i])])
+            try:
+                col_name = cols[i]
+                parsed_data[col_name] = np.append(parsed_data[col_name], [float(cols_line[i])])
+            except:
+                pass
     return parsed_data
 
 def cut_data(data, f_inx, l_inx):
@@ -34,6 +38,7 @@ class SParser(QObject):
     data_packet_is_ready = pyqtSignal(dict)
     progress_is_ready = pyqtSignal(dict)
     markerLineResultIsReady = pyqtSignal(dict)
+    totalSizeIsReady = pyqtSignal(int)
     
     def __init__(self) -> None:
         super(SParser, self).__init__()
@@ -43,6 +48,8 @@ class SParser(QObject):
         self.progress = 0
         self.raw_data = []
         self.time_coef = 1
+        self.total_size = 0
+        self.is_columns_defined = False
 
         # moving to thread
         self.objThread = QThread()
@@ -52,7 +59,6 @@ class SParser(QObject):
 
     @pyqtSlot(list, bool, float)
     def prepare_data(self, data_list, eof, number_of_batches):
-
         self._set_columns(data_list)
         self.raw_data.append(data_list)
         if eof :
@@ -64,10 +70,10 @@ class SParser(QObject):
             for i, output in enumerate(pool.imap(partial(parse, cols=self.columns), self.raw_data), 1):
                 for name, val in output.items():
                     self.parsed_data[name] = np.append(self.parsed_data[name], val)
-
+                    self.total_size += len(val)
                 self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
-
             self.calculate_rri()
+            self.totalSizeIsReady.emit(len(self.parsed_data['TOA']))
             self.data_packet_is_ready.emit(self.parsed_data)
 
     
@@ -110,28 +116,20 @@ class SParser(QObject):
 
 
     def _set_columns(self, data_list):
-        if not self.columns:
-            if self._has_columns(data_list):
-                sentence = data_list[0].split("\n")[0]
-                # repaired = re.sub(r'([^\s])\s([^\s])', r'\1_\2',a)
-                repaired = sentence
-                columns_dict = self.unit_detection(repaired.split()[1:])
-                self.columns = list(columns_dict.keys())
-                self.columns.append('RRI')
-                self.columns.append('RRF')
-                columns_dict['RRI'] = ChannelUnit['RRI']
-                columns_dict['RRF'] = ChannelUnit['RRF']
-                self.set_time_coefficient(columns_dict['TOA'])
-                self.columns_defined.emit(columns_dict)
-            else:
-                print("ERORRRRRRR!")
+        if not self.is_columns_defined:
+            sentence = data_list[0].split("\n")[0]
+            # repaired = re.sub(r'([^\s])\s([^\s])', r'\1_\2',a)
+            repaired = re.sub('%', '', sentence)
+            columns_dict = self.unit_detection(repaired.split()[:])
+            self.columns = list(columns_dict.keys())
+            self.columns.append('RRI')
+            self.columns.append('RRF')
+            columns_dict['RRI'] = ChannelUnit['RRI']
+            columns_dict['RRF'] = ChannelUnit['RRF']
+            self.set_time_coefficient(columns_dict['TOA'])
+            self.columns_defined.emit(columns_dict)
+            self.is_columns_defined = True
 
-    def _has_columns(self, received_data) -> bool:
-        first_line = received_data[0]
-        first_line = first_line.lstrip()
-        if first_line[0] != "%":
-            return False
-        return True
 
     def _init_data(self) -> None:
         for column in self.columns:
@@ -158,6 +156,7 @@ class SParser(QObject):
         self.parsed_data = {}
         self.progress = 0
         self.raw_data = []
+        self.is_columns_defined = False
     
     def unit_detection(self, channel_list):
         columns = {}
@@ -169,39 +168,26 @@ class SParser(QObject):
                 unit = mylist[1].split(")")[0]
             else:
                 name = received_name
-                unit = ChannelUnit[name.translate(name.maketrans('', '', digits))] if ChannelUnit[name.translate(name.maketrans('', '', digits))] else ''
+                try:
+                    unit = ChannelUnit[name.translate(name.maketrans('', '', digits))] if ChannelUnit[name.translate(name.maketrans('', '', digits))] else ''
+                except:
+                    pass
             columns[name] = unit
         return columns
 
     def set_time_coefficient(self, unit):
         self.time_coef = TimeCoef[unit]
 
-    @pyqtSlot(list)
-    def on_delete_selected_req(self, selected_area):
-        for time_range in selected_area:
-            pool = Pool(processes=5)
-            channel_val = self.parsed_data.values()
-            key_list = list(self.parsed_data.keys())
-            start_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[0])
-            stop_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[1])
-            self.parsed_data = {}
-            for i, output in enumerate(pool.imap(partial(cut_data, f_inx=start_index, l_inx=stop_index), channel_val), 1):
-                self.parsed_data[key_list[i-1]] = output
-        self.data_packet_is_ready.emit(self.parsed_data)
+    # @pyqtSlot(list)
+    # def on_delete_selected_req(self, selected_area):
+    #     for time_range in selected_area:
+    #         pool = Pool(processes=5)
+    #         channel_val = self.parsed_data.values()
+    #         key_list = list(self.parsed_data.keys())
+    #         start_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[0])
+    #         stop_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[1])
+    #         self.parsed_data = {}
+    #         for i, output in enumerate(pool.imap(partial(cut_data, f_inx=start_index, l_inx=stop_index), channel_val), 1):
+    #             self.parsed_data[key_list[i-1]] = output
+    #     self.data_packet_is_ready.emit(self.parsed_data)
 
-    @pyqtSlot(float)
-    def single_row_req(self, time):
-        time_list = list(self.parsed_data['TOA'])
-        index = find_nearest_value_indx(time_list, time)
-        output_data = {}
-        for key, val in self.parsed_data.items():
-            if key != 'TOA':
-                output_data[key] = val[index]
-        self.markerLineResultIsReady.emit(output_data)
-
-    @pyqtSlot(str, tuple)
-    def single_data_req(self,ch_name, data_point):
-        time_list = list(self.parsed_data['TOA'])
-        index = find_nearest_value_indx(time_list, data_point[0])
-        val = (self.parsed_data[ch_name])[index]
-        print(data_point[1], val)

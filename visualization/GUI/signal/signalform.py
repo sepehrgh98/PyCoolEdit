@@ -1,6 +1,6 @@
 import os
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QGroupBox, QFormLayout, QLabel, QLineEdit
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -15,7 +15,8 @@ Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'signal'
 
 
 class SignalForm(QMainWindow, Form):
-    request_data = pyqtSignal(dict, tuple)
+    fileInfoReceived = pyqtSignal(dict, tuple)
+    request_data = pyqtSignal(tuple)
 
     def __init__(self):
         super(SignalForm, self).__init__()
@@ -33,7 +34,8 @@ class SignalForm(QMainWindow, Form):
         self.signal_information = SignalInformationForm()
         self.channels = []
         self.req_range = ()
-        self.zoom_base_scale = 2
+        self.zoom_base_scale = 4
+        self.first_feed = True
         self.x_limit_range = None
         self.y_limit_range = None
         self.x_control = None
@@ -44,6 +46,11 @@ class SignalForm(QMainWindow, Form):
         self.hor_span_2 = None
         self.current_axis = None
         self.span_result_widgets = [] # list of (id, min_lineEdit, max_lineEdit, diff_lineEdit)
+        self.zoom_timer = QTimer(self)
+        self.zoom_timer.timeout.connect(self.on_zoom_timer_timeout)
+        self.zoom_timer.setSingleShot(True)
+        self.x_show_range = ()
+        self.plot_containers = []
 
         # setup plot
         self.fig = Figure()
@@ -86,10 +93,19 @@ class SignalForm(QMainWindow, Form):
         self.default_view.filePathChanged.connect(self.handle_file_path_changed)
 
     def get_file_path(self):
+        self.clear()
         new_path = QFileDialog.getOpenFileName(self, "Open File", filter="Text files (*.DAT);")[0]
         if self.file_path != new_path:
             self.file_path = new_path
         self.handle_file_path_changed(new_path)
+
+    def clear(self):
+        self.fig.clear()
+        for i in reversed(range(self.verticalSpanResultLayout.count())): 
+            self.verticalSpanResultLayout.itemAt(i).widget().setParent(None)
+        self.span_result_widgets.clear()
+        self.canvas.draw()
+
 
     def setup_channels(self, data_info):
         height_ratios_list = [1.4 for _ in range(data_info["channels"])]
@@ -146,7 +162,19 @@ class SignalForm(QMainWindow, Form):
         drag_from_anywhere=True,
         ignore_event_outside=True
         )
-        self.hor_span_2 = self.channels[-1].axvspan(0, 0.01, facecolor ='red', alpha = 0.5, zorder=10)
+        self.hor_span_2 = SpanSelector(
+            self.channels[-1],
+            lambda : print(),
+            "horizontal",
+            useblit=True,
+            props=dict(alpha=0.5, facecolor="tab:red"),
+            interactive=True,
+            drag_from_anywhere=True,
+            ignore_event_outside=True
+            # span_stays=True,  # Add this to make SpanSelector persistent
+        )
+        self.hor_span_2.set_active(False)
+        self.hor_span_2.set_visible(False)
 
     def setup_vertical_span_selector(self,controller, ax):
         ver_span_on_controller = SpanSelector(
@@ -159,7 +187,20 @@ class SignalForm(QMainWindow, Form):
                 drag_from_anywhere=True,
                 ignore_event_outside=True
                 )
-        ver_span = ax.axhspan(0, 0.01, facecolor ='blue', alpha = 0.5, zorder=10)
+        # ver_span = ax.axhspan(0, 0.01, facecolor ='blue', alpha = 0.5, zorder=10)
+        ver_span = SpanSelector(
+            ax,
+            lambda : print(),
+            "vertical",
+            useblit=True,
+            props=dict(alpha=0.5, facecolor="tab:blue"),
+            interactive=True,
+            drag_from_anywhere=True,
+            ignore_event_outside=True
+            # span_stays=True,  # Add this to make SpanSelector persistent
+        )
+        ver_span.set_active(False)
+        ver_span.set_visible(False)
         self.vertical_span_list.append((controller,ver_span_on_controller,ver_span))
 
     def style_channels(self, axis):
@@ -178,11 +219,8 @@ class SignalForm(QMainWindow, Form):
         self.HSDiffLineEdit.setText(str(round(xmax - xmin, 2)))
 
         # second span
-        _ndarray = self.hor_span_2.get_xy()
-        _ndarray[:, 0] = [xmin, xmin, xmax, xmax, xmin]
-        self.hor_span_2.set_xy(_ndarray)
-        self.canvas.draw()
-        self.canvas.flush_events()
+        self.hor_span_2.set_visible(True)
+        self.hor_span_2.extents = (xmin, xmax)
 
 
     def on_vertical_span_selected(self, ymin, ymax):
@@ -203,12 +241,11 @@ class SignalForm(QMainWindow, Form):
                 break
 
         # second span
+        # ver_span.set_active(False)
+        ver_span.set_visible(True)
         if ver_span:
-            _ndarray = ver_span.get_xy()
-            _ndarray[:, 1] = [ymin, ymax, ymax, ymin, ymin]
-            ver_span.set_xy(_ndarray)
-            self.canvas.draw()
-            self.canvas.flush_events()
+            ver_span.extents = (ymin, ymax)
+
 
 
     @pyqtSlot(dict)
@@ -216,22 +253,28 @@ class SignalForm(QMainWindow, Form):
         self.setup_channels(data_info)
         new_info = data_info
         new_info["file"] = self.file_path
-        self.request_data.emit(new_info, self.req_range)
+        self.fileInfoReceived.emit(new_info, self.req_range)
 
     @pyqtSlot(list)
     def feed(self, data_list):
+        if len(self.plot_containers) != 0:
+            for line in self.plot_containers:
+                line.set_data([], [])
         for item in zip(self.channels, data_list):
-            item[0].plot(item[1].key, item[1].data, linestyle='-', marker='o', markersize=5, color="#00A36C")
-            min_x = min(item[1].key)
-            max_x = max(item[1].key)
-            min_y = min(item[1].data)
-            max_y = max(item[1].data)
+            line , =item[0].plot(item[1].key, item[1].data, linestyle='-', marker='o', markersize=2, color="#00A36C")
+            self.plot_containers.append(line)
+            min_x = min(item[1].key) if len(item[1].key) > 1 else (item[1].key)[0]
+            max_x = max(item[1].key) if len(item[1].key) > 1 else (item[1].key)[0]
+            min_y = min(item[1].data) if len(item[1].data) > 1 else (item[1].data)[0]
+            max_y = max(item[1].data) if len(item[1].data) > 1 else (item[1].data)[0]
             y_range = max_y - min_y
             x_tol = 0
             y_tol = y_range/2
-            self.x_limit_range = [min_x - x_tol, max_x + x_tol]
-            self.y_limit_range = [min_y - y_tol, max_y + y_tol]
-            self.rescale()
+            if self.first_feed:
+                self.x_limit_range = (min_x - x_tol, max_x + x_tol)
+                self.y_limit_range = (min_y - y_tol, max_y + y_tol)
+                self.first_feed = False
+            self.rescale((min_x - x_tol, max_x + x_tol),(min_y - y_tol, max_y + y_tol))
 
         self.canvas.draw()
         self.canvas.flush_events()
@@ -241,15 +284,20 @@ class SignalForm(QMainWindow, Form):
         if event.inaxes in self.channels:
             if event.dblclick:
                 if event.button == 1:
-                    self.rescale()
+                    self.x_show_range = self.x_limit_range
+                    self.zoom_timer.start(100)
                 elif event.button == 3:
                     self.hor_span.set_active(False)
                     self.hor_span.set_visible(False)
-                    self.hor_span_2.remove()
+                    # self.hor_span_2.remove()
+                    self.hor_span_2.set_active(False)
+                    self.hor_span_2.set_visible(False)
                     for item in self.vertical_span_list:
                         item[1].set_active(False)
                         item[1].set_visible(False)
-                        item[2].remove()
+                        item[2].set_active(False)
+                        item[2].set_visible(False)
+                        # item[2].remove()
                     self.canvas.flush_events()
                     self.canvas.draw()
         if event.inaxes == self.x_control:
@@ -267,45 +315,50 @@ class SignalForm(QMainWindow, Form):
                 new_x_start = self.x_limit_range[0]
             if(new_x_end > self.x_limit_range[1]):
                 new_x_end = self.x_limit_range[1]
-            ax.set_xlim([new_x_start, new_x_end])
-            self.canvas.draw()
+            self.x_show_range = (new_x_start,new_x_end)
+            self.zoom_timer.start(1)
 
     def on_mouse_release(self, event):
         self.drag_mode = False       
 
-    def rescale(self):
+    def rescale(self, x_range = -1, y_range = -1):
+        if x_range == -1 or y_range == -1 :
+            x_range = self.x_limit_range
+            y_range = self.y_limit_range
         for axis in self.channels:
-            axis.set_xlim(self.x_limit_range)
-            axis.set_ylim(self.y_limit_range)
+            axis.set_xlim(x_range)
+            axis.set_ylim(y_range)
         self.canvas.draw()
+        self.canvas.flush_events()
 
     def zoom_on_wheel(self, event):
         if event.inaxes in self.channels:
-            for ax in self.channels:
-                # get the current x and y limits
-                cur_xlim = ax.get_xlim()
-                cur_xrange = (cur_xlim[1] - cur_xlim[0])*.5
-                xdata = event.xdata # get event x location
-                if event.button == 'up':
-                    # deal with zoom in
-                    scale_factor = 1/self.zoom_base_scale
-                elif event.button == 'down':
-                    # deal with zoom out
-                    scale_factor = self.zoom_base_scale
-                else: 
-                    # deal with something that should never happen
-                    scale_factor = 1
-                    print(event.button)
-                # set new limits
-                new_x_start = xdata - cur_xrange*scale_factor
-                new_x_end = xdata + cur_xrange*scale_factor
-                if(new_x_start < self.x_limit_range[0]):
-                    new_x_start = self.x_limit_range[0]
-                if(new_x_end > self.x_limit_range[1]):
-                    new_x_end = self.x_limit_range[1]
+            xdata = event.xdata
+            # get the current x and y limits
+            cur_xlim = self.channels[0].get_xlim()
+            cur_xrange = (cur_xlim[1] - cur_xlim[0])*.5
+            if event.button == 'up':
+                # deal with zoom in
+                scale_factor = 1/self.zoom_base_scale
+            elif event.button == 'down':
+                # deal with zoom out
+                scale_factor = self.zoom_base_scale
+            else: 
+                # deal with something that should never happen
+                scale_factor = 1
+                print(event.button)
 
-                ax.set_xlim([new_x_start,
-                            new_x_end])
+            new_x_start = xdata - cur_xrange*scale_factor
+            new_x_end = xdata + cur_xrange*scale_factor
+            if(new_x_start < self.x_limit_range[0]):
+                new_x_start = self.x_limit_range[0]
+            if(new_x_end > self.x_limit_range[1]):
+                new_x_end = self.x_limit_range[1]
+
+            self.x_show_range = (new_x_start,new_x_end)
+            self.zoom_timer.start(100)
+            # self.request_data.emit((new_x_start,new_x_end))
+
         if event.inaxes in self.y_controls:
             ax = event.inaxes
             # get the current x and y limits
@@ -332,7 +385,7 @@ class SignalForm(QMainWindow, Form):
 
             ax.set_ylim([new_y_start,
                         new_y_end])
-        self.canvas.draw() # force re-draw
+            self.canvas.draw() # force re-draw
 
     def handle_file_path_changed(self, file_path):
         if self.file_path != file_path:
@@ -343,5 +396,8 @@ class SignalForm(QMainWindow, Form):
             self.default_view = None
             self.plotLayout.addWidget(self.canvas)
         self.signal_information.show()
+
+    def on_zoom_timer_timeout(self):
+        self.request_data.emit(self.x_show_range)
 
 

@@ -19,7 +19,7 @@ class NormalizeWindow(QWidget, Form):
 
         # lines
         self.lines = []
-        self.time = []
+        # self.time = []
 
         # setup plot
         self.fig = Figure()
@@ -59,22 +59,25 @@ class NormalizeWindow(QWidget, Form):
 
     @pyqtSlot(DataPacket)
     def feed(self, data_packet):
-        if not len(self.time):
-            self.time = data_packet.key
         normalized_data = self.NormalizeData(data_packet.data)
-        # line, = self.main_plot.plot(data_packet.key, normalized_data, 'o', markersize=0.5, color=color)
-        self.lines.append((Channel_id_to_name[data_packet.id],normalized_data))
-        # self.legend = self.main_plot.legend()
+        self.lines.append((Channel_id_to_name[data_packet.id], data_packet.key,normalized_data))
 
 
     def NormalizeData(self, data):
-        return (data - np.min(data)) / (np.max(data) - np.min(data))
+        np.seterr(invalid='ignore') 
+        return np.divide((data - np.min(data)), (np.max(data) - np.min(data)))
+
 
     def plot_it(self):
         channels = []
         for line in self.lines:
             color = (["#"+''.join([random.choice('ABCDEF0123456789') for i in range(6)])])[-1]
-            self.main_plot.plot(self.time, line[1], 'o', markersize=0.5, color=color)
+            self.main_plot.plot(line[1], line[2], 'o', markersize=0.5, color=color)
             channels.append(line[0])
         self.main_plot.legend(channels)
+
+    def clear(self):
+        self.lines.clear()
+        self.main_plot.clear()
+        self.canvas.draw()
 

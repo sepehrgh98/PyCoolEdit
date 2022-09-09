@@ -1,3 +1,4 @@
+from queue import Full
 from matplotlib.widgets import RectangleSelector
 
 class HistoricalZoom:
@@ -8,6 +9,7 @@ class HistoricalZoom:
         self.list_of_zoom_box = []
         self.history = [] # list of tuple;(x_range, y_range)
         self.current_range_index = 0
+        self.first_zoom = True
 
 
     def setup_rect(self):
@@ -18,7 +20,7 @@ class HistoricalZoom:
                 drawtype='box',
                 useblit=True,
                 button=[1],
-                minspanx=5, minspany=5,
+                minspanx=1, minspany=1,
                 spancoords='data',
                 interactive=False,
                 rectprops = dict(facecolor='blue', edgecolor = 'black',
@@ -35,6 +37,10 @@ class HistoricalZoom:
     def on_zoom_dragged(self,eclick, erelease):
         x_range = (eclick.xdata, erelease.xdata)
         y_range = (eclick.ydata, erelease.ydata)
+        if self.first_zoom:
+            ax = self.curr_ax[:][0]
+            self.history.append((ax.get_xlim(), ax.get_ylim()))
+            self.first_zoom = False
         self.history.append((x_range, y_range))
         self.current_range_index = len(self.history)-1
         self.do_zoom(x_range, y_range)
@@ -65,9 +71,11 @@ class HistoricalZoom:
 
     def do_zoom(self, x, y):
         axis = (self.curr_ax[:])[-1]
-        axis.set_xlim(x)
-        axis.set_ylim(y)
-        self.fig.canvas.draw()
+        if x[0] != x[1] and y[0] != y[1]:
+            axis.set_xlim(x)
+            axis.set_ylim(y)
+            self.fig.canvas.draw()
 
     def reset(self):
+        self.first_zoom = True
         self.history.clear()

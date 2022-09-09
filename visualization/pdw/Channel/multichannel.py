@@ -100,3 +100,14 @@ class MultiChannels:
         # self.update_hist(data_list)
         if mood == "selection":
             self.selected_area.append(line)
+
+    def rescale(self):
+        self._axis.set_xlim(list(self.time_range))
+        if self._min == self._max:
+            self._axis.set_ylim(self._min - 1, self._max + 1)
+        else:
+            y_range = self._max - self._min
+            y_tol = y_range/4
+            self._axis.set_ylim(self._min-y_tol, self._max+y_tol)
+
+        self._canvas.draw()

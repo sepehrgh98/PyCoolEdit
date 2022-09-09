@@ -1,6 +1,3 @@
-from tkinter.messagebox import NO
-
-
 class Cell:
     _x_start = 0
     _x_end = 0

@@ -21,6 +21,7 @@ class MHDatReader:
 
 
 if __name__ == '__main__':
+    # mhreader = MHDatReader("IF1 2724 161652.DAT", 'ver2.dll', 2)
     mhreader = MHDatReader("IF1 2724 161652.DAT", 'drkh.dll', 2)
     t0 = time()
     res = mhreader.get(0, 100000000, 50000)

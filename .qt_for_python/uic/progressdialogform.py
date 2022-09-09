@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\Visualization\dist\main\visualization\GUI\progressdialogform.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\progressdialogform.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(522, 132)
+        Dialog.resize(491, 163)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Dialog)
@@ -40,12 +40,21 @@ class Ui_Dialog(object):
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.parsingProgressBar)
         self.label_3 = QtWidgets.QLabel(self.groupBox)
         self.label_3.setObjectName("label_3")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_3)
+        self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_3)
         self.visualizingProgressBar = QtWidgets.QProgressBar(self.groupBox)
         self.visualizingProgressBar.setProperty("value", 0)
         self.visualizingProgressBar.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.visualizingProgressBar.setObjectName("visualizingProgressBar")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.visualizingProgressBar)
+        self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.visualizingProgressBar)
+        self.label_4 = QtWidgets.QLabel(self.groupBox)
+        self.label_4.setObjectName("label_4")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_4)
+        self.capsulationProgressBar = QtWidgets.QProgressBar(self.groupBox)
+        self.capsulationProgressBar.setProperty("value", 0)
+        self.capsulationProgressBar.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.capsulationProgressBar.setTextVisible(True)
+        self.capsulationProgressBar.setObjectName("capsulationProgressBar")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.capsulationProgressBar)
         self.verticalLayout.addWidget(self.groupBox)
 
         self.retranslateUi(Dialog)
@@ -58,3 +67,4 @@ class Ui_Dialog(object):
         self.readingProgressBar.setFormat(_translate("Dialog", "%p%"))
         self.label_2.setText(_translate("Dialog", "Parsing:"))
         self.label_3.setText(_translate("Dialog", "Visualizing:"))
+        self.label_4.setText(_translate("Dialog", "Capsulation:"))

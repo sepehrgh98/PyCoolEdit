@@ -3,7 +3,7 @@ import os
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWidget, QFileDialog, QButtonGroup, QLabel
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 from visualization.GUI.pdw.concatbox import ConcatBox
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'pdwtools.ui'))[0]
@@ -42,10 +42,22 @@ class PDWToolsForm(QWidget, Form):
         self.file_path = None
 
         # configs
-        self.selectFileBtn.setToolTip('Select Pdw File')
-        self.newRadarBtn.setToolTip('New Radar')
+        self.dragBtn.setToolTip('Pan charts in every directions')
+        self.zoomBtn.setToolTip('Rectangular zoom')
+        self.backwardZoomBtn.setToolTip('Previous zoom range')
+        self.forwardZoomBtn.setToolTip('Next zoom range')
         self.selectBtn.setToolTip('Select Data')
         self.selectAllBtn.setToolTip('Select All Data')
+        self.deleteBtn.setToolTip('Clear selected area')
+        self.unselectBtn.setToolTip('Unselect all selected areas')
+        self.pointCursorBtn.setToolTip('Point marker')
+        self.lineMarkerBtn.setToolTip('Line marker')
+        self.resetBtn.setToolTip('Reset to home range')
+        self.selectFileBtn.setToolTip('Select Pdw File')
+        self.newRadarBtn.setToolTip('New Radar')
+        self.noralizeBtn.setToolTip('Show normalized data')
+        self.concatChannelsBtn.setToolTip('Concate channels')
+        self.exportBtn.setToolTip('Export selected data')
 
         # connections
         self.selectFileBtn.clicked.connect(self.get_file_path)
@@ -72,6 +84,23 @@ class PDWToolsForm(QWidget, Form):
         self.btn_grp.addButton(self.selectBtn)
         self.btn_grp.addButton(self.zoomBtn)
         self.btn_grp.addButton(self.dragBtn)
+
+        self.dragBtn.setIcon(QIcon('visualization/Resources/icons/pan.png'))
+        self.zoomBtn.setIcon(QIcon('visualization/Resources/icons/zoom.png'))
+        self.backwardZoomBtn.setIcon(QIcon('visualization/Resources/icons/backward.png'))
+        self.forwardZoomBtn.setIcon(QIcon('visualization/Resources/icons/forward.png'))
+        self.selectBtn.setIcon(QIcon('visualization/Resources/icons/select.png'))
+        self.selectAllBtn.setIcon(QIcon('visualization/Resources/icons/select_all.png'))
+        self.deleteBtn.setIcon(QIcon('visualization/Resources/icons/delete.png'))
+        self.unselectBtn.setIcon(QIcon('visualization/Resources/icons/deselect.png'))
+        self.pointCursorBtn.setIcon(QIcon('visualization/Resources/icons/pointmarker.png'))
+        self.lineMarkerBtn.setIcon(QIcon('visualization/Resources/icons/linemarker.png'))
+        self.resetBtn.setIcon(QIcon('visualization/Resources/icons/Home.png'))
+        self.selectFileBtn.setIcon(QIcon('visualization/Resources/icons/download-file.png'))
+        self.newRadarBtn.setIcon(QIcon('visualization/Resources/icons/radar.png'))
+        self.noralizeBtn.setIcon(QIcon('visualization/Resources/icons/normilize.png'))
+        self.concatChannelsBtn.setIcon(QIcon('visualization/Resources/icons/concate.png'))
+        self.exportBtn.setIcon(QIcon('visualization/Resources/icons/export.png'))
 
     def get_file_path(self):
         self.clearRequested.emit()

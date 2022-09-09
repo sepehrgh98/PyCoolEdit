@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\Visualization\dist\main\visualization\GUI\pdw\concatboxui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\pdw\concatboxui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -20,6 +20,7 @@ class Ui_Form(object):
         self.concatGroupBox = QtWidgets.QGroupBox(Form)
         self.concatGroupBox.setObjectName("concatGroupBox")
         self.concatBoxLayout = QtWidgets.QFormLayout(self.concatGroupBox)
+        self.concatBoxLayout.setContentsMargins(-1, 22, -1, -1)
         self.concatBoxLayout.setObjectName("concatBoxLayout")
         self.verticalLayout.addWidget(self.concatGroupBox)
         self.widget = QtWidgets.QWidget(Form)

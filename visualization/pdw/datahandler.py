@@ -18,6 +18,10 @@ class DataHandler(QObject):
     lineCursorDataRequested = pyqtSignal(float)
     markerLineResultIsReady = pyqtSignal(dict)
     pointMarkerDataRequested = pyqtSignal(str, tuple)
+    dataIsReadyForCapsulation = pyqtSignal(dict)
+    pointMarkerResultIsReady = pyqtSignal(tuple)
+    totalSizeIsReady = pyqtSignal(int)
+
 
     def __init__(self):
         super(DataHandler, self).__init__()
@@ -29,20 +33,28 @@ class DataHandler(QObject):
 
         # connections
         self.file_path_changed.connect(self.reader.set_file_path)
-        self.reader.batch_is_ready.connect(self.parser.prepare_data)
-        self.parser.columns_defined.connect(self.define_columns)
-        # self.parser.data_packet_is_ready.connect(self.packetize_data_cap_mod)
-        self.parser.data_packet_is_ready.connect(self.packetize_data)
-        self.selectDataRequested.connect(self.parser.prepare_requested_select_data)
-        self.deleteSelectedRequested.connect(self.parser.on_delete_selected_req)
-        self.reader.progress_is_ready.connect(self.progress_is_ready)
-        self.parser.progress_is_ready.connect(self.progress_is_ready)
+        self.selectDataRequested.connect(self.capsulator.prepare_requested_select_data)
+        # self.deleteSelectedRequested.connect(self.parser.on_delete_selected_req)
         self.clearRequested.connect(self.reader.clear)
         self.clearRequested.connect(self.parser.clear)
-        self.capsulator.capsulated_data_is_reaady.connect(self.final_data_is_ready)
-        self.lineCursorDataRequested.connect(self.parser.single_row_req)
-        self.parser.markerLineResultIsReady.connect(self.markerLineResultIsReady)
-        self.pointMarkerDataRequested.connect(self.parser.single_data_req)
+        self.clearRequested.connect(self.capsulator.clear)
+        self.lineCursorDataRequested.connect(self.capsulator.single_row_req)
+        self.pointMarkerDataRequested.connect(self.capsulator.single_data_req)
+        self.dataIsReadyForCapsulation.connect(self.capsulator.feed)
+
+        self.reader.batch_is_ready.connect(self.parser.prepare_data)
+        self.reader.progress_is_ready.connect(self.progress_is_ready)
+
+        self.parser.columns_defined.connect(self.define_columns)
+        self.parser.data_packet_is_ready.connect(self.packetize_data_cap_mod)
+        self.parser.progress_is_ready.connect(self.progress_is_ready)
+        self.parser.totalSizeIsReady.connect(self.totalSizeIsReady)
+
+        # self.capsulator.capsulated_data_is_reaady.connect(self.final_data_is_ready)
+        self.capsulator.capsulated_data_is_reaady.connect(self.send_capsulated_data)
+        self.capsulator.markerLineResultIsReady.connect(self.markerLineResultIsReady)
+        self.capsulator.pointMarkerResultIsReady.connect(self.pointMarkerResultIsReady)
+        self.capsulator.progress_is_ready.connect(self.progress_is_ready)
 
 
         self.timer = QElapsedTimer()
@@ -60,7 +72,10 @@ class DataHandler(QObject):
 
     @pyqtSlot(dict)
     def define_columns(self, columns):
-        columns.pop("CW")
+        if "CW" in columns:
+            columns.pop("CW")
+        if "No." in columns:
+            columns.pop("No.")
         for i in range(1, len(columns.keys())):
             channel = list(columns.keys())[i]
             unit = list(columns.values())[i]
@@ -69,8 +84,12 @@ class DataHandler(QObject):
 
     @pyqtSlot(dict)
     def packetize_data_cap_mod(self, data):
-        self.capsulator.feed(data)
-
+        self.dataIsReadyForCapsulation.emit(data)
+    
+    @pyqtSlot(dict)
+    def send_capsulated_data(self, data_pack):
+        for name, pack in data_pack.items():
+            self.final_data_is_ready.emit(pack)
 
     @pyqtSlot(dict)
     def packetize_data(self, data):

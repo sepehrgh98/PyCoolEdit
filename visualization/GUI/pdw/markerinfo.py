@@ -33,3 +33,10 @@ class MarkerInfo(QWidget, Form):
     def feed_point_marker(self, data):
         self.timeLineEdit.setText(str(round(data[0],2)))
         self.valLineEdit.setText(str(round(data[1],2)))
+
+    def clear(self):
+        for i in reversed(range(self.markerInfoLayout.count())): 
+            self.markerInfoLayout.itemAt(i).widget().setParent(None)
+        self.lineEdit_list.clear()
+        self.timeLineEdit.setText(" ")
+        self.valLineEdit.setText(" ")

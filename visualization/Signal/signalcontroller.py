@@ -1,8 +1,13 @@
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
 from visualization.visualizationparams import SignalDataPacket
 from visualization.Signal.mhdll import MHDatReader
+from visualization.Signal.mhreaderv2 import readFile
 import os
-from PyQt5 import uic
+import numpy as np
+def find_nearest_value_indx(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return idx
 
 class SignalController(QObject):
     data_packet_is_ready = pyqtSignal(list)
@@ -10,34 +15,45 @@ class SignalController(QObject):
     def __init__(self):
         super(SignalController, self).__init__()
         # variables
-        self.sampling_rate = 10000
+        self.sampling_rate = 1000000
+        self.file_info = {}
+        self.total_range = ()
+        self.key_data = []
+
+        # moving to thread
+        self.objThread = QThread()
+        self.moveToThread(self.objThread)
+        self.objThread.finished.connect(self.objThread.deleteLater)
+        self.objThread.start()
 
     @pyqtSlot(dict, tuple)
-    def get_data(self, file_info, data_range):
-        # mhd = MHDatReader(file_info["file"], file_info["channels"])
-        # print(os.getcwd())
-        # print(os.listdir(os.getcwd()))
-        dll_path = os.path.join(os.getcwd(), 'visualization', 'Signal', 'drkh.dll')
-        # dll_path = r'F:/Visualization/visualization/Signal/drkh.dll'
-        # assert os.path.exists(dll_path)
-        mhd = MHDatReader(file_info["file"],dll_path ,file_info["channels"])
+    def on_info_received(self, file_info, data_range):
+        self.file_info = file_info
+        self.total_range = data_range
+        # for i in range(int((os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"])):
+        #     self.key_data.append(i)
+        self.get_data(self.total_range)
+
+
+    @pyqtSlot(tuple)
+    def get_data(self, data_range):
         if data_range:
-            start_range = data_range[0]
-            end_range = data_range[1]
+            start_range = round(data_range[0])
+            end_range = round(data_range[1])
         else:
             start_range = 0
-            end_range = 100000000
-            # print(mhd.get_file_total_size())
-            # end_range = mhd.get_file_total_size()-10
-        # res = mhd.get(start_range, end_range, self.sampling_rate)
-        res = mhd.get(start_range, end_range, self.sampling_rate)
+            end_range = (os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"]
+        res = readFile(self.file_info["file"], start_range, end_range, self.file_info["channels"], self.sampling_rate)
         data_list = []
         key_data = []
         data_point = start_range
-        for _ in range(len(res[0])):
-            key_data.append(data_point)
+        for i in range(start_range, start_range+len(res[0])):
+            key_data.append(i)
             data_point += self.sampling_rate
         channel_count = 1
+        # start_index = find_nearest_value_indx(self.key_data, start_range)
+        # end_index = find_nearest_value_indx(self.key_data, end_range)
+        # key_data = self.key_data[start_index:end_index]
         for ch in res:
             final_data = SignalDataPacket()
             final_data.id = channel_count

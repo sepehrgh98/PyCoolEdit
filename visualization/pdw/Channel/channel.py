@@ -1,3 +1,4 @@
+from pkgutil import iter_importers
 from PyQt5 import uic
 from matplotlib.axes._axes import Axes
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
@@ -6,44 +7,18 @@ import matplotlib
 import numpy as np
 from visualization.visualizationparams import ChannelUnit, PlotType
 import matplotlib.pyplot as plt
-
-
-matplotlib.use("Qt5Agg")
-Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'channelui.ui'))[0]
-
-class Worker(QObject):
-    new_data_is_ready = pyqtSignal(np.ndarray)
-    finished = pyqtSignal()
-    progress = pyqtSignal(int)
-    def __init__(self, new_range, main_data):
-        super().__init__()
-        self.new_range = new_range
-        self.main_data = main_data
-
-
-    def run(self):
-        """Long-running task."""
-        new_val = np.array([])
-        print(self.new_range)
-        for item in self.main_data:
-            if item <= self.new_range[1] and item >= self.new_range[0]:                
-                arr = np.array((item,))
-                new_val = np.concatenate([new_val, arr], axis=0)
-        self.new_data_is_ready.emit(new_val)
-        self.finished.emit()
+import time
 
 class Channel:
     dataRequested = pyqtSignal(int, tuple, tuple)  # channel_id , x_range , y_range
 
-    def __init__(self, _id, _name, _unit, axis, _canvas, _hist_axis, _hist_canvas):
-
+    def __init__(self, _id, _name, _unit, axis, _canvas, _hist_axis):
         # initialize
         self._id = _id
         self._name = _name
         self._axis = axis
         self._canvas = _canvas
         self._hist_axis = _hist_axis
-        self._hist_canvas = _hist_canvas
         self.unit = _unit
 
  
@@ -55,11 +30,11 @@ class Channel:
         self._min = None
         self.time_range = ()
         self.whole_area = None
-        # self.selected_area = []
         self.selected_area = {}   # arange : line obj
         self.initial_plot = True
         self.time_show_range = ()
         self.plot_type = PlotType.point
+        self.color = None
 
         # style
         self.tick_size = 10
@@ -72,6 +47,7 @@ class Channel:
         self.data_color = '#b0e0e6'
         self.fig_color = '#151a1e'
 
+
     def __repr__(self) -> str:
         return str(self.id)
 
@@ -79,56 +55,25 @@ class Channel:
     def feed(self, x, data_list, color, mood="initilize"):
         if len(x)<2:
             return
-        if mood == "initilize" and self.whole_area:
-            if self.plot_type == PlotType.stem:
+        if mood == "initilize":
+            if len(data_list):
+                self._max = np.amax(data_list)
+                self._min = np.amin(data_list)
+            self.val = data_list
+            self.feed_time(x)
+            if self.whole_area:
                 self.whole_area.set_data([], [])
-            elif self.plot_type == PlotType.point:
-                # self.selected_area[x[0], x[-1]] = (markerline, stemline, baseline)
-                self.whole_area[0].remove() # markerline
-                self.whole_area[1].remove() # stemline
-                self.whole_area[2].remove() # baseline
-
             self._hist_axis.clear()
             self.cancel_selection_all()
-            self.hist_canvas.draw()
-
-        if len(data_list):
-            self._max = max(data_list)
-            self._min = min(data_list)
-        
-        self.val = data_list
-        if self.plot_type == PlotType.point:
-            line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
-        elif self.plot_type == PlotType.stem:
-            # line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
-            markerline, stemline, baseline =self._axis.stem(x
-                                , data_list
-                                , use_line_collection = True
-                                , linefmt=color
-                                , bottom = self._min
-                                , markerfmt='#182e6b'
-                                , basefmt=" ")
-            plt.setp(stemline, 'linewidth', 2)
-
-
-        if mood == "initilize":
-            self.feed_time(x)
+            self.color = color
+            area, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
             self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color=color)
+            self.whole_area = area
             self.rescale()
-
-        # self.update_hist(data_list)
-        if mood == "selection" :
-            if self.plot_type == PlotType.point:
-                self.selected_area[x[0], x[-1]] = line
-            elif self.plot_type == PlotType.stem:
-                self.selected_area[x[0], x[-1]] = (markerline, stemline, baseline)
         else:
-            if self.plot_type == PlotType.point:
-                self.whole_area = line
-            elif self.plot_type == PlotType.stem:
-                self.whole_area = (markerline, stemline, baseline)
-            
-
+            line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+            self.selected_area[x[0], x[-1]] = line
+       
 
     def feed_time(self, x):
         if len(x):
@@ -176,13 +121,6 @@ class Channel:
     def axis(self, a):
         self._axis = a
 
-    @property
-    def hist_canvas(self):
-        return self._hist_canvas
-
-    @hist_canvas.setter
-    def hist_canvas(self, a):
-        self._hist_canvas = a
 
     @property
     def hist_axis(self):
@@ -204,12 +142,13 @@ class Channel:
                               fontweight=self.font_weight,
                               color=self.font_color)
         self._hist_axis.set_facecolor(self.axis_bg_color)
-        self._hist_axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
+        # self._hist_axis.tick_params(axis='both', which='major', labelsize=self.tick_size, colors=self.plot_detail_color)
+        self._hist_axis.tick_params(left = False, labelleft = False , labelbottom = False, bottom = False)
         self._hist_axis.spines['bottom'].set_color(self.plot_detail_color)
         self._hist_axis.spines['top'].set_color(self.plot_detail_color)
         self._hist_axis.spines['right'].set_color(self.plot_detail_color)
         self._hist_axis.spines['left'].set_color(self.plot_detail_color)
-        self._hist_axis.set_xticks([])
+        # self._hist_axis.set_xticks([])
 
     @pyqtSlot(Axes)
     def add_axis(self, ax):
@@ -228,29 +167,39 @@ class Channel:
             y_tol = y_range/4
             self._axis.set_ylim(self._min-y_tol, self._max+y_tol)
 
-        self._canvas.draw()
-
     def clear(self):
         self.axis.cla()
 
     def cancel_selection_all(self):
-        for range, line_obj in self.selected_area.items():
-            line_obj.set_data([], [])
-        self.selected_area = {}
-        self.canvas.draw()
-        self.canvas.flush_events()
+        if self.selected_area:
+            for range, line_obj in self.selected_area.items():
+                line_obj.set_data([], [])
+            self.selected_area = {}
+
     
     def cancel_selection(self, req_range):
         mid_point = ((req_range[1] - req_range[0])/2)+req_range[0]
         current_range = ()
         for range, line_obj in self.selected_area.items():
-            if mid_point >= range[0] and mid_point <= range[1]:
+            if( mid_point >= range[0] and mid_point <= range[1]) or (range[0] >= req_range[0] and range[1] <= req_range[1]):
                 current_range = range
                 line_obj.set_data([], [])
                 break
         if current_range != ():
             self.selected_area.pop(current_range)
 
+    def remove_selected(self):
+        x = self.whole_area.get_xdata()
+        y = self.whole_area.get_ydata()
+        for range, line_obj in self.selected_area.items():
+            s_x = line_obj.get_xdata()
+            s_y = line_obj.get_ydata()
+            for item in zip(s_x,s_y):
+                indices = np.where(x == item[0])[0]
+                x = np.delete(x, indices)
+                y = np.delete(y, indices)
+        self.feed(x,y, self.color, mood="initilize")
+        self.canvas.draw()
 
     def on_xlims_change(self, event_ax):
         if event_ax.get_xlim() != self.time_show_range:
@@ -265,27 +214,11 @@ class Channel:
             self._axis.set_xlim([final_x_start, final_x_end])
             self._canvas.draw()
 
-    def on_ylims_change(self, event_ax):
-        if len(self.val) and not self.initial_plot:
-            new_range = event_ax.get_ylim()
-            self.thread = QThread()
-            self.worker = Worker(new_range, self.val)
-            self.worker.moveToThread(self.thread)
-            self.thread.started.connect(self.worker.run)
-            self.worker.finished.connect(self.thread.quit)
-            self.worker.finished.connect(self.worker.deleteLater)
-            self.worker.new_data_is_ready.connect(self.update_hist)
-            self.thread.finished.connect(self.thread.deleteLater)
-            self.thread.start()
-
-        if self.initial_plot:
-            self.initial_plot = False
 
     def update_hist(self, data_list):
         self._hist_axis.clear()
         self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color='#ADD8E6')
-        self._hist_canvas.draw()
-        self._hist_canvas.flush_events()
+
 
     def set_x_tick(self, title):
         self._axis.set_xlabel(title, fontsize=self.title_size, fontname=self.font_name,

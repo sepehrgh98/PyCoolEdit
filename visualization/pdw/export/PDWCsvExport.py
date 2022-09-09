@@ -15,5 +15,8 @@ class PDWCsvExport:
             for i in range(row_count):
                 row = []
                 for ch in data_dict.values():
-                    row.append(ch[i])
+                    try:
+                        row.append(ch[i])
+                    except IndexError:
+                        row.append("\t")
                 writer.writerow(row)

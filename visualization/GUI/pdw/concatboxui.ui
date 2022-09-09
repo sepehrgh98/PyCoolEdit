@@ -19,7 +19,11 @@
      <property name="title">
       <string>Concat Box</string>
      </property>
-     <layout class="QFormLayout" name="concatBoxLayout"/>
+     <layout class="QFormLayout" name="concatBoxLayout">
+      <property name="topMargin">
+       <number>22</number>
+      </property>
+     </layout>
     </widget>
    </item>
    <item>

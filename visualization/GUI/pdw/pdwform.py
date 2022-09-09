@@ -33,7 +33,9 @@ class PDWForm(QMainWindow, Form):
     showPolicyChanged = pyqtSignal(ShowPolicy)
     lineCursorDataRequested = pyqtSignal(float)
     markerLineResultIsReady = pyqtSignal(dict)
+    pointMarkerResultIsReady = pyqtSignal(tuple)
     pointMarkerDataRequested = pyqtSignal(str, tuple)
+    totalSizeIsReady = pyqtSignal(int)
 
     def __init__(self):
         super(PDWForm, self).__init__()
@@ -60,15 +62,11 @@ class PDWForm(QMainWindow, Form):
         self.leftFrameLayout.addWidget(self.marker_info)
         self.plotLayout.addWidget(self.default_view)
 
-
-
-
-
         # variables
         self.fig = self.subPlotsWidget.get_figure()
         self.canvas = self.fig.canvas
-        self.hist_fig = self.subPlotsWidget.get_hist_figure()
-        self.hist_canvas = self.hist_fig.canvas
+        # self.hist_fig = self.subPlotsWidget.get_hist_figure()
+        # self.hist_canvas = self.hist_fig.canvas
         self.channels = []
         self.data_header = None
         self.radars = []
@@ -90,7 +88,6 @@ class PDWForm(QMainWindow, Form):
     def setup_connections(self):
         # tool widget connections
         self.toolsWidget.filePathChanged.connect(self.on_filePathChanged)
-        self.toolsWidget.filePathChanged.connect(self.dataInfoWidget.set_file_name)
         self.toolsWidget.selectBtnPressed.connect(self.subPlotsWidget.enable_select_action)
         self.toolsWidget.zoomRequested.connect(self.subPlotsWidget.enable_zoom_action)
         self.toolsWidget.panRequested.connect(self.subPlotsWidget.enable_pan_action)
@@ -102,6 +99,9 @@ class PDWForm(QMainWindow, Form):
         self.toolsWidget.deselectAllRequested.connect(self.subPlotsWidget.unselectAllRequested)
         self.toolsWidget.clearRequested.connect(self.radar_controller.clear)
         self.toolsWidget.clearRequested.connect(self.subPlotsWidget.clear)
+        self.toolsWidget.clearRequested.connect(self.reviewWidget.clear)
+        self.toolsWidget.clearRequested.connect(self.normalize_window.clear)
+        self.toolsWidget.clearRequested.connect(self.marker_info.clear)
         self.toolsWidget.clearRequested.connect(self.on_clearRequested)
         self.toolsWidget.resetZoomRequested.connect(self.reset_zoom)
         self.toolsWidget.resetZoomRequested.connect(self.subPlotsWidget.resetZoomRequested)
@@ -120,12 +120,16 @@ class PDWForm(QMainWindow, Form):
         # default view widget connections
         self.default_view.filePathChanged.connect(self.on_filePathChanged)
         # self connections
+        self.filePathChanged.connect(self.dataInfoWidget.set_file_name)
+        self.totalSizeIsReady.connect(self.dataInfoWidget.set_total_data_size)
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_rect)
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_line_marker)
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_point_marker)
         self.channelsSettedUp.connect(self.subPlotsWidget.set_fig_size)
         self.showPolicyChanged.connect(self.subPlotsWidget.set_show_policy)
         self.markerLineResultIsReady.connect(self.marker_info.feed)
+        self.pointMarkerResultIsReady.connect(self.marker_info.feed_point_marker)
+
 
 
     def on_showOmniDfChanged(self, omni_df_type):
@@ -150,11 +154,11 @@ class PDWForm(QMainWindow, Form):
             self.radar_controller.setup_channel(header)
             self.toolsWidget.setup_channel(header)
             self.marker_info.setup_channels(header)
-        axs = self.fig.subplots(len(header.items()), 1, sharex='all')
-        hist_axs = self.hist_fig.subplots(len(header.items()), 1)
+        axs = self.fig.subplots(len(header.items()), 2, sharex='col', sharey='row',gridspec_kw={'width_ratios': [10, 1]})
         ch_counter = 0
         for _id, _info in header.items():
-            ch = Channel(_id, _info[0], _info[1], axs[ch_counter], self.canvas, hist_axs[ch_counter], self.hist_canvas)
+            axis_tuple = axs[ch_counter]
+            ch = Channel(_id, _info[0], _info[1], axis_tuple[0], self.canvas, axis_tuple[1])
             ch.setup_style()
             self.channels.append(ch)
             ch_counter += 1
@@ -165,8 +169,6 @@ class PDWForm(QMainWindow, Form):
 
     @pyqtSlot(DataPacket)
     def feed(self, data_packet):
-        total_size=0
-        select_size=0
         for channel in self.channels:
             current_channel = None
             if channel.is_multiple():
@@ -182,41 +184,36 @@ class PDWForm(QMainWindow, Form):
                     self.reviewWidget.feed(data_packet, mood="initilize")
                     self.normalize_window.feed(data_packet)
                     current_channel.feed(data_packet.key, data_packet.data, random.choice(self.plot_colors), mood="initilize")
-                    total_size += len(data_packet.key)
                     self.number_of_fed_channels += 1
                     self.feed_progressbar({ProgressType.visualizer:self.number_of_fed_channels/len(self.channels)})
                 elif self.feedMood == FeedMood.select:
                     self.radar_controller.feed(data_packet)
                     current_channel.feed(data_packet.key, data_packet.data, "red", mood="selection")
                     self.reviewWidget.feed_marked(data_packet)
-                    select_size += len(data_packet.key)
                     self.export_window.feed(data_packet)
                     break
 
-        if self.feedMood == FeedMood.main_data:
-            self.dataInfoWidget.set_total_data_size(total_size)
-        else:
-            self.dataInfoWidget.set_select_data_size(select_size)
+
                    
 
         self.canvas.draw()
         self.canvas.flush_events()
-        self.hist_canvas.draw()
-        self.hist_canvas.flush_events()
+
         
     @pyqtSlot(str, tuple, tuple)
     def set_selection_area(self,channel_name, x_range=(-1,), y_range=(-1,)):
         self.feedMood = FeedMood.select
+        
         self.selectDataRequested.emit(channel_name, x_range, y_range)
 
     @pyqtSlot()
     def do_unselect_all(self):
         self.feedMood = FeedMood.main_data
-        self.dataInfoWidget.set_select_data_size(0)
         self.subPlotsWidget.clear_selection_area()
         self.reviewWidget.unmark_all()
         for channel in self.channels:
             channel.cancel_selection_all()
+        self.canvas.draw()
 
     @pyqtSlot(tuple)
     def do_unselect_special_area(self, area):
@@ -231,12 +228,11 @@ class PDWForm(QMainWindow, Form):
         self.progress.show()
 
     def all_select_handle(self):
-        self.set_selection_area('TOA',(-1,),(-1,))
+        self.set_selection_area('',(-1,),(-1,))
 
     @pyqtSlot(list)
     def handle_channel_concatination(self, concat_list):
         self.fig.clf()
-        self.hist_fig.clf()
         if len(concat_list):
             multi_channel = MultiChannels()
             remove_ch = []
@@ -248,14 +244,13 @@ class PDWForm(QMainWindow, Form):
             self.channels.insert(0, multi_channel)
             
             [self.channels.remove(ch) for ch in remove_ch]
-            axs = self.fig.subplots(len(self.channels), 1, sharex='all')
-            hist_axs = self.hist_fig.subplots(len(self.channels), 1)
+            axs = self.fig.subplots(len(self.channels), 2, sharex='col', sharey='row',gridspec_kw={'width_ratios': [10, 1]})
             ch_counter = 0
             for item in self.channels:
-                item.axis = axs[ch_counter]
+                axis_tuple = axs[ch_counter]
+                item.axis = axis_tuple[0]
                 item.canvas = self.canvas
-                item.hist_axis = hist_axs[ch_counter]
-                item.hist_canvas = self.hist_canvas
+                item.hist_axis = axis_tuple[1]
                 item.setup_style()
                 ch_counter += 1
             self.channelsSettedUp.emit()
@@ -264,9 +259,8 @@ class PDWForm(QMainWindow, Form):
             self.setup_channels(self.data_header)
 
         self.canvas.draw()
-        self.hist_canvas.draw()
 
-        self.selectDataRequested.emit((-1,), (-1,))
+        self.selectDataRequested.emit("",(-1,), (-1,))
 
     @pyqtSlot(dict)
     def feed_progressbar(self, status):
@@ -277,6 +271,8 @@ class PDWForm(QMainWindow, Form):
                 self.progress.parsingProgressBar.setValue(int(val*100))
             elif key == ProgressType.visualizer:
                 self.progress.visualizingProgressBar.setValue(int(val*100))
+            elif key == ProgressType.capsulator:
+                self.progress.capsulationProgressBar.setValue(int(val*100))
         read_stat = self.progress.readingProgressBar.value()
         parse_stat = self.progress.parsingProgressBar.value()
         visualize_stat = self.progress.visualizingProgressBar.value()
@@ -296,6 +292,8 @@ class PDWForm(QMainWindow, Form):
     def reset_zoom(self):
         for ch in self.channels:
             ch.rescale()
+        self.canvas.draw()
+
 
     def on_clearRequested(self):
         self.number_of_fed_channels = 0
@@ -313,7 +311,10 @@ class PDWForm(QMainWindow, Form):
 
     def on_deleteSelectedReq(self):
         self.feedMood = FeedMood.main_data
-        self.deleteSelectedRequested.emit(self.subPlotsWidget.selection_area)
+        for ch in self.channels:
+            ch.remove_selected()
+        self.reviewWidget.unmark_all()
+        # self.deleteSelectedRequested.emit(self.subPlotsWidget.selection_area)
 
     def show_normalize(self):
         self.normalize_window.plot_it()

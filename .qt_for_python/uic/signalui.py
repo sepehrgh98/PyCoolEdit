@@ -55,6 +55,7 @@ class Ui_MainWindow(object):
         self.groupBox = QtWidgets.QGroupBox(self.controlWidget)
         self.groupBox.setObjectName("groupBox")
         self.formLayout_2 = QtWidgets.QFormLayout(self.groupBox)
+        self.formLayout_2.setContentsMargins(-1, 22, -1, -1)
         self.formLayout_2.setObjectName("formLayout_2")
         self.label_3 = QtWidgets.QLabel(self.groupBox)
         self.label_3.setObjectName("label_3")

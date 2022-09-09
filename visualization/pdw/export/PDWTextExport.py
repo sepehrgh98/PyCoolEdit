@@ -10,15 +10,20 @@ class PDWTextExport:
         row_count = len(list(data_dict.values())[0])
         col_count = len(list(data_dict.keys())[0])
         with open(self.file_dir, 'w') as f: 
+            f.write('%')
             for ch in channel_name:
                 f.write(str(ch))
                 f.write('\t\t\t')
             f.write('\n')
+            f.write('%')
             f.write("-"*50*col_count)
             f.write('\n')
-
+            
             for i in range(row_count):
                 for ch in data_dict.values():
-                    f.write(str(ch[i]))
+                    try:
+                        f.write(str(round(ch[i],5)))
+                    except IndexError:
+                        f.write("*")
                     f.write('\t\t\t')
                 f.write('\n')

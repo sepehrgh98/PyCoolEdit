@@ -1,8 +1,6 @@
 import enum
 import numpy as np
 
-
-
 class FeedMood(enum.Enum):
     main_data = 1
     select = 2
@@ -10,7 +8,8 @@ class FeedMood(enum.Enum):
 class ProgressType(enum.Enum):
     reader = 1
     parser = 2
-    visualizer = 3
+    capsulator = 3
+    visualizer = 4
 
 class ShowPolicy(enum.Enum):
     scroll = 1
@@ -21,7 +20,7 @@ class PlotType(enum.Enum):
     point = 2
 
 ChannelUnit = {
-    'TOA' : 'sec'
+    'TOA' : 'msec'
     ,'Omni' : 'dBm' 
     ,'DF' : 'dBm'
     ,'Freq' : 'Hz' 
@@ -76,6 +75,8 @@ class DataPacket:
     @data.setter
     def data(self, _data):
         self._data = _data
+
+
 
 
 class SignalDataPacket:
