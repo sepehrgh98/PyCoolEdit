@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThread, QObject, pyqtSignal, QElapsedTimer, pyqtSlot
 import numpy as np
-from visualization.visualizationparams import DataPacket, Channel_id_to_name, ProgressType
+from visualization.visualizationparams import DataPacket, Channel_id_to_name, ProgressType, FeedMood
 
 
 def find_nearest_value_indx(array, value):
@@ -14,7 +14,7 @@ class Capsulator(QObject):
     cell_count_h = 800
     # cell_count_v = 20
     # cell_count_h = 80
-    capsulated_data_is_reaady = pyqtSignal(dict)
+    capsulated_data_is_reaady = pyqtSignal(dict, FeedMood)
     markerLineResultIsReady = pyqtSignal(dict)
     pointMarkerResultIsReady = pyqtSignal(tuple)
     progress_is_ready = pyqtSignal(dict)
@@ -99,7 +99,7 @@ class Capsulator(QObject):
             Channel_id_to_name[final_data.id] = name
             self.capsulated_data[name] = final_data
             self.progress_is_ready.emit({ProgressType.capsulator: 1 if (ch_counter/all_channels)>=1 else ch_counter/all_channels})
-        self.capsulated_data_is_reaady.emit(self.capsulated_data)
+        self.capsulated_data_is_reaady.emit(self.capsulated_data, FeedMood.main_data)
 
     @pyqtSlot(str, tuple, tuple)
     def prepare_requested_select_data(self,ch_name, time_range, value_range):
@@ -158,7 +158,7 @@ class Capsulator(QObject):
             final_pack.data = np.array(required_val)
             final_pack.id = pack.id
             select_area[name] = final_pack
-        self.capsulated_data_is_reaady.emit(select_area)
+        self.capsulated_data_is_reaady.emit(select_area, FeedMood.select)
 
 
     @pyqtSlot(float)

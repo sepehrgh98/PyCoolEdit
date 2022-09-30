@@ -1,9 +1,9 @@
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread, QElapsedTimer
 import numpy as np
 from multiprocessing import Pool
 from functools import partial
-from visualization.visualizationparams import ProgressType
-from visualization.visualizationparams import ChannelUnit
+from visualization.visualizationparams import FeedMood, ProgressType
+from visualization.visualizationparams import ChannelUnit, DataPacket
 from string import digits
 from visualization.visualizationparams import TimeCoef
 import re
@@ -39,6 +39,7 @@ class SParser(QObject):
     progress_is_ready = pyqtSignal(dict)
     markerLineResultIsReady = pyqtSignal(dict)
     totalSizeIsReady = pyqtSignal(int)
+    zoomed_area_is_ready = pyqtSignal(dict, FeedMood)
     
     def __init__(self) -> None:
         super(SParser, self).__init__()
@@ -57,6 +58,20 @@ class SParser(QObject):
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
 
+    def parse(self, data_list):
+        # parsed_data = {}
+        # for column in self.columns:
+        #     parsed_data[column] = np.ndarray(0)
+        for line in data_list[2:]:
+            cols_line = line.split()
+        #     for i in range(len(cols_line)):
+        #         try:
+        #             col_name = self.columns[i]
+        #             parsed_data[col_name] = np.append(parsed_data[col_name], [float(cols_line[i])])
+        #         except:
+        #             pass
+        # return parsed_data
+
     @pyqtSlot(list, bool, float)
     def prepare_data(self, data_list, eof, number_of_batches):
         self._set_columns(data_list)
@@ -66,53 +81,84 @@ class SParser(QObject):
                 self._init_data()
                 self.initilize_data = False 
 
+            self.timer = QElapsedTimer()
+            self.timer.start()
+            # key_list = list(self.parsed_data.keys())
+            # for batch in self.raw_data:
+            #     for line in batch:
+            #         data = line.split()
+            #         for node in data:
+            #             idx = data.index(node)
+            #             self.parsed_data[key_list[idx]] = np.append(self.parsed_data[key_list[idx]], node)
+
+                    # i = self.raw_data.index(batch)+1
+                    # self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
+                # output = self.parse(batch)
+
+                # for name, val in output.items():
+                #     self.parsed_data[name] = np.append(self.parsed_data[name], val)
+                #     self.total_size += len(val)
+                # i = self.raw_data.index(batch)+1
+                # self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
+
             pool = Pool(processes=5)
             for i, output in enumerate(pool.imap(partial(parse, cols=self.columns), self.raw_data), 1):
                 for name, val in output.items():
                     self.parsed_data[name] = np.append(self.parsed_data[name], val)
                     self.total_size += len(val)
                 self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
+
+            print(self.timer.elapsed())
             self.calculate_rri()
             self.totalSizeIsReady.emit(len(self.parsed_data['TOA']))
-            self.data_packet_is_ready.emit(self.parsed_data)
+            data_packet = self.parsed_data.copy()
+            self.data_packet_is_ready.emit(data_packet)
 
     
     @pyqtSlot(str, tuple, tuple)
-    def prepare_requested_select_data(self,ch_name, time_range, value_range):
+    def prepare_requested_zoom_data(self,ch_name, time_range, value_range):
+        current_channel_time_list = (self.parsed_data['TOA'])
+        current_channel_val_list = (self.parsed_data[ch_name])
 
         if time_range == (-1,) :
             first_x_index = 0
-            last_x_index = len(self.parsed_data['TOA']) - 1
+            last_x_index = len(current_channel_time_list) - 1
         else:
-            first_x_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[0])
-            last_x_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[1])
+            may_first_x_index = find_nearest_value_indx(current_channel_time_list, time_range[0])
+            f_ind_val = current_channel_time_list[may_first_x_index]
+            f_indices = np.where(current_channel_time_list == f_ind_val)[0]
+            first_x_index = f_indices[0]
+            may_last_x_index = find_nearest_value_indx(current_channel_time_list, time_range[1])
+            l_ind_val = current_channel_time_list[may_last_x_index]
+            l_indices = np.where(current_channel_time_list == l_ind_val)[0]
+            last_x_index = l_indices[-1]
 
         if value_range == (-1,):
-            min_val = min(self.parsed_data[ch_name])
-            max_val = max(self.parsed_data[ch_name])
+            min_val = np.amin(current_channel_val_list)
+            max_val = np.amax(current_channel_val_list)
             value_range = (min_val, max_val)
 
-            
-        requested_data = dict()
-        req_time = (self.parsed_data['TOA'])[first_x_index:last_x_index]
-        req_val = (self.parsed_data[ch_name])[first_x_index:last_x_index]
-        y_x_filtered = []
-        outout_index = []
-        for key, val in zip(req_time, req_val):
-            if val >= value_range[0] and val <= value_range[1]:
-                y_x_filtered.append(val)
-                outout_index.append(list(self.parsed_data['TOA']).index(key))
 
+        req_time = current_channel_time_list[first_x_index:last_x_index+1]
 
-        requested_data[ch_name] = y_x_filtered
-
-        for key, val in self.parsed_data.items():
-            if key != ch_name:
-                new_val = [val[ind] for ind in outout_index]
-                requested_data[key] = new_val
-
-
-        self.data_packet_is_ready.emit(requested_data)
+        requested_data ={}
+        ch_counter = 0
+        for name, channel_data in self.parsed_data.items():
+            req_val = channel_data[first_x_index:last_x_index+1]
+            final_key = []
+            final_val = []
+            for key, val in zip(req_time, req_val):
+                if val >= value_range[0] and val <= value_range[1]:
+                    final_key.append(key)
+                    final_val.append(val)
+            final_pack = DataPacket()
+            final_pack.key = np.array(final_key)
+            final_pack.data = np.array(final_val)
+            final_pack.id = ch_counter
+            requested_data[name] = final_pack
+            ch_counter += 1
+        self.zoomed_area_is_ready.emit(requested_data, FeedMood.main_data)
+       
 
 
     def _set_columns(self, data_list):
@@ -178,16 +224,4 @@ class SParser(QObject):
     def set_time_coefficient(self, unit):
         self.time_coef = TimeCoef[unit]
 
-    # @pyqtSlot(list)
-    # def on_delete_selected_req(self, selected_area):
-    #     for time_range in selected_area:
-    #         pool = Pool(processes=5)
-    #         channel_val = self.parsed_data.values()
-    #         key_list = list(self.parsed_data.keys())
-    #         start_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[0])
-    #         stop_index = find_nearest_value_indx(self.parsed_data['TOA'], time_range[1])
-    #         self.parsed_data = {}
-    #         for i, output in enumerate(pool.imap(partial(cut_data, f_inx=start_index, l_inx=stop_index), channel_val), 1):
-    #             self.parsed_data[key_list[i-1]] = output
-    #     self.data_packet_is_ready.emit(self.parsed_data)
-
+   

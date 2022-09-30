@@ -35,6 +35,9 @@ class MainWindow(QMainWindow, Form):
         # self.pdw_form.deleteSelectedRequested.connect(self.data_handler.deleteSelectedRequested)
         self.pdw_form.lineCursorDataRequested.connect(self.data_handler.lineCursorDataRequested)
         self.pdw_form.pointMarkerDataRequested.connect(self.data_handler.pointMarkerDataRequested)
+        self.pdw_form.zoom_requested.connect(self.data_handler.zoom_requested)
+        self.pdw_form.forwardZoomRequested.connect(self.data_handler.on_forward_zoom_req)
+        self.pdw_form.backeardZoomRequested.connect(self.data_handler.on_backward_zoom_req)
 
         # data handler
         self.data_handler.columns_defined.connect(self.pdw_form.setup_channels)

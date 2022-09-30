@@ -4,6 +4,7 @@ import numpy as np
 class FeedMood(enum.Enum):
     main_data = 1
     select = 2
+    zoom = 3
 
 class ProgressType(enum.Enum):
     reader = 1

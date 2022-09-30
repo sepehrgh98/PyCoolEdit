@@ -25,6 +25,7 @@ class SubPlotWidget(QWidget):
     resetZoomRequested = pyqtSignal()
     lineCursorDataRequested = pyqtSignal(float)
     pointMarkerDataReady = pyqtSignal(tuple)
+    zoom_requested = pyqtSignal(str,tuple,tuple)
 
 
     def __init__(self):
@@ -110,8 +111,9 @@ class SubPlotWidget(QWidget):
         self.setup_connections()
 
     def setup_connections(self):
-        self.forwardZoomRequested.connect(self.historical_zoom.next_range)
-        self.backeardZoomRequested.connect(self.historical_zoom.previous_range)
+        self.historical_zoom.zoom_requested.connect(self.zoom_requested)
+        # self.forwardZoomRequested.connect(self.historical_zoom.next_range)
+        # self.backeardZoomRequested.connect(self.historical_zoom.previous_range)
         self.resetZoomRequested.connect(self.historical_zoom.reset)
         self.resetZoomRequested.connect(self.reset_annotates)
         # action connections

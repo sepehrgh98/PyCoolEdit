@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 import os
 import matplotlib
 import numpy as np
-from visualization.visualizationparams import ChannelUnit, PlotType
+from visualization.visualizationparams import ChannelUnit, PlotType, FeedMood
 import matplotlib.pyplot as plt
 import time
 
@@ -51,11 +51,12 @@ class Channel:
     def __repr__(self) -> str:
         return str(self.id)
 
-    @pyqtSlot(np.ndarray, list)
-    def feed(self, x, data_list, color, mood="initilize"):
+    @pyqtSlot(np.ndarray, list, FeedMood)
+    # def feed(self, x, data_list, color, mood="initilize"):
+    def feed(self, x, data_list, color, mood=FeedMood.main_data):
         if len(x)<2:
             return
-        if mood == "initilize":
+        if mood == FeedMood.main_data or mood == FeedMood.zoom:
             if len(data_list):
                 self._max = np.amax(data_list)
                 self._min = np.amin(data_list)
@@ -70,9 +71,10 @@ class Channel:
             self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color=color)
             self.whole_area = area
             self.rescale()
-        else:
+        elif mood == FeedMood.select:
             line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
             self.selected_area[x[0], x[-1]] = line
+
        
 
     def feed_time(self, x):
