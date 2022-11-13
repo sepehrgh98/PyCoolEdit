@@ -1,11 +1,11 @@
 from pkgutil import iter_importers
 from PyQt5 import uic
 from matplotlib.axes._axes import Axes
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QElapsedTimer
 import os
 import matplotlib
 import numpy as np
-from visualization.visualizationparams import ChannelUnit, PlotType, FeedMood
+from visualization.visualizationparams import ChannelUnit, FeedMood
 import matplotlib.pyplot as plt
 import time
 
@@ -33,8 +33,10 @@ class Channel:
         self.selected_area = {}   # arange : line obj
         self.initial_plot = True
         self.time_show_range = ()
-        self.plot_type = PlotType.point
         self.color = None
+        self.counts = None
+        self.bins = None
+        self.bars = None
 
         # style
         self.tick_size = 10
@@ -57,6 +59,7 @@ class Channel:
         if len(x)<2:
             return
         if mood == FeedMood.main_data or mood == FeedMood.zoom:
+            timer = QElapsedTimer()
             if len(data_list):
                 self._max = np.amax(data_list)
                 self._min = np.amin(data_list)
@@ -64,15 +67,19 @@ class Channel:
             self.feed_time(x)
             if self.whole_area:
                 self.whole_area.set_data([], [])
-            self._hist_axis.clear()
+
+            if self.bars:
+                _ = [b.remove() for b in self.bars]
             self.cancel_selection_all()
             self.color = color
-            area, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
-            self._hist_axis.hist(data_list, bins=100, orientation='horizontal', color=color)
+            area, = self._axis.plot(x, data_list, 'o', markersize=1.6, color=color)
+            timer.start()
+            self.counts, self.bins, self.bars = self._hist_axis.hist(data_list, bins=50, orientation='horizontal', color=color)
+            # print(timer.elapsed())
             self.whole_area = area
             self.rescale()
         elif mood == FeedMood.select:
-            line, = self._axis.plot(x, data_list, 'o', markersize=0.5, color=color)
+            line, = self._axis.plot(x, data_list, 'o', markersize=1.6, color=color)
             self.selected_area[x[0], x[-1]] = line
 
        
@@ -80,11 +87,8 @@ class Channel:
     def feed_time(self, x):
         if len(x):
             self.time = x
-            self.set_time_range((min(x), max(x)))
+            self.set_time_range((np.amin(x), np.amax(x)))
 
-    def set_plot_type(self, PlotType):
-        if self.plot_type != PlotType:
-            self.plot_type = PlotType
 
     @property
     def id(self):
@@ -200,8 +204,8 @@ class Channel:
                 indices = np.where(x == item[0])[0]
                 x = np.delete(x, indices)
                 y = np.delete(y, indices)
-        self.feed(x,y, self.color, mood="initilize")
-        self.canvas.draw()
+        self.feed(x,y, self.color, mood=FeedMood.main_data)
+        # self.canvas.draw()
 
     def on_xlims_change(self, event_ax):
         if event_ax.get_xlim() != self.time_show_range:

@@ -7,12 +7,9 @@ from visualization.visualizationparams import ChannelUnit, DataPacket
 from string import digits
 from visualization.visualizationparams import TimeCoef
 import re
+from visualization.helper_functions import find_nearest_value_indx
 
 
-def find_nearest_value_indx(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return idx
 
 def parse(data_list, cols):
     parsed_data = {}
@@ -40,6 +37,9 @@ class SParser(QObject):
     markerLineResultIsReady = pyqtSignal(dict)
     totalSizeIsReady = pyqtSignal(int)
     zoomed_area_is_ready = pyqtSignal(dict, FeedMood)
+    selected_data_is_ready = pyqtSignal(dict, FeedMood)
+
+
     
     def __init__(self) -> None:
         super(SParser, self).__init__()
@@ -51,30 +51,20 @@ class SParser(QObject):
         self.time_coef = 1
         self.total_size = 0
         self.is_columns_defined = False
+        self.parse_index = 0
 
         # moving to thread
-        self.objThread = QThread()
+        self.objThread = QThread(self)
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
 
-    def parse(self, data_list):
-        # parsed_data = {}
-        # for column in self.columns:
-        #     parsed_data[column] = np.ndarray(0)
-        for line in data_list[2:]:
-            cols_line = line.split()
-        #     for i in range(len(cols_line)):
-        #         try:
-        #             col_name = self.columns[i]
-        #             parsed_data[col_name] = np.append(parsed_data[col_name], [float(cols_line[i])])
-        #         except:
-        #             pass
-        # return parsed_data
-
     @pyqtSlot(list, bool, float)
     def prepare_data(self, data_list, eof, number_of_batches):
         self._set_columns(data_list)
+        if self.initilize_data:
+            self._init_data()
+            self.initilize_data = False
         self.raw_data.append(data_list)
         if eof :
             if self.initilize_data:
@@ -83,23 +73,6 @@ class SParser(QObject):
 
             self.timer = QElapsedTimer()
             self.timer.start()
-            # key_list = list(self.parsed_data.keys())
-            # for batch in self.raw_data:
-            #     for line in batch:
-            #         data = line.split()
-            #         for node in data:
-            #             idx = data.index(node)
-            #             self.parsed_data[key_list[idx]] = np.append(self.parsed_data[key_list[idx]], node)
-
-                    # i = self.raw_data.index(batch)+1
-                    # self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
-                # output = self.parse(batch)
-
-                # for name, val in output.items():
-                #     self.parsed_data[name] = np.append(self.parsed_data[name], val)
-                #     self.total_size += len(val)
-                # i = self.raw_data.index(batch)+1
-                # self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
 
             pool = Pool(processes=5)
             for i, output in enumerate(pool.imap(partial(parse, cols=self.columns), self.raw_data), 1):
@@ -108,11 +81,27 @@ class SParser(QObject):
                     self.total_size += len(val)
                 self.progress_is_ready.emit({ProgressType.parser: 1 if (i/number_of_batches)>=1 else i/number_of_batches})
 
-            print(self.timer.elapsed())
+            # print(self.timer.elapsed())
             self.calculate_rri()
             self.totalSizeIsReady.emit(len(self.parsed_data['TOA']))
             data_packet = self.parsed_data.copy()
-            self.data_packet_is_ready.emit(data_packet)
+            toa = data_packet['TOA']
+            data_packet.pop('TOA')    
+            if "CW" in data_packet:
+                data_packet.pop('CW')
+            if "No." in data_packet:
+                data_packet.pop('No.')
+
+            ch_counter = 0
+            output_packet = {}
+            for name, data in data_packet.items():
+                final_data = DataPacket()
+                final_data.key = np.array(toa)
+                final_data.data = np.array(data)
+                ch_counter += 1
+                final_data.id = ch_counter
+                output_packet[name] = final_data
+            self.data_packet_is_ready.emit(output_packet)
 
     
     @pyqtSlot(str, tuple, tuple)
@@ -158,8 +147,8 @@ class SParser(QObject):
             requested_data[name] = final_pack
             ch_counter += 1
         self.zoomed_area_is_ready.emit(requested_data, FeedMood.main_data)
-       
 
+   
 
     def _set_columns(self, data_list):
         if not self.is_columns_defined:

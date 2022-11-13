@@ -31,13 +31,17 @@ class MainWindow(QMainWindow, Form):
         # pdw form
         self.pdw_form.filePathChanged.connect(self.data_handler.set_file_path)
         self.pdw_form.clearRequested.connect(self.data_handler.clear)
-        self.pdw_form.selectDataRequested.connect(self.data_handler.selectDataRequested)
-        # self.pdw_form.deleteSelectedRequested.connect(self.data_handler.deleteSelectedRequested)
+        # self.pdw_form.selectDataRequested.connect(self.data_handler.selectDataRequested)
+        self.pdw_form.deleteSelectedRequested.connect(self.data_handler.on_delete_selected_req)
+        self.pdw_form.selectDataRequested.connect(self.data_handler.on_select_req)
         self.pdw_form.lineCursorDataRequested.connect(self.data_handler.lineCursorDataRequested)
         self.pdw_form.pointMarkerDataRequested.connect(self.data_handler.pointMarkerDataRequested)
-        self.pdw_form.zoom_requested.connect(self.data_handler.zoom_requested)
+        self.pdw_form.resetZoomRequested.connect(self.data_handler.reset_zoom)
+        self.pdw_form.zoom_requested.connect(self.data_handler.on_zoom_requested)
         self.pdw_form.forwardZoomRequested.connect(self.data_handler.on_forward_zoom_req)
         self.pdw_form.backeardZoomRequested.connect(self.data_handler.on_backward_zoom_req)
+        self.pdw_form.unselect_special_area_req.connect(self.data_handler.unselect_special_area)
+        self.pdw_form.unselect_All.connect(self.data_handler.unselect_all)
 
         # data handler
         self.data_handler.columns_defined.connect(self.pdw_form.setup_channels)
@@ -46,6 +50,8 @@ class MainWindow(QMainWindow, Form):
         self.data_handler.markerLineResultIsReady.connect(self.pdw_form.markerLineResultIsReady)
         self.data_handler.pointMarkerResultIsReady.connect(self.pdw_form.pointMarkerResultIsReady)
         self.data_handler.totalSizeIsReady.connect(self.pdw_form.totalSizeIsReady)
+        self.data_handler.zoomed_area_is_ready.connect(self.pdw_form.feed)
+        self.data_handler.select_areas_is_ready.connect(self.pdw_form.feed)
 
         # signal form
         self.signal_form.fileInfoReceived.connect(self.signal_controller.on_info_received)

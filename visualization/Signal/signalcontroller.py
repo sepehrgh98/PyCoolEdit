@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
 from visualization.visualizationparams import SignalDataPacket
 from visualization.Signal.mhdll import MHDatReader
-from visualization.Signal.mhreaderv2 import readFile
+# from visualization.Signal.mhreaderv2 import readFile
+from visualization.Signal.mhreaderv3 import readFile
 import os
 import numpy as np
 def find_nearest_value_indx(array, value):
@@ -15,13 +16,13 @@ class SignalController(QObject):
     def __init__(self):
         super(SignalController, self).__init__()
         # variables
-        self.sampling_rate = 1000000
+        self.sampling_rate = 10000
         self.file_info = {}
         self.total_range = ()
         self.key_data = []
 
         # moving to thread
-        self.objThread = QThread()
+        self.objThread = QThread(self)
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
@@ -38,18 +39,23 @@ class SignalController(QObject):
     @pyqtSlot(tuple)
     def get_data(self, data_range):
         if data_range:
-            start_range = round(data_range[0])
-            end_range = round(data_range[1])
+            start_range = int(round(data_range[0]))
+            end_range = int(round(data_range[1]))
         else:
             start_range = 0
-            end_range = (os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"]
-        res = readFile(self.file_info["file"], start_range, end_range, self.file_info["channels"], self.sampling_rate)
+            end_range = int((os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"])
+        rate = round((end_range - start_range)/2)
+        
+        res = readFile(self.file_info["file"], start_range, end_range, self.file_info["channels"], rate)
+        # res = readFile_M(self.file_info["file"], 4000, 6000, self.file_info["channels"], self.sampling_rate)
+
         data_list = []
         key_data = []
         data_point = start_range
         for i in range(start_range, start_range+len(res[0])):
             key_data.append(i)
-            data_point += self.sampling_rate
+            # data_point += self.sampling_rate
+            data_point += rate
         channel_count = 1
         # start_index = find_nearest_value_indx(self.key_data, start_range)
         # end_index = find_nearest_value_indx(self.key_data, end_range)

@@ -13,7 +13,7 @@ class SReader(QObject):
         self.progress = 0
 
         # moving to thread
-        self.objThread = QThread()
+        self.objThread = QThread(self)
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()

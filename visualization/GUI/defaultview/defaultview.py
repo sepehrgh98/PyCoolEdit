@@ -17,7 +17,6 @@ class DefaultView(QWidget, Form):
         self.filter = filter
         # icon
         icon_label = QLabel(self.iconWidget)
-        # icon_path = os.path.join(os.getcwd(), 'visualization', 'Resources', 'icons', 'main.png')
         icon_label.setScaledContents(True)
         icon_label.setPixmap(QPixmap(icon_path).scaled(200,200,Qt.AspectRatioMode.KeepAspectRatio))
         icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignRight)

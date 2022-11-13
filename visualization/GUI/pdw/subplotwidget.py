@@ -17,7 +17,6 @@ from visualization.visualizationparams import ShowPolicy
 
 class SubPlotWidget(QWidget):
     selectionRangeHasBeenSet = pyqtSignal(str, tuple, tuple)
-    # selectionRangeHasBeenSet = pyqtSignal(tuple)
     unselectAllRequested = pyqtSignal()
     unselectSpecialArea = pyqtSignal(tuple)
     forwardZoomRequested = pyqtSignal()
@@ -36,7 +35,6 @@ class SubPlotWidget(QWidget):
         self.mouse_press_ev = None
         self.channel_plot_size = 100
         self.selection_area = []
-        # self.selection_area_y = (-1, -1)
         self.show_policy = ShowPolicy.scroll
         self.annote_container = []
 
@@ -81,7 +79,6 @@ class SubPlotWidget(QWidget):
 
  
         self.canvas.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.canvas.customContextMenuRequested.connect(self.exec_canvas_menu)
 
         self.scroll = QScrollArea(self)
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -91,11 +88,8 @@ class SubPlotWidget(QWidget):
         layout = QHBoxLayout(self.plot_container)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
-        # self.hist_canvas.setMaximumWidth(150)
         layout.addWidget(self.canvas)
-        # layout.addWidget(self.hist_canvas)       
         self.scroll.setWidget(self.plot_container)
-
         self.layout().addWidget(self.scroll)
 
         # list to store the axis last used with a mouseclick
@@ -112,8 +106,6 @@ class SubPlotWidget(QWidget):
 
     def setup_connections(self):
         self.historical_zoom.zoom_requested.connect(self.zoom_requested)
-        # self.forwardZoomRequested.connect(self.historical_zoom.next_range)
-        # self.backeardZoomRequested.connect(self.historical_zoom.previous_range)
         self.resetZoomRequested.connect(self.historical_zoom.reset)
         self.resetZoomRequested.connect(self.reset_annotates)
         # action connections
@@ -149,11 +141,9 @@ class SubPlotWidget(QWidget):
             if self.mpl_toolbar.is_pan():
                 self.mpl_toolbar.pan(False)
         self.canvas.setCursor(QCursor(Qt.CrossCursor))
-        # self.zoomAction.setChecked(active)
         self.historical_zoom.activate(active)
     
     def enable_pan_action(self, active):
-        # self.dragAction.setChecked(active)
         self.mpl_toolbar.pan(active)
 
     def on_mouse_click(self, event):
@@ -171,7 +161,8 @@ class SubPlotWidget(QWidget):
                 self.unselectAllRequested.emit()
 
     def onselect(self, eclick, erelease):
-        label = (((self.curr_ax[:])[-1].get_ylabel()).split('('))[0]
+        selected_axis = (self.curr_ax[:])[-1]
+        label = ((selected_axis.get_ylabel()).split('('))[0]
         pre_coor = (eclick.xdata, eclick.ydata)
         rel_coor = (erelease.xdata, erelease.ydata)
         if eclick.button == MouseButton.LEFT and erelease.button == MouseButton.LEFT:
@@ -196,6 +187,9 @@ class SubPlotWidget(QWidget):
 
     @pyqtSlot()
     def setup_rect(self):
+        # for ax in self.fig.axes:
+        #     if bool(self.fig.axes.index(ax) % 2):
+        #         print(ax, self.fig.axes.index(ax), self.fig.axes.index(ax) // 2)
         if self.fig.axes:
             self.list_of_select_box = [RectangleSelector(
                 ax,
@@ -206,7 +200,7 @@ class SubPlotWidget(QWidget):
                 minspanx=5, minspany=5,
                 spancoords='pixels',
                 interactive=False,
-            ) for ax in self.fig.axes]
+            ) for ax in self.fig.axes if not bool(self.fig.axes.index(ax) % 2)]
             [rect.set_active(False) for rect in self.list_of_select_box]
         self.historical_zoom.setup_rect()
 
@@ -226,11 +220,9 @@ class SubPlotWidget(QWidget):
 
     def clear(self):
         self.fig.clear()
-        # self.hist_fig.clear()
         self.curr_ax = []
         self.list_of_select_box = []
         self.canvas.draw()
-        # self.hist_canvas.draw()
 
     def has_selected_area(self):
         return len(self.selection_area)

@@ -34,7 +34,7 @@ class SignalForm(QMainWindow, Form):
         self.signal_information = SignalInformationForm()
         self.channels = []
         self.req_range = ()
-        self.zoom_base_scale = 4
+        self.zoom_base_scale = 0.9
         self.first_feed = True
         self.x_limit_range = None
         self.y_limit_range = None
@@ -55,7 +55,6 @@ class SignalForm(QMainWindow, Form):
         # setup plot
         self.fig = Figure()
         self.canvas = FigureCanvas(self.fig)
-        # self.plotLayout.addWidget(self.canvas)
         self.channels = []
         self.y_controls = []
         self.canvas.draw()
@@ -339,10 +338,10 @@ class SignalForm(QMainWindow, Form):
             cur_xrange = (cur_xlim[1] - cur_xlim[0])*.5
             if event.button == 'up':
                 # deal with zoom in
-                scale_factor = 1/self.zoom_base_scale
+                scale_factor = self.zoom_base_scale
             elif event.button == 'down':
                 # deal with zoom out
-                scale_factor = self.zoom_base_scale
+                scale_factor = 1 + (1 - self.zoom_base_scale)
             else: 
                 # deal with something that should never happen
                 scale_factor = 1
@@ -356,7 +355,7 @@ class SignalForm(QMainWindow, Form):
                 new_x_end = self.x_limit_range[1]
 
             self.x_show_range = (new_x_start,new_x_end)
-            self.zoom_timer.start(100)
+            self.zoom_timer.start(10)
             # self.request_data.emit((new_x_start,new_x_end))
 
         if event.inaxes in self.y_controls:
@@ -398,6 +397,7 @@ class SignalForm(QMainWindow, Form):
         self.signal_information.show()
 
     def on_zoom_timer_timeout(self):
+        print(self.x_show_range)
         self.request_data.emit(self.x_show_range)
 
 

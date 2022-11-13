@@ -20,6 +20,12 @@ class PlotType(enum.Enum):
     stem = 1
     point = 2
 
+
+
+class DataMode(enum.Enum):
+    capsulated = 1
+    normal = 2
+
 ChannelUnit = {
     'TOA' : 'msec'
     ,'Omni' : 'dBm' 
@@ -49,9 +55,10 @@ class DataPacket:
         self._id = None
         self._data = None
         self._key = None
+        self._indexes = None
 
     def __repr__(self) -> str:
-        return str(self._id) + " : " + str(len(self._key)) + ", " + str(len(self._data))
+        return "DataPacket -> "+str(self._id) + " : " + str(len(self._key)) + ", " + str(len(self._data))
 
     @property
     def id(self):
@@ -76,6 +83,14 @@ class DataPacket:
     @data.setter
     def data(self, _data):
         self._data = _data
+
+    @property
+    def indexes(self):
+        return self._indexes
+
+    @indexes.setter
+    def indexes(self, _indexes):
+        self._indexes = _indexes
 
 
 

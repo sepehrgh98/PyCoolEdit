@@ -1,12 +1,13 @@
 from PyQt5.QtCore import QThread, QObject, pyqtSignal, QElapsedTimer, pyqtSlot
 import numpy as np
 from visualization.visualizationparams import DataPacket, Channel_id_to_name, ProgressType, FeedMood
+from visualization.helper_functions import find_nearest_value_indx
 
 
-def find_nearest_value_indx(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return idx
+# def find_nearest_value_indx(array, value):
+#     array = np.asarray(array)
+#     idx = (np.abs(array - value)).argmin()
+#     return idx
 
 
 class Capsulator(QObject):
@@ -26,7 +27,7 @@ class Capsulator(QObject):
         self.time_resolution = 0
 
         # moving to thread
-        self.objThread = QThread()
+        self.objThread = QThread(self)
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
@@ -37,12 +38,12 @@ class Capsulator(QObject):
 
 
     def feed(self, data_dict):
-        toa = data_dict['TOA']
-        data_dict.pop('TOA')
-        if "CW" in data_dict:
-            data_dict.pop('CW')
-        if "No." in data_dict:
-            data_dict.pop('No.')
+        toa = ((list(data_dict.items())[0])[1]).key
+        # data_dict.pop('TOA')
+        # if "CW" in data_dict:
+        #     data_dict.pop('CW')
+        # if "No." in data_dict:
+        #     data_dict.pop('No.')
         min_time = toa[0]
         max_time = toa[-1]
         
@@ -55,10 +56,11 @@ class Capsulator(QObject):
         ch_counter = 1
         all_channels = len(data_dict.keys())
 
-        for name, data_val in data_dict.items():
+        for name, data_packet in data_dict.items():
             final_data_key = []
             final_data_val = []
 
+            data_val = data_packet.data
             min_data = np.amin(data_val)
             max_data = np.amax(data_val)
             data_length = max_data - min_data

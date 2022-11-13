@@ -42,7 +42,7 @@ class PDWToolsForm(QWidget, Form):
         self.file_path = None
 
         # configs
-        self.dragBtn.setToolTip('Pan charts in every directions')
+        # self.dragBtn.setToolTip('Pan charts in every directions')
         self.zoomBtn.setToolTip('Rectangular zoom')
         self.backwardZoomBtn.setToolTip('Previous zoom range')
         self.forwardZoomBtn.setToolTip('Next zoom range')
@@ -64,7 +64,7 @@ class PDWToolsForm(QWidget, Form):
         self.selectBtn.clicked.connect(self.selectBtnPressed)
         self.selectAllBtn.clicked.connect(self.selectAllRequested)
         self.zoomBtn.clicked.connect(self.zoomRequested)
-        self.dragBtn.clicked.connect(self.panRequested)
+        # self.dragBtn.clicked.connect(self.panRequested)
         self.newRadarBtn.clicked.connect(self.radarRequested)
         self.resetBtn.clicked.connect(self.resetZoomRequested)
         self.concatChannelsBtn.clicked.connect(self.show_concat_box)
@@ -83,9 +83,9 @@ class PDWToolsForm(QWidget, Form):
         self.btn_grp.setExclusive(True)
         self.btn_grp.addButton(self.selectBtn)
         self.btn_grp.addButton(self.zoomBtn)
-        self.btn_grp.addButton(self.dragBtn)
+        # self.btn_grp.addButton(self.dragBtn)
 
-        self.dragBtn.setIcon(QIcon('visualization/Resources/icons/pan.png'))
+        # self.dragBtn.setIcon(QIcon('visualization/Resources/icons/pan.png'))
         self.zoomBtn.setIcon(QIcon('visualization/Resources/icons/zoom.png'))
         self.backwardZoomBtn.setIcon(QIcon('visualization/Resources/icons/backward.png'))
         self.forwardZoomBtn.setIcon(QIcon('visualization/Resources/icons/forward.png'))
