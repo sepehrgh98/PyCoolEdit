@@ -8,8 +8,7 @@ from matplotlib.widgets import SpanSelector
 import matplotlib.gridspec
 from visualization.GUI.signal.signalinformation import SignalInformationForm
 from visualization.GUI.defaultview.defaultview import DefaultView
-import matplotlib.collections as collections
-
+import numpy as np
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'signal', 'signalui.ui'))[0]
 
@@ -34,7 +33,7 @@ class SignalForm(QMainWindow, Form):
         self.signal_information = SignalInformationForm()
         self.channels = []
         self.req_range = ()
-        self.zoom_base_scale = 0.9
+        self.zoom_base_scale = 0.75
         self.first_feed = True
         self.x_limit_range = None
         self.y_limit_range = None
@@ -262,10 +261,10 @@ class SignalForm(QMainWindow, Form):
         for item in zip(self.channels, data_list):
             line , =item[0].plot(item[1].key, item[1].data, linestyle='-', marker='o', markersize=2, color="#00A36C")
             self.plot_containers.append(line)
-            min_x = min(item[1].key) if len(item[1].key) > 1 else (item[1].key)[0]
-            max_x = max(item[1].key) if len(item[1].key) > 1 else (item[1].key)[0]
-            min_y = min(item[1].data) if len(item[1].data) > 1 else (item[1].data)[0]
-            max_y = max(item[1].data) if len(item[1].data) > 1 else (item[1].data)[0]
+            min_x = np.amin(item[1].key) if len(item[1].key) > 1 else (item[1].key)[0]
+            max_x = np.amax(item[1].key) if len(item[1].key) > 1 else (item[1].key)[0]
+            min_y = np.amin(item[1].data) if len(item[1].data) > 1 else (item[1].data)[0]
+            max_y = np.amax(item[1].data) if len(item[1].data) > 1 else (item[1].data)[0]
             y_range = max_y - min_y
             x_tol = 0
             y_tol = y_range/2
@@ -327,28 +326,29 @@ class SignalForm(QMainWindow, Form):
         for axis in self.channels:
             axis.set_xlim(x_range)
             axis.set_ylim(y_range)
-        self.canvas.draw()
-        self.canvas.flush_events()
+        # self.canvas.draw()
+        # self.canvas.flush_events()
 
     def zoom_on_wheel(self, event):
         if event.inaxes in self.channels:
             xdata = event.xdata
-            # get the current x and y limits
             cur_xlim = self.channels[0].get_xlim()
-            cur_xrange = (cur_xlim[1] - cur_xlim[0])*.5
+            dis_start = xdata - cur_xlim[0]
+            dis_end = cur_xlim[1] - xdata
+            zoom_margin = min(dis_start, dis_end)
+
             if event.button == 'up':
-                # deal with zoom in
                 scale_factor = self.zoom_base_scale
             elif event.button == 'down':
-                # deal with zoom out
-                scale_factor = 1 + (1 - self.zoom_base_scale)
+                # scale_factor = 1 + (1 - self.zoom_base_scale)
+                scale_factor = 1 + self.zoom_base_scale
             else: 
-                # deal with something that should never happen
                 scale_factor = 1
                 print(event.button)
 
-            new_x_start = xdata - cur_xrange*scale_factor
-            new_x_end = xdata + cur_xrange*scale_factor
+            new_x_start = xdata - zoom_margin*scale_factor
+            new_x_end = xdata + zoom_margin*scale_factor
+
             if(new_x_start < self.x_limit_range[0]):
                 new_x_start = self.x_limit_range[0]
             if(new_x_end > self.x_limit_range[1]):
@@ -356,7 +356,6 @@ class SignalForm(QMainWindow, Form):
 
             self.x_show_range = (new_x_start,new_x_end)
             self.zoom_timer.start(10)
-            # self.request_data.emit((new_x_start,new_x_end))
 
         if event.inaxes in self.y_controls:
             ax = event.inaxes
@@ -389,6 +388,8 @@ class SignalForm(QMainWindow, Form):
     def handle_file_path_changed(self, file_path):
         if self.file_path != file_path:
             self.file_path = file_path
+            file_name = os.path.basename(file_path)
+            self.FileNameLabel.setText(file_name)
         if self.default_view:
             self.plotLayout.removeWidget(self.default_view)
             self.default_view.deleteLater()
@@ -397,7 +398,6 @@ class SignalForm(QMainWindow, Form):
         self.signal_information.show()
 
     def on_zoom_timer_timeout(self):
-        print(self.x_show_range)
         self.request_data.emit(self.x_show_range)
 
 

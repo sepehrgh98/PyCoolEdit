@@ -2,7 +2,8 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
 from visualization.visualizationparams import SignalDataPacket
 from visualization.Signal.mhdll import MHDatReader
 # from visualization.Signal.mhreaderv2 import readFile
-from visualization.Signal.mhreaderv3 import readFile
+# from visualization.Signal.mhreaderv3 import readFile
+from visualization.Signal.readFile_final import Read_file
 import os
 import numpy as np
 def find_nearest_value_indx(array, value):
@@ -12,9 +13,12 @@ def find_nearest_value_indx(array, value):
 
 class SignalController(QObject):
     data_packet_is_ready = pyqtSignal(list)
-
+    range_requested = pyqtSignal(int , int, int, int) # start, stop , NOF channels , rate
     def __init__(self):
         super(SignalController, self).__init__()
+        # module
+        self.signal_reader = None
+
         # variables
         self.sampling_rate = 10000
         self.file_info = {}
@@ -33,37 +37,41 @@ class SignalController(QObject):
         self.total_range = data_range
         # for i in range(int((os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"])):
         #     self.key_data.append(i)
+        self.signal_reader = Read_file(self.file_info["file"])
+        self.range_requested.connect(self.signal_reader.fileReader)
+        self.signal_reader.data_is_ready.connect(self.prepare_packet)
         self.get_data(self.total_range)
+
 
 
     @pyqtSlot(tuple)
     def get_data(self, data_range):
+        if not self.signal_reader:
+            return
+
         if data_range:
             start_range = int(round(data_range[0]))
             end_range = int(round(data_range[1]))
         else:
             start_range = 0
             end_range = int((os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"])
-        rate = round((end_range - start_range)/2)
-        
-        res = readFile(self.file_info["file"], start_range, end_range, self.file_info["channels"], rate)
-        # res = readFile_M(self.file_info["file"], 4000, 6000, self.file_info["channels"], self.sampling_rate)
 
-        data_list = []
-        key_data = []
-        data_point = start_range
-        for i in range(start_range, start_range+len(res[0])):
-            key_data.append(i)
-            # data_point += self.sampling_rate
-            data_point += rate
+
+        # rate = round((end_range - start_range)/2)
+        # print(start_range, end_range, self.file_info["channels"], self.sampling_rate)
+        self.range_requested.emit(start_range, end_range, self.file_info["channels"], self.sampling_rate)
+
+
+    @pyqtSlot(list)
+    def prepare_packet(self, data_list):
+        final_list = []
+        key_data = data_list[-1]
+        channel_list = data_list[:-1]
         channel_count = 1
-        # start_index = find_nearest_value_indx(self.key_data, start_range)
-        # end_index = find_nearest_value_indx(self.key_data, end_range)
-        # key_data = self.key_data[start_index:end_index]
-        for ch in res:
+        for ch in channel_list:
             final_data = SignalDataPacket()
             final_data.id = channel_count
             final_data.key = key_data
             final_data.data = ch
-            data_list.append(final_data)
-        self.data_packet_is_ready.emit(data_list)
+            final_list.append(final_data)
+        self.data_packet_is_ready.emit(final_list)

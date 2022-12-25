@@ -189,7 +189,6 @@ class SubPlotWidget(QWidget):
     def setup_rect(self):
         # for ax in self.fig.axes:
         #     if bool(self.fig.axes.index(ax) % 2):
-        #         print(ax, self.fig.axes.index(ax), self.fig.axes.index(ax) // 2)
         if self.fig.axes:
             self.list_of_select_box = [RectangleSelector(
                 ax,

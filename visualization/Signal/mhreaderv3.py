@@ -1,98 +1,93 @@
-
-from signal import signal
-from unicodedata import decimal
-import matplotlib.pyplot as plt
-import numpy as np
 import os
-import struct
+from multiprocessing import Process, Pipe
+from signal import signal
+import numpy as np
+import time
 
 
-def readFile_M(file_path, a, b, channels, N):
-    with open(file_path, 'rb') as file:
-        counter = 0
-        signal = []
-        for i in range(b-a):
-            file.seek(a+ i*2*channels)
-            num = file.read(2*channels)
-            # for j in range(channels):
-            #     print(j)
-            #     signal.append(int.from_bytes(num[j*2:2+j], "little", signed="True"))
-            if channels == 1:
-                signal.append(int.from_bytes(num, "little", signed="True"))
-            else:
-                signal.append(int.from_bytes(num[0:2], "little", signed="True"))
-                signal.append(int.from_bytes(num[2:4], "little", signed="True"))
+def readFile(file_path, a, b, channels, N, process_num):
 
-        ch1 = []
-        ch2 = []   
-        if len(signal) != (b-a):
-            for k in range(len(signal)):
-                if k % 2:
-                    ch2.append(signal[k])
-                else:
-                    ch1.append(signal[k])
-            signal = [ch1, ch2]
-    return signal
-                        
-                
-
-
-
-def readFile(file_path, a, b, channels, N):
-    with open(file_path, 'rb') as file:
-        data = []
-        signal = []
-        #Sampling when data size is significant, otherwise whole data is consider
-        # if (a-b) > 1000000:
-        #     delta = int((b - a)/N)
-        # else:
-        #     delta = 1
-        #     N = b - a
-        delta = int((b - a)/N)
-        for i in range(N):
-            # Go to the appropriate byte position regarding reading 2 bytes for a mono signal and read 4 bytes for a stereo signal 
-            file.seek(a+ i*2*channels*delta)
-            num = file.read(2*channels)
-            
-            # Consider every 2bytes a number with a sign
-            if channels == 1:
-                data.append(int.from_bytes(num, "little", signed="True"))
-            else:
-                data.append(int.from_bytes(num[0:2], "little", signed="True"))
-                data.append(int.from_bytes(num[2:4], "little", signed="True"))
-        
-        ch1 = []
-        ch2 = []   
-        
-        if channels==2:
-            for k in range(len(data)):
-                if k % 2:
-                    ch2.append(data[k])
-                else:
-                    ch1.append(data[k])
-            signal = [ch1, ch2]
-        else:
-            signal = [data]
-    return signal
-
-if __name__ == '__main__':
-    filename = 'IF1 2724 161652.DAT'
-    channels = 2
-    a, b = 0, 100000000
-    # file_path = os.path.join(os.getcwd(), "sterio", "Barker 13 (1).dat")
-    file_path = os.path.join(os.getcwd(), "visualization", "Signal", "IF1 2724 161652.dat")
-    data_mono = readFile(file_path, 0, 100000, 1, 50000)
-    print(len(data_mono), type(data_mono[0]))
-    data_stereo = readFile(file_path, 0, 100000, 2, 50000)
-    print(len(data_stereo), type(data_stereo[0]), type(data_stereo[1]))
-
+    length = int(np.ceil((b - a + 1)/process_num))
     
-  
-    # plt.subplot(2, 1, 1)
-    # plt.plot(data_M[0])
-    # plt.subplot(2, 1, 2)
-    # plt.plot(data_M[1])
-    # plt.show()
+    processes = []
+    processes_conns = []
+    last_index = b
+
+    if N % process_num >= (process_num/2):
+        N = N + (process_num - (N % process_num))
+    else:
+        N = N - (N % process_num)
+    
+    N_per_process = int(N/process_num)
+    signal = []
+    ch1 = []
+    ch2 = []
+    data = []
+    index = []
+    for i in range(process_num):
+        conn1, conn2 = Pipe()
+        p = Process(target=readFile_process, args=(conn1, file_path, a + i*length,  a + i*length + (length-1), channels, N_per_process,last_index,))
+        processes.append(p)
+        processes_conns.append((conn1, conn2))
+        # p.start()
+        # print(conn2.recv())
+        # p.join()
+    for p in processes:
+        p.start()
+    for conns in processes_conns:
+        signal = signal + conns[1].recv()
+        
+    for p in processes:
+       p.join()
+    if channels == 1:
+        for i in range(len(signal)):
+            if i%2==0:
+                data = data + signal[i]
+            else: 
+                index = index + signal[i]
+        return[data, index]
+    else:
+        counter = 0
+        for i in range(len(signal)):
+            if counter==3:
+                counter=0
+            if counter==0:
+                ch1 = ch1 + signal[i]
+            elif counter==1:
+                ch2 = ch2 + signal[i]
+            elif counter==2:
+                index = index + signal[i]
+            counter = counter + 1
+        return[ch1, ch2, index]
+
+def readFile_process(connection, file_path, a, b, channels, N, endIndex):
+    with open(file_path, 'rb') as file:
+        if b > endIndex:
+            b = endIndex
+
+        if N > b - a + 1:
+            N = b - a + 1
+        idx = np.round(np.linspace(a, b, N)).astype(int)
+        delta = [0] + [(idx[i+1] - idx[i]) for i in range(N-1) if True]
+        
+        
+        
+        if channels == 1:
+            connection.send([[int.from_bytes(file.read(2), "little", signed="True") for i in range(N) if file.seek(2*a + i*2*(delta[i])) or True], idx.tolist()])
+            connection.close()
+        else:
+            connection.send([[int.from_bytes(file.read(2), "little", signed="True") for i in range(N) if file.seek(4*a + i*4*delta[i]) or True],
+                            [int.from_bytes(file.read(2), "little", signed="True") for i in range(N) if file.seek(4*a + i*4*delta[i]+2) or True], idx.tolist()])
+            connection.close()
+       
+if __name__ == '__main__':
+    
+    file_path = os.path.join(os.getcwd(), "visualization", "visualization", "Signal", "IF1 2724 161652.DAT")
+    start = time.time()
+    data_mono = readFile(file_path, 0, 10, 2, 8, 4)
+    end = time.time()
+    print(data_mono)
+
     
     
 
