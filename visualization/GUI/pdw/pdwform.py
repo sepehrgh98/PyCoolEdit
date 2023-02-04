@@ -185,7 +185,8 @@ class PDWForm(QMainWindow, Form):
                 current_channel = channel
                 break
         if current_channel:
-            color = random.choice(self.plot_colors)
+            # color = random.choice(self.plot_colors)
+            color = "#ADD8E6"
             if feed_mode == FeedMood.main_data:
                 self.reviewWidget.feed(data_packet, mood="initilize")
                 self.normalize_window.feed(data_packet)
@@ -238,7 +239,9 @@ class PDWForm(QMainWindow, Form):
         self.progress.show()
 
     def all_select_handle(self):
-        self.set_selection_area('',(-1,),(-1,))
+        ch = self.channels[0]
+        t_r, v_r = ch.get_range()
+        self.set_selection_area(ch.name,t_r, v_r)
 
     @pyqtSlot(list)
     def handle_channel_concatination(self, concat_list):

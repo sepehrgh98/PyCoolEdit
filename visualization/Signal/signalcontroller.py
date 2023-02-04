@@ -1,8 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
 from visualization.visualizationparams import SignalDataPacket
-from visualization.Signal.mhdll import MHDatReader
-# from visualization.Signal.mhreaderv2 import readFile
-# from visualization.Signal.mhreaderv3 import readFile
 from visualization.Signal.readFile_final import Read_file
 import os
 import numpy as np
@@ -20,7 +17,7 @@ class SignalController(QObject):
         self.signal_reader = None
 
         # variables
-        self.sampling_rate = 10000
+        self.sampling_rate = 1000000
         self.file_info = {}
         self.total_range = ()
         self.key_data = []
@@ -33,10 +30,9 @@ class SignalController(QObject):
 
     @pyqtSlot(dict, tuple)
     def on_info_received(self, file_info, data_range):
+        self.clear()
         self.file_info = file_info
         self.total_range = data_range
-        # for i in range(int((os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"])):
-        #     self.key_data.append(i)
         self.signal_reader = Read_file(self.file_info["file"])
         self.range_requested.connect(self.signal_reader.fileReader)
         self.signal_reader.data_is_ready.connect(self.prepare_packet)
@@ -56,9 +52,6 @@ class SignalController(QObject):
             start_range = 0
             end_range = int((os.path.getsize(self.file_info["file"])/2)/self.file_info["channels"])
 
-
-        # rate = round((end_range - start_range)/2)
-        # print(start_range, end_range, self.file_info["channels"], self.sampling_rate)
         self.range_requested.emit(start_range, end_range, self.file_info["channels"], self.sampling_rate)
 
 
@@ -75,3 +68,9 @@ class SignalController(QObject):
             final_data.data = ch
             final_list.append(final_data)
         self.data_packet_is_ready.emit(final_list)
+
+    def clear(self):
+        self.signal_reader = None
+        self.file_info = {}
+        self.total_range = ()
+        self.key_data = []

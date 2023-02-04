@@ -155,6 +155,7 @@ class Capsulator(QObject):
             else:
                 required_key = final_key
                 required_val = final_val
+            
             final_pack = DataPacket()
             final_pack.key = np.array(required_key)
             final_pack.data = np.array(required_val)

@@ -7,12 +7,14 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
 
 class Read_file(QObject):
     data_is_ready = pyqtSignal(list)
+    
     def __init__(self, file_path):
         super(Read_file, self).__init__()
-
-        with open(file_path, 'rb') as file:
+        self.file = file_path
+    
+    def fileOpen(self):
+        with open(self.file, 'rb') as file:
             self.data = file.read()
-            self.num = int(len(self.data)/2)
     
     def fileReader(self, a, b, channels, N):
         self.start = a
@@ -29,7 +31,6 @@ class Read_file(QObject):
 
         self.res.append(idx.tolist())
         self.data_is_ready.emit(self.res)
-        # return self.res
     
 
 
@@ -37,6 +38,7 @@ if __name__ == "__main__":
     file_path = os.path.join(os.getcwd(), "visualization", "Signal", "IF1 2724 161652.dat")
     file = Read_file(file_path)
     tic = time.time()
+    file.fileOpen()
 
     signal = file.fileReader(0, 10000000, 2, 500000)
     toc = time.time() - tic

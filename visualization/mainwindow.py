@@ -16,6 +16,8 @@ class MainWindow(QMainWindow, Form):
         self.setupUi(self)
 
         self.setWindowTitle('Offline')
+        self.setMinimumSize(200,200)
+
 
         # setup module
         self.pdw_form = PDWForm()

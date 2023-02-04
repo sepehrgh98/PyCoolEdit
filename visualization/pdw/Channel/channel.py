@@ -59,7 +59,6 @@ class Channel:
         if len(x)<2:
             return
         if mood == FeedMood.main_data or mood == FeedMood.zoom:
-            timer = QElapsedTimer()
             if len(data_list):
                 self._max = np.amax(data_list)
                 self._min = np.amin(data_list)
@@ -73,9 +72,12 @@ class Channel:
             self.cancel_selection_all()
             self.color = color
             area, = self._axis.plot(x, data_list, 'o', markersize=1.6, color=color)
-            timer.start()
             self.counts, self.bins, self.bars = self._hist_axis.hist(data_list, bins=50, orientation='horizontal', color=color)
-            # print(timer.elapsed())
+            start = np.amin(self.counts)
+            end = np.amax(self.counts)
+            diff = np.abs(end - start)/4
+            end = end + diff
+            self._hist_axis.set_xlim(start, end)
             self.whole_area = area
             self.rescale()
         elif mood == FeedMood.select:
@@ -164,8 +166,15 @@ class Channel:
     def set_time_range(self, freq_range):
         self.time_range = freq_range
 
+    def get_range(self):
+        return self._axis.get_xlim(), self._axis.get_ylim()
+
     def rescale(self):
-        self._axis.set_xlim(list(self.time_range))
+        start = self.time_range[0]
+        end = self.time_range[1]
+        diff = np.abs(end-start)
+        marg = diff/40
+        self._axis.set_xlim([start-marg,end+marg])
         if self._min == self._max:
             self._axis.set_ylim(self._min - 1, self._max + 1)
         else:
