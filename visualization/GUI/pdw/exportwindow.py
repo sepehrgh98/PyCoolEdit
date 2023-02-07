@@ -26,13 +26,13 @@ class PDWExprtWindow(QWidget, Form):
         self.pathLineEdit.setText(new_path)
 
     def feed(self, packet):
-        if 'TOA' not in  self.selected_data.keys():
-            self.selected_data['TOA'] = packet.key
-        if Channel_id_to_name[packet.id] not in self.selected_data:
-            self.selected_data[Channel_id_to_name[packet.id]] = packet.data
-        else:
-            self.selected_data[Channel_id_to_name[packet.id]] = np.concatenate([self.selected_data[Channel_id_to_name[packet.id]], packet.data],axis=0)
-    
+        self.selected_data = {}
+        for id, data in packet.items():
+            if not 'TOA' in self.selected_data:
+                self.selected_data['TOA'] = data.key
+            self.selected_data[Channel_id_to_name[id]] = data.data
+       
+        
     def do_export(self):
         exporter = None
         new_path = self.pathLineEdit.text()

@@ -54,10 +54,14 @@ class SParser(QObject):
         self.parse_index = 0
 
         # moving to thread
-        self.objThread = QThread(self)
+        self.objThread = QThread()
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
+
+    def __del__(self):
+        self.objThread.quit()
+        self.objThread.wait()
 
     @pyqtSlot(list, bool, float)
     def prepare_data(self, data_list, eof, number_of_batches):

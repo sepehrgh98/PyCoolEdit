@@ -6,13 +6,14 @@ from visualization.visualizationparams import DataPacket
 
 
 class RadarController(QObject):
-    def __init__(self):
+    def __init__(self, parent):
         super(RadarController, self).__init__()
         self.channels_header = None
         self.radars = []
         self.temp_data = {}
         self.temp_data_is_empty = True
         self.channels_status = False
+        self.parent = parent
 
     @pyqtSlot(DataPacket)
     def feed(self, data_packet):
@@ -25,7 +26,7 @@ class RadarController(QObject):
         
     def initialize_new_radar(self):
         if self.channels_header:
-            radar = RadarForm()
+            radar = RadarForm(self.parent)
             radar.setup_channel(self.channels_header)
             self.radars.append(radar)
             if not self.temp_data_is_empty :

@@ -54,6 +54,7 @@ class MainWindow(QMainWindow, Form):
         self.data_handler.totalSizeIsReady.connect(self.pdw_form.totalSizeIsReady)
         self.data_handler.zoomed_area_is_ready.connect(self.pdw_form.feed)
         self.data_handler.select_areas_is_ready.connect(self.pdw_form.feed)
+        self.data_handler.normal_selected_data_is_ready.connect(self.pdw_form.feed_selected)
 
         # signal form
         self.signal_form.fileInfoReceived.connect(self.signal_controller.on_info_received)

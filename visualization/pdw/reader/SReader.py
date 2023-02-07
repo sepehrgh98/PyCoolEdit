@@ -13,10 +13,14 @@ class SReader(QObject):
         self.progress = 0
 
         # moving to thread
-        self.objThread = QThread(self)
+        self.objThread = QThread()
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
+
+    def __del__(self):
+        self.objThread.quit()
+        self.objThread.wait()
 
     
     @pyqtSlot(str)

@@ -53,7 +53,7 @@ class PDWForm(QMainWindow, Form):
         self.dataInfoWidget = DataInformationForm()
         self.reviewWidget = PDWReviewForm()
         self.subPlotsWidget = SubPlotWidget()
-        self.radar_controller = RadarController()
+        self.radar_controller = RadarController(self)
         self.progress = ProgressDialog(self)
         self.default_view = DefaultView(icon_path = 
                             os.path.join(os.getcwd(), 'visualization', 'Resources', 'icons', 'main.png')
@@ -91,6 +91,7 @@ class PDWForm(QMainWindow, Form):
 
         # initialization
         self.setup_connections()
+        
 
     def setup_connections(self):
         # tool widget connections
@@ -194,7 +195,7 @@ class PDWForm(QMainWindow, Form):
                 color = "red"
                 self.radar_controller.feed(data_packet)
                 self.reviewWidget.feed_marked(data_packet)
-                self.export_window.feed(data_packet)
+                # self.export_window.feed(data_packet)
 
             current_channel.feed(data_packet.key, data_packet.data, color, mood=feed_mode)
             self.number_of_fed_channels += 1
@@ -337,4 +338,8 @@ class PDWForm(QMainWindow, Form):
         self.feedMood = FeedMood.zoom
         self.number_of_fed_channels = 0
         self.zoom_requested.emit(channel,time_range, val_range)
+
+    @pyqtSlot(dict)
+    def feed_selected(self, data):
+        self.export_window.feed(data)
 

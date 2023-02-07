@@ -10,8 +10,8 @@ Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'radar',
 
 
 class RadarForm(QMainWindow, Form):
-    def __init__(self):
-        super(RadarForm, self).__init__()
+    def __init__(self, parent):
+        super(RadarForm, self).__init__(parent)
         self.setupUi(self)
 
         self.tabWidget = QTabWidget()

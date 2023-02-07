@@ -8,7 +8,7 @@ from visualization.pdw.parser.SParser import SParser
 from visualization.pdw.reader.SReader import SReader
 from visualization.visualizationparams import ChannelUnit, DataPacket, FeedMood
 from visualization.pdw.capsulation.capsulator import Capsulator
-from visualization.visualizationparams import Channel_id_to_name, DataMode
+from visualization.visualizationparams import Channel_name_to_id, DataMode
 from visualization.helper_functions import find_nearest_value_indx
 from visualization.pdw.pdwhistory import PDWHistory
 import numpy as np
@@ -29,6 +29,7 @@ class DataHandler(QObject):
     dataIsReadyForCapsulation = pyqtSignal(dict)
     pointMarkerResultIsReady = pyqtSignal(tuple)
     totalSizeIsReady = pyqtSignal(int)
+    normal_selected_data_is_ready = pyqtSignal(dict)
 
 
     def __init__(self):
@@ -72,7 +73,6 @@ class DataHandler(QObject):
         self.normal_data = {}
         self.full_time_duration = 0
         self.capsulated_data = None
-        # self.select_areas = {} # {(time_range, val_range) : ((capsul_data,cap_indexes) , (main_data, main_indexes))}
         self.select_areas = {} # {data_type : DataPack(index)}
         self.select_areas[DataMode.normal] = dict()
         self.select_areas[DataMode.capsulated] = dict()
@@ -82,10 +82,14 @@ class DataHandler(QObject):
 
 
         # moving to thread
-        self.objThread = QThread(self)
+        self.objThread = QThread()
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
+
+    def __del__(self):
+        self.objThread.quit()
+        self.objThread.wait()
 
     @pyqtSlot(dict)
     def define_columns(self, columns):
@@ -139,11 +143,37 @@ class DataHandler(QObject):
         output = self.search_in_data(working_data,ch_name, time_range, value_range, data_mode)
         if not output:
             return
-        
+
         new_data, new_data_indexes = output
         self.to_plot(new_data, FeedMood.zoom)
-
         hist_obj = PDWHistory(data_mode)
+        if ch_name in working_selected_data.keys():
+            working_selected_data = self.select_areas[data_mode]
+            min_index_selected = (working_selected_data[ch_name])[0]
+            max_index_selected = (working_selected_data[ch_name])[-1]
+            min_index_zoomed = (new_data_indexes[ch_name])[0]
+            max_index_zoomed = (new_data_indexes[ch_name])[-1]
+
+            if min_index_zoomed <= max_index_selected or max_index_zoomed >= min_index_selected:
+                min_index = min_index_zoomed
+                max_index = max_index_zoomed
+                if min_index_zoomed <= min_index_selected :
+                    min_index = min_index_selected
+                if max_index_zoomed >= max_index_selected :
+                    max_index = max_index_selected
+                final_data = {}
+                final_data_index = {}
+                requested_indexes = list(range(min_index, max_index))
+                for name, data in working_selected_data.items():
+                    final_pack = DataPacket()
+                    final_pack.key = [((working_data[name]).key)[idx] for idx in requested_indexes]
+                    final_pack.data =[((working_data[name]).data)[idx] for idx in requested_indexes]
+                    final_pack.id = Channel_name_to_id[name]
+                    final_data[Channel_name_to_id[name]] = final_pack
+                    final_data_index[Channel_name_to_id[name]] = requested_indexes
+                self.to_plot(final_data, FeedMood.select)
+                hist_obj.add_selected(final_data, final_data_index)
+
         hist_obj.data = new_data 
         hist_obj.time_range = time_range
         hist_obj.val_range = value_range
@@ -189,19 +219,35 @@ class DataHandler(QObject):
 
             hist.add_selected(reg,idxs)
 
-        if hist.data_mode == self.current_hist.data_mode:
-            workig_index = new_data_indexes
-        else:
-            workig_index = backup_select_region_indexes
 
         if self.current_hist.data_mode in self.select_areas.keys(): 
-            selected_data = self.select_areas[self.current_hist.data_mode]
-            for name , indexes in workig_index.items():
-                if name not in selected_data.keys():
-                    selected_data[name] = set() 
-                selected_data[name].update(indexes)
+            for mode, data in self.select_areas.items():
+                if mode == self.current_hist.data_mode:
+                    workig_index = new_data_indexes
+                else:
+                    workig_index = backup_select_region_indexes
+                for name , indexes in workig_index.items():
+                    if name not in data.keys():
+                        data[name] = []
+                    temp_set = set(data[name])
+                    temp_set.update(indexes)
+                    data[name] = sorted(temp_set)
+            self.prepare_all_selected_data()
 
 
+    def prepare_all_selected_data(self):
+        final_data = {}
+        time = []
+        for name, data in self.select_areas[DataMode.normal].items():
+            if not len(time):
+                time = [((self.normal_data[name]).key)[idx] for idx in data]
+            new_data = [((self.normal_data[name]).data)[idx] for idx in data]
+            final_pack = DataPacket()
+            final_pack.key = np.array(time)
+            final_pack.data = np.array(new_data)
+            final_pack.id = Channel_name_to_id[name]
+            final_data[Channel_name_to_id[name]] = final_pack
+        self.normal_selected_data_is_ready.emit(final_data)
 
 
     def is_normal_data_needed(self,time_range):
@@ -369,7 +415,9 @@ class DataHandler(QObject):
     @pyqtSlot()
     def unselect_all(self):
         if len(self.history) == 1:
-            self.select_areas.clear()
+            self.select_areas = {} # {data_type : DataPack(index)}
+            self.select_areas[DataMode.normal] = dict()
+            self.select_areas[DataMode.capsulated] = dict()
             self.history[0].selected_area.clear()
         
 
@@ -395,5 +443,6 @@ class DataHandler(QObject):
         self.history.append(hist_obj)
 
         self.to_plot(self.capsulated_data , FeedMood.main_data)
+        
 
 

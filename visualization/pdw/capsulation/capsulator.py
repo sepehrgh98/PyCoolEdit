@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThread, QObject, pyqtSignal, QElapsedTimer, pyqtSlot
 import numpy as np
-from visualization.visualizationparams import DataPacket, Channel_id_to_name, ProgressType, FeedMood
+from visualization.visualizationparams import DataPacket, Channel_id_to_name, ProgressType, FeedMood, Channel_name_to_id
 from visualization.helper_functions import find_nearest_value_indx
 
 
@@ -27,10 +27,14 @@ class Capsulator(QObject):
         self.time_resolution = 0
 
         # moving to thread
-        self.objThread = QThread(self)
+        self.objThread = QThread()
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
+
+    def __del__(self):
+        self.objThread.quit()
+        self.objThread.wait()
             
     def clear(self):
         self.time_resolution = 0
@@ -99,6 +103,7 @@ class Capsulator(QObject):
             final_data.id = ch_counter
             ch_counter += 1
             Channel_id_to_name[final_data.id] = name
+            Channel_name_to_id[name] = final_data.id
             self.capsulated_data[name] = final_data
             self.progress_is_ready.emit({ProgressType.capsulator: 1 if (ch_counter/all_channels)>=1 else ch_counter/all_channels})
         self.capsulated_data_is_reaady.emit(self.capsulated_data, FeedMood.main_data)

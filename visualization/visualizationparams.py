@@ -41,6 +41,8 @@ ChannelUnit = {
 }
 
 Channel_id_to_name = {}
+Channel_name_to_id = {}
+
 
 TimeCoef = {
      'psec' : 10e-12

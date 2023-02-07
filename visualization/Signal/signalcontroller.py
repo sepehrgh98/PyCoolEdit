@@ -23,10 +23,14 @@ class SignalController(QObject):
         self.key_data = []
 
         # moving to thread
-        self.objThread = QThread(self)
+        self.objThread = QThread()
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
+
+    def __del__(self):
+        self.objThread.quit()
+        self.objThread.wait()
 
     @pyqtSlot(dict, tuple)
     def on_info_received(self, file_info, data_range):

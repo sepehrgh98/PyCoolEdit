@@ -17,10 +17,16 @@ class HistoricalZoom(QObject):
         self.original_range = None
 
         # moving to thread
-        self.objThread = QThread(self)
+        self.objThread = QThread()
         self.moveToThread(self.objThread)
         self.objThread.finished.connect(self.objThread.deleteLater)
         self.objThread.start()
+
+    def __del__(self):
+        self.objThread.quit()
+        self.objThread.wait()
+        # self.obj.finished.disconnect()
+        # self.executeProgram()
 
 
     def setup_rect(self):

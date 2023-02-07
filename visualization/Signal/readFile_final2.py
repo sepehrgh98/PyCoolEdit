@@ -2,7 +2,7 @@ import os
 import sys
 import time
 import numpy as np
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 
 class Read_file(QObject):
