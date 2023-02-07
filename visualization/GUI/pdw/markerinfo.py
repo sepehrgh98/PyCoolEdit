@@ -1,15 +1,17 @@
 import os
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QLabel, QLineEdit
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from visualization.visualizationparams import Channel_id_to_name
 
 Form = uic.loadUiType(os.path.join(os.getcwd(), 'visualization', 'GUI', 'pdw', 'markerinfoui.ui'))[0]
 
-class MarkerInfo(QWidget, Form):
-    def __init__(self):
-        super(MarkerInfo, self).__init__()
+class MarkerInfo(QMainWindow, Form):
+    def __init__(self, parent):
+        super(MarkerInfo, self).__init__(parent)
         self.setupUi(self)
+        self.move(parent.window().frameGeometry().topLeft())
+
         self.lineEdit_list = []
 
 

@@ -16,7 +16,7 @@ class RadarForm(QMainWindow, Form):
 
         self.tabWidget = QTabWidget()
         self.tabWidget.setTabPosition(QTabWidget.TabPosition.North)
-        self.tabWidget.setTabShape(QTabWidget.TabShape.Triangular)
+        # self.tabWidget.setTabShape(QTabWidget.TabShape.Triangular)
         self.channels = []
         # self.shared_table_model = SharedTableDataBase()
 

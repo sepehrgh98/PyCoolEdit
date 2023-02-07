@@ -12,15 +12,17 @@ class DataInformationForm(QWidget, Form):
     def __init__(self):
         super(DataInformationForm, self).__init__()
         self.setupUi(self)
-        self.fileNameLabel.setStyleSheet('color: red')
-        self.totalDataNumberLabel.setStyleSheet('color: red')
+        # self.fileNameLabel.setStyleSheet('color: red')
+        # self.totalDataNumberLabel.setStyleSheet('color: red')
         # self.selectedDataNumberLabel.setStyleSheet('color: red')
 
     @pyqtSlot(str)
     def set_file_name(self, path):
-        self.fileNameLabel.setText(os.path.basename(path))
+        pass
+        # self.fileNameLabel.setText(os.path.basename(path))
 
     @pyqtSlot(int)
     def set_total_data_size(self, size):
-        self.totalDataNumberLabel.setText(str(size))
+        pass
+        # self.totalDataNumberLabel.setText(str(size))
 

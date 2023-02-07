@@ -147,8 +147,8 @@ class DataHandler(QObject):
         new_data, new_data_indexes = output
         self.to_plot(new_data, FeedMood.zoom)
         hist_obj = PDWHistory(data_mode)
+        working_selected_data = self.select_areas[data_mode]
         if ch_name in working_selected_data.keys():
-            working_selected_data = self.select_areas[data_mode]
             min_index_selected = (working_selected_data[ch_name])[0]
             max_index_selected = (working_selected_data[ch_name])[-1]
             min_index_zoomed = (new_data_indexes[ch_name])[0]

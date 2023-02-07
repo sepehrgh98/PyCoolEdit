@@ -57,7 +57,7 @@ class RadarChannelForm(QWidget, Form):
         self.tableWidget.setColumnCount(6)
         table_header = [self._name, "Count", "Min", "Max", "Average", "STD"]
         self.tableWidget.setHorizontalHeaderLabels(table_header)
-        # self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\signal\signalui.ui'
+# Form implementation generated from reading ui file 'f:\Visualization\visualization\GUI\signal\signalControlBar.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -11,22 +11,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1230, 668)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.plotWidget = QtWidgets.QWidget(self.centralwidget)
-        self.plotWidget.setObjectName("plotWidget")
-        self.plotLayout = QtWidgets.QVBoxLayout(self.plotWidget)
-        self.plotLayout.setObjectName("plotLayout")
-        self.verticalLayout.addWidget(self.plotWidget)
-        self.controlWidget = QtWidgets.QWidget(self.centralwidget)
+class Ui_Form(object):
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(1153, 300)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(Form)
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.controlWidget = QtWidgets.QWidget(Form)
         self.controlWidget.setObjectName("controlWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.controlWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -118,35 +109,33 @@ class Ui_MainWindow(object):
         self.verticalSpanResultLayout.setObjectName("verticalSpanResultLayout")
         self.horizontalLayout.addWidget(self.verticalSpanResultWidget)
         self.horizontalLayout.setStretch(1, 2)
-        self.verticalLayout.addWidget(self.controlWidget)
-        self.verticalLayout.setStretch(0, 1)
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.horizontalLayout_3.addWidget(self.controlWidget)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label.setText(_translate("MainWindow", "Sample Frequency (Hz)"))
-        self.label_2.setText(_translate("MainWindow", "IF Frequency(Hz)"))
-        self.openFileBtn.setText(_translate("MainWindow", "open file"))
-        self.label_6.setText(_translate("MainWindow", "File:"))
+        Form.setWindowTitle(_translate("Form", "Form"))
+        self.label.setText(_translate("Form", "Sample Frequency (Hz)"))
+        self.label_2.setText(_translate("Form", "IF Frequency(Hz)"))
+        self.openFileBtn.setText(_translate("Form", "open file"))
+        self.label_6.setText(_translate("Form", "File:"))
         item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Strat Time(mics)"))
+        item.setText(_translate("Form", "Strat Time(mics)"))
         item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "End Time(mics)"))
+        item.setText(_translate("Form", "End Time(mics)"))
         item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Type"))
+        item.setText(_translate("Form", "Type"))
         item = self.tableWidget.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "IFFreq "))
+        item.setText(_translate("Form", "IFFreq "))
         item = self.tableWidget.horizontalHeaderItem(4)
-        item.setText(_translate("MainWindow", "PW"))
+        item.setText(_translate("Form", "PW"))
         item = self.tableWidget.horizontalHeaderItem(5)
-        item.setText(_translate("MainWindow", "Start Freq(MHz)"))
+        item.setText(_translate("Form", "Start Freq(MHz)"))
         item = self.tableWidget.horizontalHeaderItem(6)
-        item.setText(_translate("MainWindow", "End Freq(MHz)"))
-        self.groupBox.setTitle(_translate("MainWindow", "Horizontal Span"))
-        self.label_3.setText(_translate("MainWindow", "min : "))
-        self.label_4.setText(_translate("MainWindow", "max : "))
-        self.label_5.setText(_translate("MainWindow", "diff : "))
+        item.setText(_translate("Form", "End Freq(MHz)"))
+        self.groupBox.setTitle(_translate("Form", "Horizontal Span"))
+        self.label_3.setText(_translate("Form", "min : "))
+        self.label_4.setText(_translate("Form", "max : "))
+        self.label_5.setText(_translate("Form", "diff : "))

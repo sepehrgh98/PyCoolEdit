@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
-        self.tabWidget.setTabShape(QtWidgets.QTabWidget.Triangular)
+        self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setIconSize(QtCore.QSize(20, 20))
         self.tabWidget.setElideMode(QtCore.Qt.ElideNone)
         self.tabWidget.setDocumentMode(False)

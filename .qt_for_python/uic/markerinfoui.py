@@ -11,18 +11,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(180, 374)
-        self.verticalLayout = QtWidgets.QVBoxLayout(Form)
-        self.verticalLayout.setSpacing(15)
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(227, 410)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.scrollArea = QtWidgets.QScrollArea(Form)
+        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 156, 233))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 203, 226))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.scrollAreaWidgetContents)
         self.horizontalLayout.setContentsMargins(0, 0, 5, 0)
@@ -35,7 +36,7 @@ class Ui_Form(object):
         self.horizontalLayout.addWidget(self.markerInfoGroupBox)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout.addWidget(self.scrollArea)
-        self.groupBox = QtWidgets.QGroupBox(Form)
+        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setObjectName("groupBox")
         self.formLayout = QtWidgets.QFormLayout(self.groupBox)
         self.formLayout.setContentsMargins(-1, 22, -1, -1)
@@ -55,14 +56,22 @@ class Ui_Form(object):
         self.valLineEdit.setObjectName("valLineEdit")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.valLineEdit)
         self.verticalLayout.addWidget(self.groupBox)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 227, 26))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, Form):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.markerInfoGroupBox.setTitle(_translate("Form", "Line Marker data"))
-        self.groupBox.setTitle(_translate("Form", "Point Marker"))
-        self.label.setText(_translate("Form", "Time:"))
-        self.label_2.setText(_translate("Form", "Value:"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.markerInfoGroupBox.setTitle(_translate("MainWindow", "Line Marker data"))
+        self.groupBox.setTitle(_translate("MainWindow", "Point Marker"))
+        self.label.setText(_translate("MainWindow", "Time:"))
+        self.label_2.setText(_translate("MainWindow", "Value:"))

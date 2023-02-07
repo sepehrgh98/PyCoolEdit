@@ -15,13 +15,14 @@ class RadarController(QObject):
         self.channels_status = False
         self.parent = parent
 
-    @pyqtSlot(DataPacket)
+    @pyqtSlot(dict)
     def feed(self, data_packet):
-        for id in self.temp_data.keys():
-            if id == data_packet.id:
-                (self.temp_data[id])[0] = np.concatenate([(self.temp_data[id])[0], data_packet.key], axis=0)
-                (self.temp_data[id])[1] = np.concatenate([(self.temp_data[id])[1], data_packet.data], axis=0)
-                break
+        self.temp_data = data_packet
+        # for id in self.temp_data.keys():
+        #     if id == data_packet.id:
+        #         (self.temp_data[id])[0] = np.concatenate([(self.temp_data[id])[0], data_packet.key], axis=0)
+        #         (self.temp_data[id])[1] = np.concatenate([(self.temp_data[id])[1], data_packet.data], axis=0)
+        #         break
         self.temp_data_is_empty = False
         
     def initialize_new_radar(self):
@@ -30,25 +31,26 @@ class RadarController(QObject):
             radar.setup_channel(self.channels_header)
             self.radars.append(radar)
             if not self.temp_data_is_empty :
-                for key, val in self.temp_data.items():
+                for id, data_pack in self.temp_data.items():
                     packet = DataPacket()
-                    packet.id = key
-                    packet.key = val[0]
-                    packet.data = val[1]
+                    packet.id = id
+                    packet.key = data_pack.key
+                    packet.data = data_pack.data
                     radar.feed(packet)
                 radar.show()
 
     @pyqtSlot(dict)
     def setup_channel(self, header):
         self.channels_header = header
-        for _id, _info in header.items():
-            self.temp_data[_id] = [np.array([]), np.array([])] # time & val
+        # for _id, _info in header.items():
+        #     self.temp_data[_id] = [np.array([]), np.array([])] # time & val
         self.channels_status = True
 
     @pyqtSlot()
     def reset(self):
-        for _id, _name in self.temp_data.items():
-            self.temp_data[_id] = [np.array([]), np.array([])] # time & val
+        self.temp_data = {}
+        # for _id, _name in self.temp_data.items():
+        #     self.temp_data[_id] = [np.array([]), np.array([])] # time & val
         self.temp_data_is_empty = True
 
     def channels_defined(self):

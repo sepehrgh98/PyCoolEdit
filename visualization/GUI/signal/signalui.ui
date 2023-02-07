@@ -37,7 +37,7 @@
     </item>
     <item>
      <widget class="QWidget" name="controlWidget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,1,2">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2,0,0">
        <property name="spacing">
         <number>7</number>
        </property>
@@ -66,16 +66,6 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="sampleFreqLineEdit"/>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QPushButton" name="openFileBtn">
-            <property name="text">
-             <string>open file</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="IFLineEdit"/>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -83,87 +73,30 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="IFLineEdit"/>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QPushButton" name="openFileBtn">
+            <property name="text">
+             <string>open file</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>File:</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="2" column="1">
            <widget class="QLabel" name="FileNameLabel">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Horizontal Span</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <property name="topMargin">
-           <number>22</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>min : </string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="HSMinLineEdit">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>max : </string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>diff : </string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="HSMaxLineEdit"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="HSDiffLineEdit"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QWidget" name="verticalSpanResultWidget" native="true">
-         <layout class="QVBoxLayout" name="verticalSpanResultLayout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
          </layout>
         </widget>
        </item>
@@ -224,6 +157,73 @@
             </column>
            </widget>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Horizontal Span</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_2">
+          <property name="topMargin">
+           <number>22</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>min : </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="HSMinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>max : </string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>diff : </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="HSMaxLineEdit"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="HSDiffLineEdit"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="verticalSpanResultWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalSpanResultLayout">
+          <property name="spacing">
+           <number>7</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
          </layout>
         </widget>
        </item>

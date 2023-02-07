@@ -28,6 +28,7 @@ class SignalForm(QMainWindow, Form):
                     , filter="Text files (*.DAT);")
 
         self.plotLayout.addWidget(self.default_view)    
+        self.controlWidget.hide()
         # variables
         self.file_path = None
         self.signal_information = SignalInformationForm()
@@ -69,6 +70,7 @@ class SignalForm(QMainWindow, Form):
         self.axis_bg_color = '#222b2e'
         self.data_color = '#b0e0e6'
         self.fig_color = '#151a1e'
+        
 
 
         # style fig
@@ -397,6 +399,7 @@ class SignalForm(QMainWindow, Form):
             self.plotLayout.removeWidget(self.default_view)
             self.default_view.deleteLater()
             self.default_view = None
+            self.controlWidget.show()
             self.plotLayout.addWidget(self.canvas)
         self.signal_information.show()
 

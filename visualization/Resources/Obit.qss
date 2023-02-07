@@ -52,27 +52,27 @@ QRadioButton{
 /*-----QPushButton-----*/
 QPushButton
 {
-	background-color: #ff9c2b;
-	color: #000000;
+	background-color: #232430;
+	color: #B3C1DAE3;
 	font-weight: bold;
 	border-style: solid;
-	border-color: #000000;
+	border-color: #B3C1DAE3;
 	padding: 6px;
-	border-radius: 15px;
+	/* border-radius: 15px; */
 
 }
 
 
 QPushButton::hover
 {
-	background-color: #ffaf5d;
+	background-color: #4b4c58;
 
 }
 
 
 QPushButton::pressed
 {
-	background-color: #dd872f;
+	background-color: #4b4c58;
 
 }
 
@@ -123,7 +123,7 @@ QTableView::item
 {
 	background-color: #232430;
 	color: #c1c1c1;
-	border: none;
+	border: 1px solid #37384d;
 
 }
 
@@ -144,24 +144,17 @@ QHeaderView::section:horizontal
 
 }
 
-
+/* 
 QTableView::indicator{
 	background-color: #1d1d28;
 	border: 1px solid #37384d;
 
-}
-
-
-QTableView::indicator:checked{
-	image:url("./ressources/check.png"); /*To replace*/
-	background-color: #1d1d28;
-
-}
+} */
 
 /*-----QTabWidget-----*/
 QTabWidget::pane 
 { 
-    border: none;
+	border: 1px solid #37384d;
 }
 
 

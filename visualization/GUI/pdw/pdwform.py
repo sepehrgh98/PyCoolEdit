@@ -60,12 +60,13 @@ class PDWForm(QMainWindow, Form):
                             , text='Offline')
         self.export_window = PDWExprtWindow()
         self.normalize_window = NormalizeWindow()
-        self.marker_info = MarkerInfo()
+        self.marker_info = MarkerInfo(self)
 
         # add widgets
-        self.leftFrameLayout.addWidget(self.toolsWidget)
-        self.infoWidgetLayout.addWidget(self.dataInfoWidget)
-        self.leftFrameLayout.addWidget(self.marker_info)
+        # self.leftFrameLayout.addWidget(self.toolsWidget)
+        # self.infoWidgetLayout.addWidget(self.dataInfoWidget)
+        # self.leftFrameLayout.addWidget(self.marker_info)
+        # self.toolsWidgetLayout.addWidget(self.toolsWidget)
         self.plotLayout.addWidget(self.default_view)
 
         # variables
@@ -117,7 +118,9 @@ class PDWForm(QMainWindow, Form):
         self.toolsWidget.forwardZoomRequested.connect(self.forwardZoomRequested)
         self.toolsWidget.backeardZoomRequested.connect(self.backeardZoomRequested)
         self.toolsWidget.lineMarkerRequested.connect(self.subPlotsWidget.activate_line_marker)
+        self.toolsWidget.lineMarkerRequested.connect(self.show_marker_info)
         self.toolsWidget.pointMarkerRequested.connect(self.subPlotsWidget.activate_point_marker)
+        self.toolsWidget.pointMarkerRequested.connect(self.show_marker_info)
         # sub plot widget connections
         self.subPlotsWidget.selectionRangeHasBeenSet.connect(self.set_selection_area)
         self.subPlotsWidget.unselectAllRequested.connect(self.do_unselect_all)
@@ -129,8 +132,10 @@ class PDWForm(QMainWindow, Form):
         # default view widget connections
         self.default_view.filePathChanged.connect(self.on_filePathChanged)
         # self connections
-        self.filePathChanged.connect(self.dataInfoWidget.set_file_name)
-        self.totalSizeIsReady.connect(self.dataInfoWidget.set_total_data_size)
+        # self.filePathChanged.connect(self.dataInfoWidget.set_file_name)
+        self.filePathChanged.connect(self.toolsWidget.set_file_name)
+        # self.totalSizeIsReady.connect(self.dataInfoWidget.set_total_data_size)
+        self.totalSizeIsReady.connect(self.toolsWidget.set_total_data_size)
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_rect)
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_line_marker)
         self.channelsSettedUp.connect(self.subPlotsWidget.setup_point_marker)
@@ -193,7 +198,7 @@ class PDWForm(QMainWindow, Form):
                 self.normalize_window.feed(data_packet)
             elif feed_mode == FeedMood.select:
                 color = "red"
-                self.radar_controller.feed(data_packet)
+                # self.radar_controller.feed(data_packet)
                 self.reviewWidget.feed_marked(data_packet)
                 # self.export_window.feed(data_packet)
 
@@ -303,6 +308,7 @@ class PDWForm(QMainWindow, Form):
             self.plotLayout.removeWidget(self.default_view)
             self.default_view.deleteLater()
             self.default_view = None
+            self.toolsWidgetLayout.addWidget(self.toolsWidget)
             self.reviewLayout.addWidget(self.reviewWidget)
             self.plotLayout.addWidget(self.subPlotsWidget)
         self.filePathChanged.emit(file_path)
@@ -342,4 +348,8 @@ class PDWForm(QMainWindow, Form):
     @pyqtSlot(dict)
     def feed_selected(self, data):
         self.export_window.feed(data)
+        self.radar_controller.feed(data)
+
+    def show_marker_info(self):
+        self.marker_info.show()
 

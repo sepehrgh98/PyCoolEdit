@@ -1,7 +1,7 @@
 import os
 
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QFileDialog, QButtonGroup, QLabel
 from PyQt5.QtGui import QPixmap, QIcon
 from visualization.GUI.pdw.concatbox import ConcatBox
@@ -36,12 +36,15 @@ class PDWToolsForm(QWidget, Form):
 
         # widgets
         self.concat_box = ConcatBox()
+        
 
 
         # variables
         self.file_path = None
 
         # configs
+        self.fileNameLabel.setStyleSheet('color: red')
+        self.totalDataNumberLabel.setStyleSheet('color: red')
         # self.dragBtn.setToolTip('Pan charts in every directions')
         self.zoomBtn.setToolTip('Rectangular zoom')
         self.backwardZoomBtn.setToolTip('Previous zoom range')
@@ -53,21 +56,19 @@ class PDWToolsForm(QWidget, Form):
         self.pointCursorBtn.setToolTip('Point marker')
         self.lineMarkerBtn.setToolTip('Line marker')
         self.resetBtn.setToolTip('Reset to home range')
+
         self.selectFileBtn.setToolTip('Select Pdw File')
         self.newRadarBtn.setToolTip('New Radar')
         self.noralizeBtn.setToolTip('Show normalized data')
-        self.concatChannelsBtn.setToolTip('Concate channels')
         self.exportBtn.setToolTip('Export selected data')
 
         # connections
-        self.selectFileBtn.clicked.connect(self.get_file_path)
+        # self.selectFileBtn.clicked.connect(self.get_file_path)
         self.selectBtn.clicked.connect(self.selectBtnPressed)
         self.selectAllBtn.clicked.connect(self.selectAllRequested)
         self.zoomBtn.clicked.connect(self.zoomRequested)
-        # self.dragBtn.clicked.connect(self.panRequested)
         self.newRadarBtn.clicked.connect(self.radarRequested)
         self.resetBtn.clicked.connect(self.resetZoomRequested)
-        self.concatChannelsBtn.clicked.connect(self.show_concat_box)
         self.unselectBtn.clicked.connect(self.deselectAllRequested)
         self.exportBtn.clicked.connect(self.exportRequested)
         self.deleteBtn.clicked.connect(self.deleteSelectedRequested)
@@ -83,9 +84,7 @@ class PDWToolsForm(QWidget, Form):
         self.btn_grp.setExclusive(True)
         self.btn_grp.addButton(self.selectBtn)
         self.btn_grp.addButton(self.zoomBtn)
-        # self.btn_grp.addButton(self.dragBtn)
 
-        # self.dragBtn.setIcon(QIcon('visualization/Resources/icons/pan.png'))
         self.zoomBtn.setIcon(QIcon('visualization/Resources/icons/zoom.png'))
         self.backwardZoomBtn.setIcon(QIcon('visualization/Resources/icons/backward.png'))
         self.forwardZoomBtn.setIcon(QIcon('visualization/Resources/icons/forward.png'))
@@ -96,10 +95,9 @@ class PDWToolsForm(QWidget, Form):
         self.pointCursorBtn.setIcon(QIcon('visualization/Resources/icons/pointmarker.png'))
         self.lineMarkerBtn.setIcon(QIcon('visualization/Resources/icons/linemarker.png'))
         self.resetBtn.setIcon(QIcon('visualization/Resources/icons/Home.png'))
-        self.selectFileBtn.setIcon(QIcon('visualization/Resources/icons/download-file.png'))
+        self.selectFileBtn.setIcon(QIcon('visualization/Resources/icons/openfile.png'))
         self.newRadarBtn.setIcon(QIcon('visualization/Resources/icons/radar.png'))
         self.noralizeBtn.setIcon(QIcon('visualization/Resources/icons/normilize.png'))
-        self.concatChannelsBtn.setIcon(QIcon('visualization/Resources/icons/concate.png'))
         self.exportBtn.setIcon(QIcon('visualization/Resources/icons/export.png'))
 
     def get_file_path(self):
@@ -117,3 +115,12 @@ class PDWToolsForm(QWidget, Form):
 
     def setup_channel(self, header):
         self.concat_box.setup_channel(header)
+
+    @pyqtSlot(str)
+    def set_file_name(self, path):
+        self.fileNameLabel.setText(os.path.basename(path))
+
+    @pyqtSlot(int)
+    def set_total_data_size(self, size):
+        self.totalDataNumberLabel.setText(str(size))
+
