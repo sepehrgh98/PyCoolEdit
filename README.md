@@ -5,8 +5,22 @@
 <h1 align="center">🎛️ PyCoolEdit — Signal Visualization & Processing GUI</h1>
 
 <p align="center">
+  <a href="https://github.com/sepehrgh98/Chatbot">
+    <img src="https://img.shields.io/badge/Code-GitHub-black?logo=github" />
+  </a>
+  <a href="https://colab.research.google.com/github/sepehrgh98/Chatbot">
+    <img src="https://img.shields.io/badge/Open%20in-Colab-blue?logo=google-colab" />
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-green.svg" />
+  </a>
+</p>
+
+
+<p align="center">
   A modern PyQt-based reimplementation of <strong>CoolEdit</strong> for signal and waveform processing.
 </p>
+
 
 
 
