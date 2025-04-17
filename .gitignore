@@ -2,3 +2,6 @@
 .idea
 *.pyc
 .gitignore
+./visualization-data
+./offline_code_videos
+./.qt_for_python

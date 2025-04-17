@@ -1,0 +1,4 @@
+- Python 3.7+
+- PyQt5
+- numpy
+- matplotlib 3.6.3
